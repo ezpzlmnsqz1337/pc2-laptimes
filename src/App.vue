@@ -27,6 +27,7 @@
 
   <div class="__wrapper">
     <div class="__timeWrapper">
+      <h1>Add Laptime</h1>
       <div class="__inputRow">
         <!-- object value -->
         <v-select
@@ -208,6 +209,7 @@ a {
 }
 
 .__timeWrapper {
+  width: 80vw;
   padding: 2rem;
   margin: 0 auto;
   text-align: center;
