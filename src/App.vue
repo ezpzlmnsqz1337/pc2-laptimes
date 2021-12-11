@@ -1,128 +1,31 @@
 <template>
-  <Modal
-    v-if="showModal"
-    @close="showModal = false"
-  >
-    <template #header>
-      Add driver
-    </template>
-    <template #body>
-      <input
-        v-model="newDriverName"
-        type="text"
-      >
-      <div>
-        <Button
-          :type="ButtonType.PRIMARY"
-          @click="addNewDriver({name: newDriverName})"
-        >
-          Add
-        </Button>
-        <Button :type="ButtonType.DANGER">
-          Cancel
-        </Button>
-      </div>
-    </template>
-  </Modal>
-
   <div class="__wrapper">
-    <div class="__timeWrapper">
-      <h1>Add Laptime</h1>
-      <div class="__inputRow">
-        <!-- object value -->
-        <v-select
-          v-model="car"
-          placeholder="Select car"
-          :options="cars"
-          :reduce="car => car.uid"
-          label="name"
-        />
-      </div>
-      <div class="__inputRow">
-        <v-select
-          v-model="track"
-          placeholder="Select track"
-          :options="tracks"
-          :reduce="track => track.uid"
-          label="track"
-          @change="trackVariant=null"
-        />
-      </div>
-      <div
-        v-if="track"
-        class="__inputRow"
-      >
-        <v-select
-          v-model="trackVariant"
-          placeholder="Select track variant"
-          :options="getTrackVariants(track)"
-        />
-      </div>
-      <div
-        class="__inputRow"
-      >
-        <v-select
-          v-model="driver"
-          placeholder="Select driver"
-          :options="drivers"
-          :reduce="driver => driver.uid"
-          label="name"
-        />
-        <Button
-          :type="ButtonType.SUCCESS"
-          @click="showModal = true"
-        >
-          Add
-        </Button>
-      </div>
-      <div class="__inputRow">
-        <input
-          v-model="lapTime"
-          type="text"
-          class="__lapTime"
-          :class="{__error: lapTimeError}"
-          placeholder="0:00.000"
-          @input="validateLapTimeFormat()"
-        >
-      </div>
-      <div class="__inputRow">
-        <Button
-          :type="ButtonType.PRIMARY"
-          block
-          class="__submit"
-          :disabled="!valid"
-          @click="addLapTime({car, track, trackVariant, time})"
-        >
-          Submit
-        </Button>
-      </div>
-    </div>
+    <Button
+      :type="ButtonType.SECONDARY"
+      @click="showAddLapTime = !showAddLapTime"
+    >
+      Toggle
+    </Button>
+    <AddLaptime v-if="showAddLapTime" />
+    <LaptimeBoard v-if="!showAddLapTime" />
   </div>
 </template>
 
 <script>
 import { unsubscribeAll } from '@/vuex-firestore-binding'
-import { mapActions, mapGetters, mapState } from 'vuex'
+import AddLaptime from '@/components/AddLaptime'
+import LaptimeBoard from '@/components/LaptimeBoard'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'App',
+  components: {
+    AddLaptime,
+    LaptimeBoard
+  },
   data () {
     return {
-      car: null,
-      track: null,
-      trackVariant: null,
-      driver: null,
-      lapTime: '',
-      lapTimeError: false,
-      newDriverName: '',
-      showModal: false
-    }
-  },
-  computed: {
-    ...mapState(['cars', 'tracks', 'drivers', 'times']),
-    ...mapGetters(['getTrackVariants']),
-    valid () {
-      return this.car && this.track && this.trackVariant && this.driver && this.lapTime && !this.lapTimeError
+      showAddLapTime: true
     }
   },
   mounted () {
@@ -132,10 +35,7 @@ export default {
     unsubscribeAll()
   },
   methods: {
-    ...mapActions(['bindDb', 'addNewDriver']),
-    validateLapTimeFormat () {
-      this.lapTimeError = this.lapTime.match(/\d{1,2}:\d\d\.\d{3}/) === null
-    }
+    ...mapActions(['bindDb'])
   }
 }
 </script>
@@ -205,48 +105,7 @@ a {
 
 .__wrapper {
   background-color: var(--bg-dark3);
-  min-height: 100vh;
-}
-
-.__timeWrapper {
-  width: 80vw;
-  padding: 2rem;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.__inputRow {
-  display: flex;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  width: 100%;
-}
-
-.__inputRow > input, .__inputRow > .v-select {
-  width: 100%;
-}
-
-.v-select > div {
-  background-color: var(--bg-light1);
-  border-radius: 0.3rem;
-  padding: 0.5rem;
-  border: 0.1rem solid black;
-}
-
-.__lapTime {
-  text-align: center;
-  font-size: 2rem;
-}
-
-.__error {
-  border: 0.15rem solid !important;
-  color: red !important;
-  border-color: red !important;
-}
-
-.__submit {
-  width: 100%;
-  font-size: 2rem;
-  margin: 0 auto !important;
+  height: 100vh;
+  overflow-y: scroll;
 }
 </style>
