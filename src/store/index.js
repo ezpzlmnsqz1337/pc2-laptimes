@@ -30,7 +30,7 @@ export default createStore({
     getDriverById: (state) => (id) => {
       return state.drivers.find(x => x.uid === id)
     },
-    getTimes: (state) => ({ carId, trackId, trackVariant, driverId, transmission, weather }) => {
+    getTimes: (state) => ({ carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, date }) => {
       let result = [...state.times]
       if (carId) result = result.filter(x => x.carId === carId)
       if (trackId) result = result.filter(x => x.trackId === trackId)
@@ -38,6 +38,8 @@ export default createStore({
       if (driverId) result = result.filter(x => x.driverId === driverId)
       if (transmission) result = result.filter(x => x.transmission === transmission)
       if (weather) result = result.filter(x => x.weather === weather)
+      if (brakingLine) result = result.filter(x => x.brakingLine === brakingLine)
+      if (date) result = result.filter(x => x.date === date)
       console.log(result)
       return result.sort((a, b) => a.laptime > b.laptime ? 1 : -1)
     }
@@ -53,8 +55,8 @@ export default createStore({
       const docRef = doc(db, 'drivers', driver.uid)
       await setDoc(docRef, driver)
     },
-    async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, date }) {
-      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, date }
+    async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, date }) {
+      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, date }
       const docRef = doc(db, 'times', time.uid)
       await setDoc(docRef, time)
     },

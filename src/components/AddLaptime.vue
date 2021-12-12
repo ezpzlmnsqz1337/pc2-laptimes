@@ -113,6 +113,18 @@
           </div>
         </template>
       </v-select>
+
+      <v-select
+        v-model="brakingLine"
+        :options="Object.values(BrakingLine)"
+        placeholder="Select braking line"
+      >
+        <template #header>
+          <div class="__selectLabel">
+            Breaking line
+          </div>
+        </template>
+      </v-select>
     </div>
     <div class="__inputRow">
       <Button
@@ -120,7 +132,7 @@
         block
         class="__submit"
         :disabled="!valid"
-        @click="addLaptime({carId, trackId, trackVariant, driverId, laptime, transmission, weather, date: new Date().getTime()})"
+        @click="addLaptime({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, date: new Date().getTime()})"
       >
         Submit
       </Button>
@@ -132,6 +144,7 @@
 import { mapActions, mapGetters, mapState } from 'vuex'
 import TransmissionType from '@/constants/TransmissionType'
 import WeatherType from '@/constants/WeatherType'
+import BrakingLine from '@/constants/BrakingLine'
 
 export default {
   name: 'AddLaptime',
@@ -145,6 +158,7 @@ export default {
       laptimeError: false,
       transmission: TransmissionType.SEQUENTIAL,
       weather: WeatherType.SUN,
+      brakingLine: BrakingLine.ON,
       newDriverName: '',
       showModal: false
     }
@@ -153,7 +167,7 @@ export default {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getTrackVariants']),
     valid () {
-      return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather
+      return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
     }
   },
   methods: {
@@ -224,5 +238,9 @@ export default {
 .__modalInput {
   margin-bottom: 1rem;
   width: 100%;
+}
+
+.__brakingLine {
+  width: 5rem;
 }
 </style>

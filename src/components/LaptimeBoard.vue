@@ -66,6 +66,17 @@
           </div>
         </template>
       </v-select>
+      <v-select
+        v-model="brakingLine"
+        :options="Object.values(BrakingLine)"
+        placeholder="Any"
+      >
+        <template #header>
+          <div class="__selectLabel">
+            Braking line
+          </div>
+        </template>
+      </v-select>
     </div>
     <br>
     <h2>Laptime board</h2>
@@ -79,10 +90,11 @@
         <th>Track variant</th>
         <th>Transmission</th>
         <th>Weather</th>
+        <th>Braking line</th>
         <th>Actions</th>
       </tr>
       <tr
-        v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather})"
+        v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather, brakingLine})"
         :key="index"
         class="__row"
       >
@@ -110,6 +122,9 @@
         <td class="__weather">
           {{ time.weather }}
         </td>
+        <td class="__brakingLine">
+          {{ time.brakingLine }}
+        </td>
         <td class="__delete">
           <Button :type="ButtonType.DANGER">
             Delete
@@ -132,7 +147,8 @@ export default {
       trackVariant: null,
       driverId: null,
       transmission: null,
-      weather: null
+      weather: null,
+      brakingLine: null
     }
   },
   computed: {
@@ -150,7 +166,6 @@ export default {
 
 <style>
 .__laptimeBoardWrapper {
-  width: 80vw;
   padding: 2rem;
   margin: 0 auto;
   text-align: center;

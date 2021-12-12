@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button'
 import ButtonType from '@/constants/ButtonType'
 import TransmissionType from '@/constants/TransmissionType'
 import WeatherType from '@/constants/WeatherType'
+import BrakingLine from '@/constants/BrakingLine'
 import Modal from '@/components/ui/Modal'
 import { debounce } from 'debounce'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
@@ -17,6 +18,7 @@ const app = createApp(App)
 app.config.globalProperties.ButtonType = ButtonType
 app.config.globalProperties.TransmissionType = TransmissionType
 app.config.globalProperties.WeatherType = WeatherType
+app.config.globalProperties.BrakingLine = BrakingLine
 app.config.globalProperties.debounce = debounce
 app.use(store)
 app.use(PerfectScrollbar)
