@@ -1,7 +1,7 @@
 <template>
   <Modal
-    v-if="showModal"
-    @close="showModal = false"
+    v-if="showNewDriverModal"
+    @close="showNewDriverModal = false"
   >
     <template #header>
       <h3>Add driver</h3>
@@ -30,6 +30,37 @@
     </template>
   </Modal>
 
+  <Modal
+    v-if="showNewCarModal"
+    @close="showNewCarModal = false"
+  >
+    <template #header>
+      <h3>Add Car</h3>
+    </template>
+    <template #body>
+      <input
+        v-model="newCarName"
+        class="__modalInput"
+        placeholder="Enter car name"
+        type="text"
+      >
+      <div class="__modalButtons">
+        <Button
+          :type="ButtonType.DANGER"
+          @click="showModal = false"
+        >
+          Cancel
+        </Button>
+        <Button
+          :type="ButtonType.PRIMARY"
+          @click="addCar()"
+        >
+          Add
+        </Button>
+      </div>
+    </template>
+  </Modal>
+
   <div class="__timeWrapper">
     <h1>Add Laptime</h1>
     <div class="__inputRow">
@@ -41,6 +72,12 @@
         :reduce="car => car.uid"
         label="name"
       />
+      <Button
+        :type="ButtonType.SUCCESS"
+        @click="showNewCarModal = true"
+      >
+        Add
+      </Button>
     </div>
     <div class="__inputRow">
       <v-select
@@ -74,7 +111,7 @@
       />
       <Button
         :type="ButtonType.SUCCESS"
-        @click="showModal = true"
+        @click="showNewDriverModal = true"
       >
         Add
       </Button>
@@ -89,50 +126,61 @@
         @input="validateLaptimeFormat()"
       >
     </div>
-    <div class="__inputRow">
-      <v-select
-        v-model="transmission"
-        :options="Object.values(TransmissionType)"
-        placeholder="Select transmission"
-      >
-        <template #header>
-          <div class="__selectLabel">
-            Transmission
-          </div>
-        </template>
-      </v-select>
-
-      <v-select
-        v-model="weather"
-        :options="Object.values(WeatherType)"
-        placeholder="Select weather"
-      >
-        <template #header>
-          <div class="__selectLabel">
-            Weather
-          </div>
-        </template>
-      </v-select>
-
-      <v-select
-        v-model="brakingLine"
-        :options="Object.values(BrakingLine)"
-        placeholder="Select braking line"
-      >
-        <template #header>
-          <div class="__selectLabel">
-            Breaking line
-          </div>
-        </template>
-      </v-select>
+    <div class="__radioHeader">
+      Transmission
     </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        no-any
+        name="ALtransmission"
+        :values="Object.values(TransmissionType)"
+        @changed="e => transmission = e"
+      />
+    </div>
+
+    <div class="__radioHeader">
+      Weather
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        no-any
+        name="ALweather"
+        :values="Object.values(WeatherType)"
+        @changed="e => weather = e"
+      />
+    </div>
+
+    <div class="__radioHeader">
+      Braking line
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        no-any
+        name="ALbrakingLine"
+        :values="Object.values(BrakingLine)"
+        @changed="e => brakingLine = e"
+      />
+    </div>
+
+    <div class="__radioHeader">
+      Controls
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        no-any
+        name="ALcontrols"
+        :values="Object.values(ControlType)"
+        @changed="e => controls = e"
+      />
+    </div>
+
     <div class="__inputRow">
       <Button
         :type="ButtonType.PRIMARY"
         block
         class="__submit"
         :disabled="!valid"
-        @click="addLaptime({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, date: new Date().getTime()})"
+        @click="addLaptime({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, date: new Date().getTime()})"
       >
         Submit
       </Button>
@@ -145,6 +193,7 @@ import { mapActions, mapGetters, mapState } from 'vuex'
 import TransmissionType from '@/constants/TransmissionType'
 import WeatherType from '@/constants/WeatherType'
 import BrakingLine from '@/constants/BrakingLine'
+import ControlType from '@/constants/ControlType'
 
 export default {
   name: 'AddLaptime',
@@ -159,8 +208,11 @@ export default {
       transmission: TransmissionType.SEQUENTIAL,
       weather: WeatherType.SUN,
       brakingLine: BrakingLine.ON,
+      controls: ControlType.STEERING_WHEEL,
       newDriverName: '',
-      showModal: false
+      showNewDriverModal: false,
+      newCarName: '',
+      showNewCarModal: false
     }
   },
   computed: {
@@ -175,9 +227,15 @@ export default {
     validateLaptimeFormat () {
       this.laptimeError = this.laptime.match(/^\d{1,2}:\d\d\.\d{3}$/) === null
     },
+    addCar () {
+      this.addNewCar({ name: this.newCarName })
+      this.newCarName = ''
+      this.showNewCarModal = false
+    },
     addDriver () {
       this.addNewDriver({ name: this.newDriverName })
       this.newDriverName = ''
+      this.showNewDriverModal = false
     }
   }
 }
@@ -196,6 +254,17 @@ export default {
   margin: 0 auto;
   margin-bottom: 1rem;
   width: 100%;
+  justify-content: center;
+}
+
+@media only screen and (max-width: 700px) {
+  .__inputRow {
+    flex-direction: column;
+  }
+
+.__timeWrapper {
+  width: 90vw;
+}
 }
 
 .__inputRow > input, .__inputRow > .v-select {
@@ -242,5 +311,20 @@ export default {
 
 .__brakingLine {
   width: 5rem;
+}
+
+.__radioHeader {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.__noColumn {
+  flex-direction: row !important;
+  border-bottom: 0.1rem solid white;
+}
+
+.__noColumn > div {
+  padding: 1rem;
 }
 </style>

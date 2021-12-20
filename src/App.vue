@@ -6,8 +6,10 @@
     >
       Toggle
     </Button>
-    <AddLaptime v-if="showAddLapTime" />
-    <LaptimeBoard v-if="!showAddLapTime" />
+    <div v-show="showAddLapTime">
+      <AddLaptime />
+    </div>
+    <LaptimeBoard v-show="!showAddLapTime" />
   </div>
 </template>
 

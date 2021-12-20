@@ -3,10 +3,12 @@ import App from '@/App'
 import store from '@/store/index.js'
 import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import Button from '@/components/ui/Button'
+import RadioButtons from '@/components/ui/RadioButtons'
 import ButtonType from '@/constants/ButtonType'
 import TransmissionType from '@/constants/TransmissionType'
 import WeatherType from '@/constants/WeatherType'
 import BrakingLine from '@/constants/BrakingLine'
+import ControlType from '@/constants/ControlType'
 import Modal from '@/components/ui/Modal'
 import { debounce } from 'debounce'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
@@ -19,10 +21,12 @@ app.config.globalProperties.ButtonType = ButtonType
 app.config.globalProperties.TransmissionType = TransmissionType
 app.config.globalProperties.WeatherType = WeatherType
 app.config.globalProperties.BrakingLine = BrakingLine
+app.config.globalProperties.ControlType = ControlType
 app.config.globalProperties.debounce = debounce
 app.use(store)
 app.use(PerfectScrollbar)
 app.component('Button', Button)
 app.component('Modal', Modal)
+app.component('RadioButtons', RadioButtons)
 app.component('VSelect', vSelect)
 app.mount('#app')

@@ -42,41 +42,48 @@
         label="name"
       />
     </div>
-    <div class="__inputRow">
-      <v-select
-        v-model="transmission"
-        :options="Object.values(TransmissionType)"
-        placeholder="Any"
-      >
-        <template #header>
-          <div class="__selectLabel">
-            Transmission
-          </div>
-        </template>
-      </v-select>
+    <div class="__radioHeader">
+      Transmission
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        name="transmission"
+        :values="Object.values(TransmissionType)"
+        @changed="e => transmission = e"
+      />
+    </div>
 
-      <v-select
-        v-model="weather"
-        :options="Object.values(WeatherType)"
-        placeholder="Any"
-      >
-        <template #header>
-          <div class="__selectLabel">
-            Weather
-          </div>
-        </template>
-      </v-select>
-      <v-select
-        v-model="brakingLine"
-        :options="Object.values(BrakingLine)"
-        placeholder="Any"
-      >
-        <template #header>
-          <div class="__selectLabel">
-            Braking line
-          </div>
-        </template>
-      </v-select>
+    <div class="__radioHeader">
+      Weather
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        name="weather"
+        :values="Object.values(WeatherType)"
+        @changed="e => weather = e"
+      />
+    </div>
+
+    <div class="__radioHeader">
+      Braking line
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        name="brakingLine"
+        :values="Object.values(BrakingLine)"
+        @changed="e => brakingLine = e"
+      />
+    </div>
+
+    <div class="__radioHeader">
+      Controls
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        name="controls"
+        :values="Object.values(ControlType)"
+        @changed="e => controls = e"
+      />
     </div>
     <br>
     <h2>Laptime board</h2>
@@ -91,10 +98,11 @@
         <th>Transmission</th>
         <th>Weather</th>
         <th>Braking line</th>
+        <th>Controls</th>
         <th>Actions</th>
       </tr>
       <tr
-        v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather, brakingLine})"
+        v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls})"
         :key="index"
         class="__row"
       >
@@ -125,6 +133,9 @@
         <td class="__brakingLine">
           {{ time.brakingLine }}
         </td>
+        <td class="__controls">
+          {{ time.controls }}
+        </td>
         <td class="__delete">
           <Button :type="ButtonType.DANGER">
             Delete
@@ -148,12 +159,13 @@ export default {
       driverId: null,
       transmission: null,
       weather: null,
-      brakingLine: null
+      brakingLine: null,
+      controls: null
     }
   },
   computed: {
     ...mapState(['cars', 'tracks', 'drivers']),
-    ...mapGetters(['getTimes', 'getCarById', 'getTrackById', 'getDriverById'])
+    ...mapGetters(['getTimes', 'getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants'])
   },
   methods: {
     getDriver (time) {
