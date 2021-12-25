@@ -86,7 +86,7 @@
         :options="tracks"
         :reduce="track => track.uid"
         label="track"
-        @change="trackVariant=null"
+        @option:selected="trackVariant=getTrackVariants($event.uid)[0]"
       />
     </div>
     <div

@@ -49,6 +49,7 @@
       <RadioButtons
         name="transmission"
         :values="Object.values(TransmissionType)"
+        :value="transmission"
         @changed="e => transmission = e"
       />
     </div>
@@ -60,6 +61,7 @@
       <RadioButtons
         name="weather"
         :values="Object.values(WeatherType)"
+        :value="weather"
         @changed="e => weather = e"
       />
     </div>
@@ -71,6 +73,7 @@
       <RadioButtons
         name="brakingLine"
         :values="Object.values(BrakingLine)"
+        :value="brakingLine"
         @changed="e => brakingLine = e"
       />
     </div>
@@ -82,9 +85,16 @@
       <RadioButtons
         name="controls"
         :values="Object.values(ControlType)"
+        :value="controls"
         @changed="e => controls = e"
       />
     </div>
+    <Button
+      :type="ButtonType.SECONDARY"
+      @click="clearFilter()"
+    >
+      Clear filter
+    </Button>
     <br>
     <h2>Laptime board</h2>
     <table class="__laptimeBoard">
@@ -94,12 +104,7 @@
         <th>Laptime</th>
         <th>Car</th>
         <th>Track</th>
-        <th>Track variant</th>
-        <th>Transmission</th>
-        <th>Weather</th>
-        <th>Braking line</th>
-        <th>Controls</th>
-        <th>Actions</th>
+        <th>Settings</th>
       </tr>
       <tr
         v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls})"
@@ -110,36 +115,39 @@
           {{ index+1 }}.
         </td>
         <td class="__driver">
-          {{ getDriver(time) }}
+          <div @click="driverId = time.driverId">
+            <span>{{ getDriver(time) }}</span>
+          </div>
         </td>
         <td class="__laptime">
           {{ time.laptime }}
         </td>
         <td class="__car">
-          {{ getCarById(time.carId).name }}
+          <div @click="carId = time.carId">
+            {{ getCarById(time.carId).name }}
+          </div>
         </td>
         <td class="__track">
-          {{ getTrackById(time.trackId).track }}
+          <div @click="trackId = time.trackId">
+            {{ getTrackById(time.trackId).track }}
+          </div>
+          <div @click="trackId = time.trackId;trackVariant = trackVariant">
+            {{ time.trackVariant }}
+          </div>
         </td>
-        <td class="__trackVariant">
-          {{ time.trackVariant }}
-        </td>
-        <td class="__transmission">
-          {{ time.transmission }}
-        </td>
-        <td class="__weather">
-          {{ time.weather }}
-        </td>
-        <td class="__brakingLine">
-          {{ time.brakingLine }}
-        </td>
-        <td class="__controls">
-          {{ time.controls }}
-        </td>
-        <td class="__delete">
-          <Button :type="ButtonType.DANGER">
-            Delete
-          </Button>
+        <td class="__settings">
+          <div @click="transmission = time.transmission">
+            {{ time.transmission }}
+          </div>
+          <div @click="weather = time.weather">
+            {{ time.weather }}
+          </div>
+          <div @click="brakingLine = time.brakingLine">
+            {{ time.brakingLine }}
+          </div>
+          <div @click="controls = time.controls">
+            {{ time.controls }}
+          </div>
         </td>
       </tr>
     </table>
@@ -169,14 +177,25 @@ export default {
   },
   methods: {
     getDriver (time) {
+      console.log('DI: ', time.driverId)
       const driver = this.getDriverById(time.driverId)
       return driver ? driver.name : 'Loading'
+    },
+    clearFilter () {
+      this.carId = null
+      this.trackId = null
+      this.trackVariant = null
+      this.driverId = null
+      this.transmission = null
+      this.weather = null
+      this.brakingLine = null
+      this.controls = null
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .__laptimeBoardWrapper {
   padding: 2rem;
   margin: 0 auto;
@@ -185,29 +204,77 @@ export default {
 
 .__laptimeBoard {
   width: 100%;
-  border: 1px solid white;
   border-radius: 0.3rem;
+  border-spacing:0;
+  border-collapse: collapse;
+  font-size: 1rem;
 }
 
-.__laptimeBoard th{
-  border-bottom: 1px solid white;
-  height: 1rem;
-  height: 2rem;
+th {
+  border-bottom: 1px solid var(--border-dark1);
+  background-color: #4081c2;
+  color: var(--text-light1);
+  padding: 1rem 0.5rem;
 }
 
-.__laptimeBoard .__id, .__laptimeBoard .__driver  {
+tr:nth-child(even) {
+  background-color: gray;
+}
+
+tr:nth-child(odd) {
+  color: var(--text-dark1);
+  background-color: white;
+}
+
+td {
+  padding: 0.5rem;
+}
+
+td div:hover {
+  cursor: pointer;
+  color: var(--hover);
+}
+
+.__id, .__driver  {
   font-weight: bold;
 }
 
-.__laptimeBoard > tr:nth-child(2) .__driver {
+tr:nth-child(2) .__driver > div > span {
   color: gold;
+  background-color: var(--bg-dark3);
+  padding: 0.2rem;
 }
 
-.__laptimeBoard > tr:nth-child(3) .__driver {
+tr:nth-child(3) .__driver > div > span {
   color: silver;
+  background-color: var(--bg-dark3);
+  padding: 0.2rem;
 }
 
-.__laptimeBoard > tr:nth-child(4) .__driver {
+tr:nth-child(4) .__driver > div > span {
   color: #cd7f32;
+  background-color: var(--bg-dark3);
+  padding: 0.2rem;
+}
+
+.__settings:hover {
+  cursor: pointer;
+}
+
+@media only screen and (max-width: 700px) {
+  .__laptimeBoard {
+    font-size: 0.5rem;
+  }
+
+  th {
+    border-bottom: 1px solid var(--border-dark1);
+    background-color: #4081c2;
+    color: var(--text-light1);
+    padding: 1rem 0.2rem;
+  }
+
+  td {
+    padding: 0.2rem;
+  }
 }
 </style>

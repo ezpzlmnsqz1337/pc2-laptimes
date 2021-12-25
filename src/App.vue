@@ -6,10 +6,10 @@
     >
       Toggle
     </Button>
-    <div v-show="showAddLapTime">
+    <div v-show="!showAddLapTime">
       <AddLaptime />
     </div>
-    <LaptimeBoard v-show="!showAddLapTime" />
+    <LaptimeBoard v-show="showAddLapTime" />
   </div>
 </template>
 
@@ -44,7 +44,7 @@ export default {
 
 <style>
 :root {
-  --hover: #2970b6;
+  --hover: #188cff;
   --active: #205b95;
   --text-light1: #ffffff;
   --text-light2: gray;
