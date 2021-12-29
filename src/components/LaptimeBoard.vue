@@ -1,156 +1,159 @@
 <template>
   <div class="__laptimeBoardWrapper">
-    <h1>Filter times</h1>
-    <div class="__inputRow">
-      <!-- object value -->
-      <v-select
-        v-model="carId"
-        placeholder="Select car"
-        :options="cars"
-        :reduce="car => car.uid"
-        label="name"
-      />
-    </div>
-    <div class="__inputRow">
-      <v-select
-        v-model="trackId"
-        placeholder="Select track"
-        :options="tracks"
-        :reduce="track => track.uid"
-        label="track"
-        @change="trackVariant=null"
-      />
-    </div>
-    <div
-      v-if="trackId"
-      class="__inputRow"
-    >
-      <v-select
-        v-model="trackVariant"
-        placeholder="Select track variant"
-        :options="getTrackVariants(trackId)"
-      />
-    </div>
-    <div
-      class="__inputRow"
-    >
-      <v-select
-        v-model="driverId"
-        placeholder="Select driver"
-        :options="drivers"
-        :reduce="driver => driver.uid"
-        label="name"
-      />
-    </div>
-    <div class="__radioHeader">
-      Transmission
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="transmission"
-        :values="Object.values(TransmissionType)"
-        :value="transmission"
-        @changed="e => transmission = e"
-      />
-    </div>
-
-    <div class="__radioHeader">
-      Weather
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="weather"
-        :values="Object.values(WeatherType)"
-        :value="weather"
-        @changed="e => weather = e"
-      />
-    </div>
-
-    <div class="__radioHeader">
-      Braking line
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="brakingLine"
-        :values="Object.values(BrakingLine)"
-        :value="brakingLine"
-        @changed="e => brakingLine = e"
-      />
-    </div>
-
-    <div class="__radioHeader">
-      Controls
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="controls"
-        :values="Object.values(ControlType)"
-        :value="controls"
-        @changed="e => controls = e"
-      />
-    </div>
-    <Button
-      :type="ButtonType.SECONDARY"
-      @click="clearFilter()"
-    >
-      Clear filter
-    </Button>
-    <br>
-    <h2>Laptime board</h2>
-    <table class="__laptimeBoard">
-      <tr class="__row __header">
-        <th>Rank</th>
-        <th>Driver</th>
-        <th>Laptime</th>
-        <th>Car</th>
-        <th>Track</th>
-        <th>Settings</th>
-      </tr>
-      <tr
-        v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls})"
-        :key="index"
-        class="__row"
+    <div class="__filter">
+      <h1>Filter times</h1>
+      <div class="__inputRow">
+        <!-- object value -->
+        <v-select
+          v-model="carId"
+          placeholder="Select car"
+          :options="cars"
+          :reduce="car => car.uid"
+          label="name"
+        />
+      </div>
+      <div class="__inputRow">
+        <v-select
+          v-model="trackId"
+          placeholder="Select track"
+          :options="tracks"
+          :reduce="track => track.uid"
+          label="track"
+          @change="trackVariant=null"
+        />
+      </div>
+      <div
+        v-if="trackId"
+        class="__inputRow"
       >
-        <td class="__id">
-          {{ index+1 }}.
-        </td>
-        <td class="__driver">
-          <div @click="driverId = time.driverId">
-            <span>{{ getDriver(time) }}</span>
-          </div>
-        </td>
-        <td class="__laptime">
-          {{ time.laptime }}
-        </td>
-        <td class="__car">
-          <div @click="carId = time.carId">
-            {{ getCarById(time.carId).name }}
-          </div>
-        </td>
-        <td class="__track">
-          <div @click="trackId = time.trackId">
-            {{ getTrackById(time.trackId).track }}
-          </div>
-          <div @click="trackId = time.trackId;trackVariant = trackVariant">
-            {{ time.trackVariant }}
-          </div>
-        </td>
-        <td class="__settings">
-          <div @click="transmission = time.transmission">
-            {{ time.transmission }}
-          </div>
-          <div @click="weather = time.weather">
-            {{ time.weather }}
-          </div>
-          <div @click="brakingLine = time.brakingLine">
-            {{ time.brakingLine }}
-          </div>
-          <div @click="controls = time.controls">
-            {{ time.controls }}
-          </div>
-        </td>
-      </tr>
-    </table>
+        <v-select
+          v-model="trackVariant"
+          placeholder="Select track variant"
+          :options="getTrackVariants(trackId)"
+        />
+      </div>
+      <div
+        class="__inputRow"
+      >
+        <v-select
+          v-model="driverId"
+          placeholder="Select driver"
+          :options="drivers"
+          :reduce="driver => driver.uid"
+          label="name"
+        />
+      </div>
+      <div class="__radioHeader">
+        Transmission
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="transmission"
+          :values="Object.values(TransmissionType)"
+          :value="transmission"
+          @changed="e => transmission = e"
+        />
+      </div>
+
+      <div class="__radioHeader">
+        Weather
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="weather"
+          :values="Object.values(WeatherType)"
+          :value="weather"
+          @changed="e => weather = e"
+        />
+      </div>
+
+      <div class="__radioHeader">
+        Braking line
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="brakingLine"
+          :values="Object.values(BrakingLine)"
+          :value="brakingLine"
+          @changed="e => brakingLine = e"
+        />
+      </div>
+
+      <div class="__radioHeader">
+        Controls
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="controls"
+          :values="Object.values(ControlType)"
+          :value="controls"
+          @changed="e => controls = e"
+        />
+      </div>
+      <Button
+        :type="ButtonType.SECONDARY"
+        @click="clearFilter()"
+      >
+        Clear filter
+      </Button>
+    </div>
+    <div class="__laptimeBoard">
+      <h2>Laptime board</h2>
+      <table>
+        <tr class="__row __header">
+          <th>Rank</th>
+          <th>Driver</th>
+          <th>Laptime</th>
+          <th>Car</th>
+          <th>Track</th>
+          <th>Settings</th>
+        </tr>
+        <tr
+          v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls})"
+          :key="index"
+          class="__row"
+        >
+          <td class="__id">
+            {{ index+1 }}.
+          </td>
+          <td class="__driver">
+            <div @click="driverId = time.driverId">
+              <span>{{ getDriver(time) }}</span>
+            </div>
+          </td>
+          <td class="__laptime">
+            {{ time.laptime }}
+          </td>
+          <td class="__car">
+            <div @click="carId = time.carId">
+              {{ getCarById(time.carId).name }}
+            </div>
+          </td>
+          <td class="__track">
+            <div @click="trackId = time.trackId">
+              {{ getTrackById(time.trackId).track }}
+            </div>
+            <div @click="trackId = time.trackId;trackVariant = trackVariant">
+              {{ time.trackVariant }}
+            </div>
+          </td>
+          <td class="__settings">
+            <div @click="transmission = time.transmission">
+              {{ time.transmission }}
+            </div>
+            <div @click="weather = time.weather">
+              {{ time.weather }}
+            </div>
+            <div @click="brakingLine = time.brakingLine">
+              {{ time.brakingLine }}
+            </div>
+            <div @click="controls = time.controls">
+              {{ time.controls }}
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -200,10 +203,21 @@ export default {
   padding: 2rem;
   margin: 0 auto;
   text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
 }
 
 .__laptimeBoard {
-  width: 100%;
+  padding: 1rem;
+}
+
+.__filter {
+  padding: 1rem;
+}
+
+.__laptimeBoard table {
+  min-width: 55vw;
   border-radius: 0.3rem;
   border-spacing:0;
   border-collapse: collapse;
@@ -218,7 +232,7 @@ th {
 }
 
 tr:nth-child(even) {
-  background-color: gray;
+  background-color: #888888;
 }
 
 tr:nth-child(odd) {
@@ -261,8 +275,27 @@ tr:nth-child(4) .__driver > div > span {
   cursor: pointer;
 }
 
+@media only screen and (max-width: 1024px) {
+  .__laptimeBoardWrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .__laptimeBoard table {
+    width: 90vw;
+  }
+
+  .__filter {
+    width: 50%;
+  }
+}
+
 @media only screen and (max-width: 700px) {
-  .__laptimeBoard {
+  .__laptimeBoardWrapper {
+    padding: 1rem;
+  }
+
+  .__laptimeBoard table {
     font-size: 0.5rem;
   }
 
@@ -275,6 +308,15 @@ tr:nth-child(4) .__driver > div > span {
 
   td {
     padding: 0.2rem;
+  }
+
+  .__filter {
+    padding: 0;
+    width: 100%;
+  }
+
+  .__laptimeBoard {
+    padding: 0;
   }
 }
 </style>

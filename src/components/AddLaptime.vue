@@ -16,7 +16,7 @@
       <div class="__modalButtons">
         <Button
           :type="ButtonType.DANGER"
-          @click="showModal = false"
+          @click="showNewDriverModal = false"
         >
           Cancel
         </Button>
@@ -47,7 +47,7 @@
       <div class="__modalButtons">
         <Button
           :type="ButtonType.DANGER"
-          @click="showModal = false"
+          @click="showNewCarModal = false"
         >
           Cancel
         </Button>
@@ -134,6 +134,7 @@
         no-any
         name="ALtransmission"
         :values="Object.values(TransmissionType)"
+        :value="transmission"
         @changed="e => transmission = e"
       />
     </div>
@@ -146,6 +147,7 @@
         no-any
         name="ALweather"
         :values="Object.values(WeatherType)"
+        :value="weather"
         @changed="e => weather = e"
       />
     </div>
@@ -158,6 +160,7 @@
         no-any
         name="ALbrakingLine"
         :values="Object.values(BrakingLine)"
+        :value="brakingLine"
         @changed="e => brakingLine = e"
       />
     </div>
@@ -170,6 +173,7 @@
         no-any
         name="ALcontrols"
         :values="Object.values(ControlType)"
+        :value="controls"
         @changed="e => controls = e"
       />
     </div>
@@ -223,7 +227,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addNewDriver', 'addLaptime']),
+    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar']),
     validateLaptimeFormat () {
       this.laptimeError = this.laptime.match(/^\d{1,2}:\d\d\.\d{3}$/) === null
     },
@@ -243,7 +247,7 @@ export default {
 
 <style>
 .__timeWrapper {
-  width: 80vw;
+  width: 30%;
   padding: 2rem;
   margin: 0 auto;
   text-align: center;
@@ -257,14 +261,21 @@ export default {
   justify-content: center;
 }
 
+@media only screen and (max-width: 1280px) {
+  .__timeWrapper {
+    width: 50%;
+  }
+}
+
 @media only screen and (max-width: 700px) {
+  .__timeWrapper {
+    width: 100%;
+    padding: 1rem;
+  }
+
   .__inputRow {
     flex-direction: column;
   }
-
-.__timeWrapper {
-  width: 90vw;
-}
 }
 
 .__inputRow > input, .__inputRow > .v-select {
