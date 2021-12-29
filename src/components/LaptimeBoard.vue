@@ -10,7 +10,7 @@
           :options="cars"
           :reduce="car => car.uid"
           label="name"
-          @update:model-value="sf({carId: $event})"
+          @update:model-value="setFilter({carId: $event})"
         />
       </div>
       <div class="__inputRow">
