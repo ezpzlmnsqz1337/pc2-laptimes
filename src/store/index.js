@@ -3,11 +3,17 @@ import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase'
 import { collection, doc, setDoc } from 'firebase/firestore'
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
+import ScreenType from '@/constants/ScreenType'
+import laptimeFilter from '@/store/modules/laptimeFilter'
 
 const debug = process.env.NODE_ENV !== 'production'
 
 export default createStore({
+  modules: {
+    laptimeFilter
+  },
   state: {
+    activeScreen: ScreenType.LAPTIME_BOARD,
     cars: [],
     tracks: [],
     times: [],
@@ -41,12 +47,15 @@ export default createStore({
       if (brakingLine) result = result.filter(x => x.brakingLine === brakingLine)
       if (controls) result = result.filter(x => x.controls === controls)
       if (date) result = result.filter(x => x.date === date)
-      console.log(result)
+
       return result.sort((a, b) => a.laptime > b.laptime ? 1 : -1)
     }
   },
   mutations: {
     reset (state) {
+    },
+    showScreen (state, { screen }) {
+      state.activeScreen = screen
     },
     ...vuexMutations
   },

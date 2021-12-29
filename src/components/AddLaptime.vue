@@ -117,14 +117,38 @@
       </Button>
     </div>
     <div class="__inputRow">
-      <input
-        v-model="laptime"
-        type="text"
-        class="__laptime"
+      <div
+        class="__lapTimeInputs"
         :class="{__error: laptimeError}"
-        placeholder="0:00.000"
-        @input="validateLaptimeFormat()"
       >
+        <input
+          v-model="minutes"
+          type="text"
+          class="__minutes"
+          placeholder="0"
+          @input="validateLaptimeFormat()"
+        >
+        <div class="__colon">
+          :
+        </div>
+        <input
+          v-model="seconds"
+          type="text"
+          class="__seconds"
+          placeholder="00"
+          @input="validateLaptimeFormat()"
+        >
+        <div class="__dot">
+          .
+        </div>
+        <input
+          v-model="milliseconds"
+          type="text"
+          class="__milliseconds"
+          placeholder="000"
+          @input="validateLaptimeFormat()"
+        >
+      </div>
     </div>
     <div class="__radioHeader">
       Transmission
@@ -184,7 +208,7 @@
         block
         class="__submit"
         :disabled="!valid"
-        @click="addLaptime({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, date: new Date().getTime()})"
+        @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, date: new Date().getTime()})"
       >
         Submit
       </Button>
@@ -193,11 +217,12 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import TransmissionType from '@/constants/TransmissionType'
 import WeatherType from '@/constants/WeatherType'
 import BrakingLine from '@/constants/BrakingLine'
 import ControlType from '@/constants/ControlType'
+import ScreenType from '@/constants/ScreenType'
 
 export default {
   name: 'AddLaptime',
@@ -207,7 +232,9 @@ export default {
       trackId: null,
       trackVariant: null,
       driverId: null,
-      laptime: '',
+      minutes: '',
+      seconds: '',
+      milliseconds: '',
       laptimeError: false,
       transmission: TransmissionType.SEQUENTIAL,
       weather: WeatherType.SUN,
@@ -222,14 +249,30 @@ export default {
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getTrackVariants']),
+    laptime () {
+      const SECONDS_LENGTH = 2
+      const MILLISECONDS_LENGTH = 3
+      // check not set
+      if ((!this.minutes.length > 0 || this.seconds.length !== SECONDS_LENGTH || this.milliseconds.length !== MILLISECONDS_LENGTH)) return
+      const [minutes, seconds, milliseconds] = [parseInt(this.minutes), parseInt(this.seconds), parseInt(this.milliseconds)]
+      // check greater than zero
+      if ((minutes < 0 || seconds < 0 || milliseconds < 0)) return
+      // check in range
+      if (seconds >= 60 || milliseconds >= 1000) return
+      // format string
+      const [m, s, ms] = [this.minutes, this.seconds, this.milliseconds]
+      return `${m}:${s.padStart(SECONDS_LENGTH, '0')}.${ms.padStart(MILLISECONDS_LENGTH, '0')}`
+    },
     valid () {
       return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
     }
   },
   methods: {
     ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar']),
+    ...mapMutations(['showScreen']),
+    ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     validateLaptimeFormat () {
-      this.laptimeError = this.laptime.match(/^\d{1,2}:\d\d\.\d{3}$/) === null
+      this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d\d\.\d{3}$/) === null
     },
     addCar () {
       this.addNewCar({ name: this.newCarName })
@@ -240,6 +283,18 @@ export default {
       this.addNewDriver({ name: this.newDriverName })
       this.newDriverName = ''
       this.showNewDriverModal = false
+    },
+    submit (laptime) {
+      this.addLaptime(laptime)
+      this.driverId = null
+      this.$toast.success('Laptime added! Click here to show laptime table.', {
+        onClick: () => this.showTimeInTable(laptime)
+      })
+    },
+    showTimeInTable ({ carId, trackId, trackVariant }) {
+      this.clearFilter()
+      this.setFilter({ carId, trackId, trackVariant })
+      this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
     }
   }
 }
@@ -289,15 +344,75 @@ export default {
   border: 0.1rem solid black;
 }
 
-.__timeWrapper .__laptime {
+.__lapTimeInputs {
+  border-radius: 0.3rem;
+  display: flex;
+}
+
+.__lapTimeInputs .__minutes {
+  width: 100%;
+  text-align: right;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  padding-right: 0.3rem;
+}
+
+.__lapTimeInputs .__seconds {
+  width: 3.1rem;
+  border-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
   text-align: center;
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+}
+
+.__lapTimeInputs .__milliseconds {
+  width: 100%;
+  border-left: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  padding-left: 0.3rem;
+}
+
+.__lapTimeInputs .__colon, .__lapTimeInputs .__dot {
+  background-color: white;
+  color: var(--text-dark1);
+  font-size: 2rem;
+  padding-top: 0.45rem;
+  border-top: 0.1rem solid black;
+  border-bottom: 0.1rem solid black;
+}
+
+.__lapTimeInputs input {
   font-size: 2rem;
 }
 
-.__error {
-  border: 0.15rem solid !important;
-  color: red !important;
-  border-color: red !important;
+.__lapTimeInputs input:focus {
+  outline: 0;
+}
+
+.__lapTimeInputs.__error .__minutes {
+  border: 0.15rem solid red;
+  color: red;
+  border-right: none;
+}
+
+.__lapTimeInputs.__error .__seconds, .__lapTimeInputs.__error .__colon, .__lapTimeInputs.__error .__dot {
+  border: 0.15rem solid red;
+  color: red;
+  border-right: none;
+  border-left: none;
+}
+
+.__lapTimeInputs.__error .__milliseconds {
+  border: 0.15rem solid red;
+  color: red;
+  border-left: none;
 }
 
 .__submit {

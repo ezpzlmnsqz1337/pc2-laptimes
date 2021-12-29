@@ -1,15 +1,25 @@
 <template>
   <div class="__wrapper">
-    <Button
-      :type="ButtonType.SECONDARY"
-      @click="showAddLapTime = !showAddLapTime"
-    >
-      Toggle
-    </Button>
-    <div v-show="!showAddLapTime">
+    <div class="__menu">
+      <Button
+        :type="ButtonType.SECONDARY"
+        :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME}"
+        @click="showScreen({screen: ScreenType.ADD_LAPTIME})"
+      >
+        Add laptime
+      </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        :class="{__selected: activeScreen === ScreenType.LAPTIME_BOARD}"
+        @click="showScreen({screen: ScreenType.LAPTIME_BOARD})"
+      >
+        Laptime board
+      </Button>
+    </div>
+    <div v-show="activeScreen === ScreenType.ADD_LAPTIME">
       <AddLaptime />
     </div>
-    <LaptimeBoard v-show="showAddLapTime" />
+    <LaptimeBoard v-show="activeScreen === ScreenType.LAPTIME_BOARD" />
   </div>
 </template>
 
@@ -17,7 +27,7 @@
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import AddLaptime from '@/components/AddLaptime'
 import LaptimeBoard from '@/components/LaptimeBoard'
-import { mapActions } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'App',
@@ -25,10 +35,8 @@ export default {
     AddLaptime,
     LaptimeBoard
   },
-  data () {
-    return {
-      showAddLapTime: true
-    }
+  computed: {
+    ...mapState(['activeScreen'])
   },
   mounted () {
     this.bindDb()
@@ -37,7 +45,8 @@ export default {
     unsubscribeAll()
   },
   methods: {
-    ...mapActions(['bindDb'])
+    ...mapActions(['bindDb']),
+    ...mapMutations(['showScreen'])
   }
 }
 </script>
@@ -81,7 +90,7 @@ body {
   margin-top: 0;
 }
 
-input[type=text], input[type=password], input[type=email]{
+input[type=text], input[type=password], input[type=email], input[type=number]{
   padding: 0.5rem;
   border-radius: 0.3rem;
   border: 0.1rem solid black;
@@ -109,5 +118,14 @@ a {
   background-color: var(--bg-dark3);
   height: 100vh;
   overflow-y: scroll;
+}
+
+.__menu {
+  padding-top: 1rem;
+  text-align: center;
+}
+
+.__menu .__selected {
+  background-color: #242424 !important;
 }
 </style>

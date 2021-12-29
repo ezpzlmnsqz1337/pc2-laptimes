@@ -5,21 +5,22 @@
       <div class="__inputRow">
         <!-- object value -->
         <v-select
-          v-model="carId"
+          :model-value="carId"
           placeholder="Select car"
           :options="cars"
           :reduce="car => car.uid"
           label="name"
+          @update:model-value="sf({carId: $event})"
         />
       </div>
       <div class="__inputRow">
         <v-select
-          v-model="trackId"
+          :model-value="trackId"
           placeholder="Select track"
           :options="tracks"
           :reduce="track => track.uid"
           label="track"
-          @change="trackVariant=null"
+          @update:model-value="setFilter({trackId: $event})"
         />
       </div>
       <div
@@ -27,20 +28,22 @@
         class="__inputRow"
       >
         <v-select
-          v-model="trackVariant"
+          :model-value="trackVariant"
           placeholder="Select track variant"
           :options="getTrackVariants(trackId)"
+          @update:model-value="setFilter({trackVariant: $event})"
         />
       </div>
       <div
         class="__inputRow"
       >
         <v-select
-          v-model="driverId"
+          :model-value="driverId"
           placeholder="Select driver"
           :options="drivers"
           :reduce="driver => driver.uid"
           label="name"
+          @update:model-value="setFilter({driverId: $event})"
         />
       </div>
       <div class="__radioHeader">
@@ -51,7 +54,7 @@
           name="transmission"
           :values="Object.values(TransmissionType)"
           :value="transmission"
-          @changed="e => transmission = e"
+          @changed="e => setFilter({transmission: e})"
         />
       </div>
 
@@ -63,7 +66,7 @@
           name="weather"
           :values="Object.values(WeatherType)"
           :value="weather"
-          @changed="e => weather = e"
+          @changed="e => setFilter({weather: e})"
         />
       </div>
 
@@ -75,7 +78,7 @@
           name="brakingLine"
           :values="Object.values(BrakingLine)"
           :value="brakingLine"
-          @changed="e => brakingLine = e"
+          @changed="e => setFilter({brakingLine: e})"
         />
       </div>
 
@@ -87,7 +90,7 @@
           name="controls"
           :values="Object.values(ControlType)"
           :value="controls"
-          @changed="e => controls = e"
+          @changed="e => setFilter({controls: e})"
         />
       </div>
       <Button
@@ -117,7 +120,7 @@
             {{ index+1 }}.
           </td>
           <td class="__driver">
-            <div @click="driverId = time.driverId">
+            <div @click="setFilter({driverId: time.driverId})">
               <span>{{ getDriver(time) }}</span>
             </div>
           </td>
@@ -125,29 +128,29 @@
             {{ time.laptime }}
           </td>
           <td class="__car">
-            <div @click="carId = time.carId">
+            <div @click="setFilter({carId: time.carId})">
               {{ getCarById(time.carId).name }}
             </div>
           </td>
           <td class="__track">
-            <div @click="trackId = time.trackId">
+            <div @click="setFilter({trackId: time.trackId})">
               {{ getTrackById(time.trackId).track }}
             </div>
-            <div @click="trackId = time.trackId;trackVariant = trackVariant">
+            <div @click="setFilter({trackId: time.trackId, trackVariant: time.trackVariant})">
               {{ time.trackVariant }}
             </div>
           </td>
           <td class="__settings">
-            <div @click="transmission = time.transmission">
+            <div @click="setFilter({transmission: time.transmission})">
               {{ time.transmission }}
             </div>
-            <div @click="weather = time.weather">
+            <div @click="setFilter({weather: time.weather})">
               {{ time.weather }}
             </div>
-            <div @click="brakingLine = time.brakingLine">
+            <div @click="setFilter({brakingLine: time.brakingLine})">
               {{ time.brakingLine }}
             </div>
-            <div @click="controls = time.controls">
+            <div @click="setFilter({controls: time.controls})">
               {{ time.controls }}
             </div>
           </td>
@@ -158,41 +161,21 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'LaptimeBoard',
-  data () {
-    return {
-      carId: null,
-      trackId: null,
-      trackVariant: null,
-      driverId: null,
-      transmission: null,
-      weather: null,
-      brakingLine: null,
-      controls: null
-    }
-  },
   computed: {
     ...mapState(['cars', 'tracks', 'drivers']),
-    ...mapGetters(['getTimes', 'getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants'])
+    ...mapGetters(['getTimes', 'getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
+    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls']),
+    ...mapGetters('laptimeFilter', ['getFilter'])
   },
   methods: {
+    ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     getDriver (time) {
-      console.log('DI: ', time.driverId)
       const driver = this.getDriverById(time.driverId)
       return driver ? driver.name : 'Loading'
-    },
-    clearFilter () {
-      this.carId = null
-      this.trackId = null
-      this.trackVariant = null
-      this.driverId = null
-      this.transmission = null
-      this.weather = null
-      this.brakingLine = null
-      this.controls = null
     }
   }
 }
