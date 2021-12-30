@@ -48,7 +48,17 @@ export default createStore({
       if (controls) result = result.filter(x => x.controls === controls)
       if (date) result = result.filter(x => x.date === date)
 
-      return result.sort((a, b) => a.laptime > b.laptime ? 1 : -1)
+      return result.sort((a, b) => {
+        const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
+
+        const l1 = a.laptime.match(pattern)
+        const l2 = b.laptime.match(pattern)
+
+        const time1 = new Date(parseInt(l1[1]) * 60 * 1000 + parseInt(l1[2]) * 1000 + parseInt(l1[3]))
+        const time2 = new Date(parseInt(l2[1]) * 60 * 1000 + parseInt(l2[2]) * 1000 + parseInt(l2[3]))
+
+        return time1.getTime() - time2.getTime()
+      })
     }
   },
   mutations: {

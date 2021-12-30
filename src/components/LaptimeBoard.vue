@@ -107,6 +107,7 @@
           <th>Rank</th>
           <th>Driver</th>
           <th>Laptime</th>
+          <th>Losing</th>
           <th>Car</th>
           <th>Track</th>
           <th>Settings</th>
@@ -131,6 +132,9 @@
           </td>
           <td class="__laptime">
             {{ time.laptime }}
+          </td>
+          <td class="__losing">
+            <span v-if="index > 0">{{ getLaptimeDiff(time.laptime) }}</span>
           </td>
           <td class="__car">
             <div @click="setFilter({carId: time.carId})">
@@ -159,21 +163,30 @@
             </div>
           </td>
           <td class="__settings">
-            <div @click="setFilter({transmission: time.transmission})">
+            <div
+              :class="transmissionClass(time.transmission)"
+              @click="setFilter({transmission: time.transmission})"
+            >
               <EditableSelect
                 :text="time.transmission"
                 :options="Object.values(TransmissionType).map(x => ({name: x}))"
                 @value:update="updateLaptime({uid: time.uid, transmission: $event.name})"
               />
             </div>
-            <div @click="setFilter({weather: time.weather})">
+            <div
+              :class="weatherClass(time.weather)"
+              @click="setFilter({weather: time.weather})"
+            >
               <EditableSelect
                 :text="time.weather"
                 :options="Object.values(WeatherType).map(x => ({name: x}))"
                 @value:update="updateLaptime({uid: time.uid, weather: $event.name})"
               />
             </div>
-            <div @click="setFilter({brakingLine: time.brakingLine})">
+            <div
+              :class="brakingLineClass(time.brakingLine)"
+              @click="setFilter({brakingLine: time.brakingLine})"
+            >
               <EditableSelect
                 :text="time.brakingLine"
                 :options="Object.values(BrakingLine).map(x => ({name: x}))"
@@ -195,7 +208,10 @@
 </template>
 
 <script>
+import BrakingLine from '@/constants/BrakingLine'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import WeatherType from '@/constants/WeatherType'
+import TransmissionType from '@/constants/TransmissionType'
 
 export default {
   name: 'LaptimeBoard',
@@ -203,11 +219,60 @@ export default {
     ...mapState(['cars', 'tracks', 'drivers']),
     ...mapGetters(['getTimes', 'getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
     ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls']),
-    ...mapGetters('laptimeFilter', ['getFilter'])
+    ...mapGetters('laptimeFilter', ['getFilter']),
+    firstLaptime () {
+      return this.getTimes({
+        carId: this.carId,
+        trackId: this.trackId,
+        trackVariant: this.trackVariant,
+        driverId: this.driverId,
+        transmission: this.transmission,
+        weather: this.weather,
+        brakingLine: this.brakingLine,
+        controls: this.controls
+      })[0].laptime
+    }
   },
   methods: {
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     ...mapActions(['updateLaptime']),
+    brakingLineClass (brakingLine) {
+      return {
+        __brakingLineOn: brakingLine === BrakingLine.ON,
+        __brakingLineOff: brakingLine === BrakingLine.OFF
+      }
+    },
+    weatherClass (weather) {
+      return {
+        __weatherSunny: weather === WeatherType.SUN,
+        __weatherRainy: weather === WeatherType.RAIN,
+        __weatherSnow: weather === WeatherType.SNOW
+      }
+    },
+    transmissionClass (transmission) {
+      return {
+        __transmissionAutomatic: transmission === TransmissionType.AUTOMATIC,
+        __transmissionSequential: transmission === TransmissionType.SEQUENTIAL,
+        __transmissionHPattern: transmission === TransmissionType.H_PATTERN
+      }
+    },
+    getLaptimeDiff (laptime) {
+      const SECONDS_LENGTH = 2
+      const MILLISECONDS_LENGTH = 3
+
+      const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
+
+      const l1 = this.firstLaptime.match(pattern)
+      const l2 = laptime.match(pattern)
+
+      const time1 = new Date(parseInt(l1[1]) * 60 * 1000 + parseInt(l1[2]) * 1000 + parseInt(l1[3]))
+      const time2 = new Date(parseInt(l2[1]) * 60 * 1000 + parseInt(l2[2]) * 1000 + parseInt(l2[3]))
+
+      const diff = new Date(time2.getTime() - time1.getTime())
+
+      const [m, s, ms] = [diff.getMinutes(), diff.getSeconds(), diff.getMilliseconds()].map(x => String(x))
+      return `+ ${m}:${s.padStart(SECONDS_LENGTH, '0')}.${ms.padStart(MILLISECONDS_LENGTH, '0')}`
+    },
     getDriver (time) {
       const driver = this.getDriverById(time.driverId)
       return driver ? driver.name : 'Loading'
@@ -259,6 +324,11 @@ tr:nth-child(odd) {
   background-color: white;
 }
 
+tr:hover {
+  color: var(--text-dark1);
+  background-color: #93c4f5;
+}
+
 td {
   padding: 0.5rem;
 }
@@ -290,8 +360,60 @@ td div:hover {
   padding: 0.2rem;
 }
 
+.__losing span{
+  white-space: nowrap;
+  color: #c20000;
+}
+
+.__weatherSunny {
+  background-color: #fbff00;
+  color: var(--text-dark1);
+}
+
+.__weatherRainy {
+  background-color: #274db4;
+  color: var(--text-light1);
+}
+
+.__weatherSnow {
+  background-color: #f3f3f3;
+  color: var(--text-dark1);
+}
+
+.__brakingLineOff {
+  background-color: #e00707;
+  color: var(--text-light1);
+}
+
+.__brakingLineOn {
+  background-color: #059711;
+  color: var(--text-light1);
+}
+
+.__transmissionAutomatic {
+  background-color: #059711;
+  color: var(--text-light1);
+}
+
+.__transmissionSequential {
+  background-color: #274db4;
+  color: var(--text-light1);
+}
+
+.__transmissionHPattern {
+  background-color: #954401;
+  color: var(--text-light1);
+}
+
 .__settings:hover {
   cursor: pointer;
+}
+
+.__settings > div {
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.7rem;
 }
 
 @media only screen and (max-width: 1024px) {
