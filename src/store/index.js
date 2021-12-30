@@ -1,12 +1,21 @@
 import { createLogger, createStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase'
-import { collection, doc, getDocs, limit, orderBy, query, setDoc, where } from 'firebase/firestore'
+import { enableIndexedDbPersistence, collection, doc, getDocs, limit, orderBy, query, setDoc, where } from 'firebase/firestore'
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 import ScreenType from '@/constants/ScreenType'
 import laptimeFilter from '@/store/modules/laptimeFilter'
 
 const debug = process.env.NODE_ENV !== 'production'
+
+enableIndexedDbPersistence(db)
+  .catch((err) => {
+    if (err.code === 'failed-precondition') {
+      console.log('Unable to activate local persistance, failed-precondition')
+    } else if (err.code === 'unimplemented') {
+      console.log('Unable to activate local persistance, unidentified browser')
+    }
+  })
 
 export default createStore({
   modules: {
@@ -72,7 +81,8 @@ export default createStore({
       console.log('Laptime: ', laptime, docRef)
       await setDoc(docRef, laptime, { merge: true })
     },
-    async getTimes ({ commit }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date }) {
+    async getTimes ({ commit }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, distinct }) {
+      distinct = distinct === 'yes'
       const constraints = []
 
       if (carId) constraints.push(where('carId', '==', carId))
@@ -86,11 +96,27 @@ export default createStore({
       if (startType) constraints.push(where('startType', '==', startType))
       if (date) constraints.push(where('date', '==', date))
       constraints.push(orderBy('laptime'))
-      constraints.push(limit(10))
+      constraints.push(limit(30))
 
+      const times = []
+      const drivers = []
+      const cars = []
+      const tracks = []
+      const trackVariants = []
       const q = query(collection(db, 'times'), ...constraints)
       const querySnapshot = await getDocs(q)
-      return commit('setTimes', querySnapshot.docs.map(x => x.data()))
+      querySnapshot.forEach(doc => {
+        const t = doc.data()
+        // filter duplicate times
+        if (distinct && drivers.includes(t.driverId) && cars.includes(t.carId) && tracks.includes(t.trackId) && trackVariants.includes(t.trackVariant)) return
+        times.push(t)
+        if (!drivers.includes(t.driverId)) drivers.push(t.driverId)
+        if (!cars.includes(t.carId)) cars.push(t.carId)
+        if (!tracks.includes(t.trackId)) tracks.push(t.trackId)
+        if (!trackVariants.includes(t.trackVariant)) trackVariants.push(t.trackVariant)
+      })
+
+      return commit('setTimes', times)
     },
     async bindDb ({ commit }) {
       commit('reset')

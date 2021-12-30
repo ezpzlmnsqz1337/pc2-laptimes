@@ -47,7 +47,6 @@ export default {
       this.$nextTick(() => this.$refs.select.$el.focus())
     },
     update (e) {
-      console.log(e)
       this.$emit('value:update', e)
       this.edit = false
     }
@@ -56,11 +55,11 @@ export default {
 </script>
 
 <style scoped>
-::v-deep .vs__dropdown-toggle {
+:deep(.vs__dropdown-toggle) {
   min-width: 10rem;
 }
 
-::v-deep .vs__dropdown-menu {
+:deep(.vs__dropdown-menu) {
   width: auto;
   overflow-x: hidden;
 }

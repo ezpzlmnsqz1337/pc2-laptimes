@@ -109,6 +109,19 @@
           @changed="e => setFilter({startType: e})"
         />
       </div>
+
+      <div class="__header">
+        Distinct
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="startType"
+          :values="['yes', 'no']"
+          :value="distinct"
+          @changed="e => setFilter({distinct: e})"
+        />
+      </div>
+
       <Button
         :type="ButtonType.SECONDARY"
         @click="clearFilter()"
@@ -235,7 +248,7 @@ export default {
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
-    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType']),
+    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct']),
     ...mapGetters('laptimeFilter', ['getFilter']),
     firstLaptime () {
       return this.times[0].laptime
@@ -323,12 +336,12 @@ export default {
   padding: 1rem;
 }
 
-.__activeFilter ::v-deep .vs__dropdown-toggle {
+.__activeFilter :deep(.vs__dropdown-toggle) {
   border: 0.1rem solid #4081C2;
   box-shadow: 0px 0px 5px 2px #4081C2;
 }
 
-.__activeFilter ::v-deep span.vs__selected {
+.__activeFilter :deep(span.vs__selected) {
   color: #4081C2;
   font-weight: bold;
 }
@@ -375,19 +388,19 @@ td div:hover {
   font-weight: bold;
 }
 
-::v-deep tr:nth-child(2) .__driver span {
+:deep(tr:nth-child(2) .__driver span) {
   color: gold;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-::v-deep tr:nth-child(3) .__driver span {
+:deep(tr:nth-child(3) .__driver span) {
   color: silver;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-::v-deep tr:nth-child(4) .__driver span {
+:deep(tr:nth-child(4) .__driver span) {
   color: #cd7f32;
   background-color: var(--bg-dark3);
   padding: 0.2rem;

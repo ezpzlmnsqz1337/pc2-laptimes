@@ -455,12 +455,12 @@ export default {
   font-size: 1.1rem;
 }
 
-.__selected ::v-deep .vs__dropdown-toggle {
+.__selected :deep(.vs__dropdown-toggle) {
   border: 0.1rem solid #4081C2;
   box-shadow: 0px 0px 5px 2px #4081C2;
 }
 
-.__selected ::v-deep span.vs__selected {
+.__selected :deep(span.vs__selected) {
   color: #4081C2;
   font-weight: bold;
 }
