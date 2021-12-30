@@ -162,4 +162,12 @@ a {
 .vs__actions .vs__clear {
   fill: red;
 }
+
+.fa.fa-steering_wheel {
+  display: block;
+  width: 1rem;
+  font-size: 2rem;
+  background: url('assets/icons/steering_wheel.svg');
+  background-repeat: no-repeat;
+}
 </style>

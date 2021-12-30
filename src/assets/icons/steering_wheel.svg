@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="14px"
+   height="13px"
+   id="svg2985"
+   version="1.1"
+   viewBox="0 0 64 64">
+  <g id="layer1">
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:4.02492237;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3009"
+       d="m 45,26.5 a 22.5,22.5 0 1 1 -45,0 22.5,22.5 0 1 1 45,0 z"
+       transform="matrix(1.0666667,0,0,-1.1111111,8.4999992,61.444444)" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 10,32 45,0 0,0 0,0"
+       id="path3952"
+       />
+    <path
+       style="fill:#ffffff;stroke:#ffffff;stroke-width:4;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       id="path3954"
+       d="m -20,29 a 5,5 0 1 1 -10,0 5,5 0 1 1 10,0 z"
+       transform="translate(57.5,3)" />
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:4;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 32.5,57 0,-20"
+       id="path3956"
+       />
+  </g>
+</svg>

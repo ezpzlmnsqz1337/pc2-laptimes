@@ -1,9 +1,15 @@
 <template>
   <div>
-    <span
+    <div
       v-if="!edit"
+      class="__textContainer"
       @click="startEditing($event)"
-    >{{ text }}</span>
+    >
+      <div
+        v-if="icon"
+        :class="`fa fa-${icon}`"
+      /><span>{{ text }}</span>
+    </div>
     <v-select
       v-if="edit"
       ref="select"
@@ -24,6 +30,10 @@ export default {
     text: {
       type: String,
       default: 'Editable text'
+    },
+    icon: {
+      type: String,
+      default: ''
     },
     options: {
       type: Array,
@@ -55,6 +65,11 @@ export default {
 </script>
 
 <style scoped>
+.__textContainer {
+  display: flex;
+  justify-content: space-around;
+}
+
 :deep(.vs__dropdown-toggle) {
   min-width: 10rem;
 }

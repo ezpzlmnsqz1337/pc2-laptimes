@@ -1,7 +1,7 @@
 <template>
   <div class="__laptimeBoardWrapper">
     <div class="__filter">
-      <h1>Filter times</h1>
+      <h2>Filter times</h2>
       <div class="__inputRow">
         <!-- object value -->
         <v-select
@@ -115,8 +115,8 @@
       </div>
       <div class="__inputRow __noColumn">
         <RadioButtons
-          name="startType"
-          :values="['yes', 'no']"
+          name="distinct"
+          :values="Object.values(Distinct)"
           :value="distinct"
           @changed="e => setFilter({distinct: e})"
         />
@@ -199,6 +199,7 @@
             >
               <EditableSelect
                 :text="time.transmission"
+                :icon="time.transmission"
                 :options="Object.values(TransmissionType).map(x => ({name: x}))"
                 @value:update="updateLaptime({uid: time.uid, transmission: $event.name})"
               />
@@ -209,6 +210,7 @@
             >
               <EditableSelect
                 :text="time.weather"
+                :icon="weatherIcon(time.weather)"
                 :options="Object.values(WeatherType).map(x => ({name: x}))"
                 @value:update="updateLaptime({uid: time.uid, weather: $event.name})"
               />
@@ -219,13 +221,18 @@
             >
               <EditableSelect
                 :text="time.brakingLine"
+                :icon="time.brakingLine === BrakingLine.ON ? 'check-circle' : 'times-circle'"
                 :options="Object.values(BrakingLine).map(x => ({name: x}))"
                 @value:update="updateLaptime({uid: time.uid, brakingLine: $event.name})"
               />
             </div>
-            <div @click="setFilter({controls: time.controls})">
+            <div
+              :class="controlsClass(time.controls)"
+              @click="setFilter({controls: time.controls})"
+            >
               <EditableSelect
                 :text="time.controls"
+                :icon="time.controls"
                 :options="Object.values(ControlType).map(x => ({name: x}))"
                 @value:update="updateLaptime({uid: time.uid, controls: $event.name})"
               />
@@ -242,6 +249,7 @@ import BrakingLine from '@/constants/BrakingLine'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import WeatherType from '@/constants/WeatherType'
 import TransmissionType from '@/constants/TransmissionType'
+import ControlType from '@/constants/ControlType'
 
 export default {
   name: 'LaptimeBoard',
@@ -276,11 +284,29 @@ export default {
         __weatherSnow: weather === WeatherType.SNOW
       }
     },
+    weatherIcon (weather) {
+      if (!weather) return
+      switch (weather) {
+        case WeatherType.SUN:
+          return 'sun'
+        case WeatherType.RAIN:
+          return 'cloud-rain'
+        case WeatherType.SNOW:
+          return 'snowflake'
+      }
+    },
     transmissionClass (transmission) {
       return {
         __transmissionAutomatic: transmission === TransmissionType.AUTOMATIC,
         __transmissionSequential: transmission === TransmissionType.SEQUENTIAL,
         __transmissionHPattern: transmission === TransmissionType.H_PATTERN
+      }
+    },
+    controlsClass (controls) {
+      return {
+        __controlsKeyboard: controls === ControlType.KEYBOARD,
+        __controlsGamepad: controls === ControlType.GAMEPAD,
+        __controlsSteeringWheel: controls === ControlType.STEERING_WHEEL
       }
     },
     setFilter (filter) {
@@ -324,7 +350,7 @@ export default {
   text-align: center;
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-evenly;
 }
 
 .__laptimeBoard {
@@ -388,19 +414,19 @@ td div:hover {
   font-weight: bold;
 }
 
-:deep(tr:nth-child(2) .__driver span) {
+tr:nth-child(2) :deep(.__driver span) {
   color: gold;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-:deep(tr:nth-child(3) .__driver span) {
+tr:nth-child(3) :deep(.__driver span) {
   color: silver;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-:deep(tr:nth-child(4) .__driver span) {
+tr:nth-child(4) :deep(.__driver span) {
   color: #cd7f32;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
@@ -451,6 +477,21 @@ td div:hover {
   color: var(--text-light1);
 }
 
+.__controlsKeyboard {
+  background-color: #059711;
+  color: var(--text-light1);
+}
+
+.__controlsGamepad {
+  background-color: #233974;
+  color: var(--text-light1);
+}
+
+.__controlsSteeringWheel {
+  background-color: #424242;
+  color: var(--text-light1);
+}
+
 .__settings:hover {
   cursor: pointer;
 }
@@ -460,6 +501,7 @@ td div:hover {
   border-radius: 0.3rem;
   margin-bottom: 0.3rem;
   font-size: 0.7rem;
+  min-width: 6rem;
 }
 
 @media only screen and (max-width: 1024px) {

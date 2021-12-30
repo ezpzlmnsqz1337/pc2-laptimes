@@ -12,6 +12,7 @@ import BrakingLine from '@/constants/BrakingLine'
 import ControlType from '@/constants/ControlType'
 import StartType from '@/constants/StartType'
 import ScreenType from '@/constants/ScreenType'
+import Distinct from '@/constants/Distinct'
 import Modal from '@/components/ui/Modal'
 import { debounce } from 'debounce'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
@@ -19,6 +20,7 @@ import 'material-icons/iconfont/material-icons.css'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 import Toaster from '@meforma/vue-toaster'
+import '@fortawesome/fontawesome-free/css/all.css'
 
 const app = createApp(App)
 app.config.globalProperties.ButtonType = ButtonType
@@ -28,6 +30,7 @@ app.config.globalProperties.BrakingLine = BrakingLine
 app.config.globalProperties.ControlType = ControlType
 app.config.globalProperties.StartType = StartType
 app.config.globalProperties.ScreenType = ScreenType
+app.config.globalProperties.Distinct = Distinct
 
 app.config.globalProperties.debounce = debounce
 app.use(store)

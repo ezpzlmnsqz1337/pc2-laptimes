@@ -9,6 +9,7 @@
     "deploy": "ssh pi@malina 'rm -rf /home/pi/workspace/laptimes/**' && scp -r ./dist/** pi@malina:/home/pi/workspace/laptimes/"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
     "@meforma/vue-toaster": "^1.3.0",
     "core-js": "^3.6.5",
     "debounce": "^1.2.1",

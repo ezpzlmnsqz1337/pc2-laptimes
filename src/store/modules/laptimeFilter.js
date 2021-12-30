@@ -1,3 +1,5 @@
+import Distinct from '@/constants/Distinct'
+
 const state = () => ({
   carId: null,
   trackId: null,
@@ -8,7 +10,7 @@ const state = () => ({
   brakingLine: null,
   controls: null,
   startType: null,
-  distinct: 'yes'
+  distinct: Distinct.YES
 })
 
 // getters
@@ -59,7 +61,7 @@ const mutations = {
     state.brakingLine = null
     state.controls = null
     state.startType = null
-    state.distinct = false
+    state.distinct = Distinct.YES
   }
 }
 
