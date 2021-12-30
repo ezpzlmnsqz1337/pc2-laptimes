@@ -121,7 +121,12 @@
           </td>
           <td class="__driver">
             <div @click="setFilter({driverId: time.driverId})">
-              <span>{{ getDriver(time) }}</span>
+              <EditableSelect
+                label="name"
+                :text="getDriver(time)"
+                :options="drivers"
+                @value:update="updateLaptime({uid: time.uid, driverId: $event.uid})"
+              />
             </div>
           </td>
           <td class="__laptime">
@@ -129,29 +134,58 @@
           </td>
           <td class="__car">
             <div @click="setFilter({carId: time.carId})">
-              {{ getCarById(time.carId).name }}
+              <EditableSelect
+                :text="getCarById(time.carId).name"
+                :options="cars"
+                @value:update="updateLaptime({uid: time.uid, carId: $event.uid})"
+              />
             </div>
           </td>
           <td class="__track">
             <div @click="setFilter({trackId: time.trackId})">
-              {{ getTrackById(time.trackId).track }}
+              <EditableSelect
+                label="track"
+                :text="getTrackById(time.trackId).track"
+                :options="tracks"
+                @value:update="updateLaptime({uid: time.uid, trackId: $event.uid})"
+              />
             </div>
             <div @click="setFilter({trackId: time.trackId, trackVariant: time.trackVariant})">
-              {{ time.trackVariant }}
+              <EditableSelect
+                :text="time.trackVariant"
+                :options="getTrackVariants(trackId)"
+                @value:update="updateLaptime({uid: time.uid, trackVariant: $event})"
+              />
             </div>
           </td>
           <td class="__settings">
             <div @click="setFilter({transmission: time.transmission})">
-              {{ time.transmission }}
+              <EditableSelect
+                :text="time.transmission"
+                :options="Object.values(TransmissionType).map(x => ({name: x}))"
+                @value:update="updateLaptime({uid: time.uid, transmission: $event.name})"
+              />
             </div>
             <div @click="setFilter({weather: time.weather})">
-              {{ time.weather }}
+              <EditableSelect
+                :text="time.weather"
+                :options="Object.values(WeatherType).map(x => ({name: x}))"
+                @value:update="updateLaptime({uid: time.uid, weather: $event.name})"
+              />
             </div>
             <div @click="setFilter({brakingLine: time.brakingLine})">
-              {{ time.brakingLine }}
+              <EditableSelect
+                :text="time.brakingLine"
+                :options="Object.values(BrakingLine).map(x => ({name: x}))"
+                @value:update="updateLaptime({uid: time.uid, brakingLine: $event.name})"
+              />
             </div>
             <div @click="setFilter({controls: time.controls})">
-              {{ time.controls }}
+              <EditableSelect
+                :text="time.controls"
+                :options="Object.values(ControlType).map(x => ({name: x}))"
+                @value:update="updateLaptime({uid: time.uid, controls: $event.name})"
+              />
             </div>
           </td>
         </tr>
@@ -161,7 +195,7 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'LaptimeBoard',
@@ -173,6 +207,7 @@ export default {
   },
   methods: {
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
+    ...mapActions(['updateLaptime']),
     getDriver (time) {
       const driver = this.getDriverById(time.driverId)
       return driver ? driver.name : 'Loading'
@@ -193,6 +228,7 @@ export default {
 
 .__laptimeBoard {
   padding: 1rem;
+  border-radius: 0.3rem;
 }
 
 .__filter {
@@ -201,9 +237,9 @@ export default {
 
 .__laptimeBoard table {
   min-width: 55vw;
-  border-radius: 0.3rem;
+  overflow: hidden;
   border-spacing:0;
-  border-collapse: collapse;
+  border-radius: 0.3rem;
   font-size: 1rem;
 }
 
@@ -236,19 +272,19 @@ td div:hover {
   font-weight: bold;
 }
 
-tr:nth-child(2) .__driver > div > span {
+::v-deep tr:nth-child(2) .__driver span {
   color: gold;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-tr:nth-child(3) .__driver > div > span {
+::v-deep tr:nth-child(3) .__driver span {
   color: silver;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-tr:nth-child(4) .__driver > div > span {
+::v-deep tr:nth-child(4) .__driver span {
   color: #cd7f32;
   background-color: var(--bg-dark3);
   padding: 0.2rem;

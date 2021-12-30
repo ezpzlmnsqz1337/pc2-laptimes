@@ -4,6 +4,7 @@ import store from '@/store/index.js'
 import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import Button from '@/components/ui/Button'
 import RadioButtons from '@/components/ui/RadioButtons'
+import EditableSelect from '@/components/ui/EditableSelect'
 import ButtonType from '@/constants/ButtonType'
 import TransmissionType from '@/constants/TransmissionType'
 import WeatherType from '@/constants/WeatherType'
@@ -32,6 +33,7 @@ app.use(Toaster)
 app.use(PerfectScrollbar)
 app.component('Button', Button)
 app.component('Modal', Modal)
+app.component('EditableSelect', EditableSelect)
 app.component('RadioButtons', RadioButtons)
 app.component('VSelect', vSelect)
 app.mount('#app')

@@ -75,6 +75,12 @@ export default createStore({
       const docRef = doc(db, 'times', time.uid)
       await setDoc(docRef, time)
     },
+    async updateLaptime (state, laptime) {
+      if (!laptime.uid) return
+      const docRef = doc(db, 'times', laptime.uid)
+      console.log('Laptime: ', laptime, docRef)
+      await setDoc(docRef, laptime, { merge: true })
+    },
     bindDb ({ commit }) {
       commit('reset')
       bindFirestoreCollection(commit, 'cars', collection(db, 'cars'))
