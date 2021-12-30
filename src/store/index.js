@@ -1,7 +1,7 @@
 import { createLogger, createStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase'
-import { collection, doc, setDoc } from 'firebase/firestore'
+import { collection, doc, getDocs, limit, orderBy, query, setDoc, where } from 'firebase/firestore'
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 import ScreenType from '@/constants/ScreenType'
 import laptimeFilter from '@/store/modules/laptimeFilter'
@@ -15,8 +15,8 @@ export default createStore({
   state: {
     activeScreen: ScreenType.LAPTIME_BOARD,
     cars: [],
-    tracks: [],
     times: [],
+    tracks: [],
     drivers: []
   },
   getters: {
@@ -35,34 +35,15 @@ export default createStore({
     },
     getDriverById: (state) => (id) => {
       return state.drivers.find(x => x.uid === id)
-    },
-    getTimes: (state) => ({ carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, date }) => {
-      let result = [...state.times]
-      if (carId) result = result.filter(x => x.carId === carId)
-      if (trackId) result = result.filter(x => x.trackId === trackId)
-      if (trackVariant) result = result.filter(x => x.trackVariant === trackVariant)
-      if (driverId) result = result.filter(x => x.driverId === driverId)
-      if (transmission) result = result.filter(x => x.transmission === transmission)
-      if (weather) result = result.filter(x => x.weather === weather)
-      if (brakingLine) result = result.filter(x => x.brakingLine === brakingLine)
-      if (controls) result = result.filter(x => x.controls === controls)
-      if (date) result = result.filter(x => x.date === date)
-
-      return result.sort((a, b) => {
-        const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
-
-        const l1 = a.laptime.match(pattern)
-        const l2 = b.laptime.match(pattern)
-
-        const time1 = new Date(parseInt(l1[1]) * 60 * 1000 + parseInt(l1[2]) * 1000 + parseInt(l1[3]))
-        const time2 = new Date(parseInt(l2[1]) * 60 * 1000 + parseInt(l2[2]) * 1000 + parseInt(l2[3]))
-
-        return time1.getTime() - time2.getTime()
-      })
     }
   },
   mutations: {
     reset (state) {
+    },
+    setTimes (state, times) {
+      if (!times) return
+      state.times.splice(0)
+      state.times.push(...times)
     },
     showScreen (state, { screen }) {
       state.activeScreen = screen
@@ -80,22 +61,41 @@ export default createStore({
       const docRef = doc(db, 'drivers', driver.uid)
       await setDoc(docRef, driver)
     },
-    async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, date }) {
-      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, date }
+    async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, notes }) {
+      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, notes }
       const docRef = doc(db, 'times', time.uid)
       await setDoc(docRef, time)
     },
-    async updateLaptime (state, laptime) {
+    async updateLaptime ({ commit }, laptime) {
       if (!laptime.uid) return
       const docRef = doc(db, 'times', laptime.uid)
       console.log('Laptime: ', laptime, docRef)
       await setDoc(docRef, laptime, { merge: true })
     },
-    bindDb ({ commit }) {
+    async getTimes ({ commit }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date }) {
+      const constraints = []
+
+      if (carId) constraints.push(where('carId', '==', carId))
+      if (trackId) constraints.push(where('trackId', '==', trackId))
+      if (trackVariant) constraints.push(where('trackVariant', '==', trackVariant))
+      if (driverId) constraints.push(where('driverId', '==', driverId))
+      if (transmission) constraints.push(where('transmission', '==', transmission))
+      if (weather) constraints.push(where('weather', '==', weather))
+      if (brakingLine) constraints.push(where('brakingLine', '==', brakingLine))
+      if (controls) constraints.push(where('controls', '==', controls))
+      if (startType) constraints.push(where('startType', '==', startType))
+      if (date) constraints.push(where('date', '==', date))
+      constraints.push(orderBy('laptime'))
+      constraints.push(limit(10))
+
+      const q = query(collection(db, 'times'), ...constraints)
+      const querySnapshot = await getDocs(q)
+      return commit('setTimes', querySnapshot.docs.map(x => x.data()))
+    },
+    async bindDb ({ commit }) {
       commit('reset')
       bindFirestoreCollection(commit, 'cars', collection(db, 'cars'))
       bindFirestoreCollection(commit, 'tracks', collection(db, 'tracks'))
-      bindFirestoreCollection(commit, 'times', collection(db, 'times'))
       bindFirestoreCollection(commit, 'drivers', collection(db, 'drivers'))
     }
   },

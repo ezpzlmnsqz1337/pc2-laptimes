@@ -10,6 +10,7 @@
           :options="cars"
           :reduce="car => car.uid"
           label="name"
+          :class="{__activeFilter: carId}"
           @update:model-value="setFilter({carId: $event})"
         />
       </div>
@@ -20,6 +21,7 @@
           :options="tracks"
           :reduce="track => track.uid"
           label="track"
+          :class="{__activeFilter: trackId}"
           @update:model-value="setFilter({trackId: $event})"
         />
       </div>
@@ -31,6 +33,7 @@
           :model-value="trackVariant"
           placeholder="Select track variant"
           :options="getTrackVariants(trackId)"
+          :class="{__activeFilter: trackVariant}"
           @update:model-value="setFilter({trackVariant: $event})"
         />
       </div>
@@ -43,10 +46,11 @@
           :options="drivers"
           :reduce="driver => driver.uid"
           label="name"
+          :class="{__activeFilter: driverId}"
           @update:model-value="setFilter({driverId: $event})"
         />
       </div>
-      <div class="__radioHeader">
+      <div class="__header">
         Transmission
       </div>
       <div class="__inputRow __noColumn">
@@ -58,7 +62,7 @@
         />
       </div>
 
-      <div class="__radioHeader">
+      <div class="__header">
         Weather
       </div>
       <div class="__inputRow __noColumn">
@@ -70,7 +74,7 @@
         />
       </div>
 
-      <div class="__radioHeader">
+      <div class="__header">
         Braking line
       </div>
       <div class="__inputRow __noColumn">
@@ -82,7 +86,7 @@
         />
       </div>
 
-      <div class="__radioHeader">
+      <div class="__header">
         Controls
       </div>
       <div class="__inputRow __noColumn">
@@ -91,6 +95,18 @@
           :values="Object.values(ControlType)"
           :value="controls"
           @changed="e => setFilter({controls: e})"
+        />
+      </div>
+
+      <div class="__header">
+        Start type
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="startType"
+          :values="Object.values(StartType)"
+          :value="startType"
+          @changed="e => setFilter({startType: e})"
         />
       </div>
       <Button
@@ -113,9 +129,10 @@
           <th>Settings</th>
         </tr>
         <tr
-          v-for="(time, index) in getTimes({carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls})"
+          v-for="(time, index) in times"
           :key="index"
           class="__row"
+          :title="getRowTitleText(time)"
         >
           <td class="__id">
             {{ index+1 }}.
@@ -216,26 +233,23 @@ import TransmissionType from '@/constants/TransmissionType'
 export default {
   name: 'LaptimeBoard',
   computed: {
-    ...mapState(['cars', 'tracks', 'drivers']),
-    ...mapGetters(['getTimes', 'getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
-    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls']),
+    ...mapState(['cars', 'tracks', 'drivers', 'times']),
+    ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
+    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType']),
     ...mapGetters('laptimeFilter', ['getFilter']),
     firstLaptime () {
-      return this.getTimes({
-        carId: this.carId,
-        trackId: this.trackId,
-        trackVariant: this.trackVariant,
-        driverId: this.driverId,
-        transmission: this.transmission,
-        weather: this.weather,
-        brakingLine: this.brakingLine,
-        controls: this.controls
-      })[0].laptime
+      return this.times[0].laptime
     }
   },
   methods: {
-    ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
-    ...mapActions(['updateLaptime']),
+    ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
+    ...mapActions(['updateLaptime', 'getTimes']),
+    getRowTitleText (laptime) {
+      const date = new Date(laptime.date).toLocaleString()
+      let result = `Date: ${date}`
+      if (laptime.notes) result += `\nNotes: ${laptime.notes}`
+      return result
+    },
     brakingLineClass (brakingLine) {
       return {
         __brakingLineOn: brakingLine === BrakingLine.ON,
@@ -255,6 +269,15 @@ export default {
         __transmissionSequential: transmission === TransmissionType.SEQUENTIAL,
         __transmissionHPattern: transmission === TransmissionType.H_PATTERN
       }
+    },
+    setFilter (filter) {
+      filter = { ...this.getFilter(), ...filter }
+      this.sf(filter)
+      this.getTimes(filter)
+    },
+    clearFilter () {
+      this.cf()
+      this.getTimes(this.getFilter())
     },
     getLaptimeDiff (laptime) {
       const SECONDS_LENGTH = 2
@@ -298,6 +321,16 @@ export default {
 
 .__filter {
   padding: 1rem;
+}
+
+.__activeFilter ::v-deep .vs__dropdown-toggle {
+  border: 0.1rem solid #4081C2;
+  box-shadow: 0px 0px 5px 2px #4081C2;
+}
+
+.__activeFilter ::v-deep span.vs__selected {
+  color: #4081C2;
+  font-weight: bold;
 }
 
 .__laptimeBoard table {

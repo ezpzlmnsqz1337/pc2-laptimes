@@ -10,6 +10,7 @@ import TransmissionType from '@/constants/TransmissionType'
 import WeatherType from '@/constants/WeatherType'
 import BrakingLine from '@/constants/BrakingLine'
 import ControlType from '@/constants/ControlType'
+import StartType from '@/constants/StartType'
 import ScreenType from '@/constants/ScreenType'
 import Modal from '@/components/ui/Modal'
 import { debounce } from 'debounce'
@@ -25,6 +26,7 @@ app.config.globalProperties.TransmissionType = TransmissionType
 app.config.globalProperties.WeatherType = WeatherType
 app.config.globalProperties.BrakingLine = BrakingLine
 app.config.globalProperties.ControlType = ControlType
+app.config.globalProperties.StartType = StartType
 app.config.globalProperties.ScreenType = ScreenType
 
 app.config.globalProperties.debounce = debounce

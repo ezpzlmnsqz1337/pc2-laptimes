@@ -27,7 +27,7 @@
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import AddLaptime from '@/components/AddLaptime'
 import LaptimeBoard from '@/components/LaptimeBoard'
-import { mapActions, mapMutations, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'App',
@@ -38,14 +38,16 @@ export default {
   computed: {
     ...mapState(['activeScreen'])
   },
-  mounted () {
-    this.bindDb()
+  async mounted () {
+    await this.bindDb()
+    this.getTimes(this.getFilter())
   },
   unmounted () {
     unsubscribeAll()
   },
   methods: {
-    ...mapActions(['bindDb']),
+    ...mapGetters('laptimeFilter', ['getFilter']),
+    ...mapActions(['bindDb', 'getTimes']),
     ...mapMutations(['showScreen'])
   }
 }
@@ -105,6 +107,23 @@ a {
   color: var(--anchor);
 }
 
+.__inputRow {
+  display: flex;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.__noColumn {
+  flex-direction: row !important;
+  border-bottom: 0.1rem solid white;
+}
+
+.__noColumn > div {
+  padding: 1rem;
+}
+
 /* custom scrollbar overrides */
 .ps .ps__rail-x:hover, .ps .ps__rail-y:hover, .ps .ps__rail-x:focus, .ps .ps__rail-y:focus, .ps .ps__rail-x.ps--clicking, .ps .ps__rail-y.ps--clicking {
   background-color: transparent !important;
@@ -127,5 +146,20 @@ a {
 
 .__menu .__selected {
   background-color: #242424 !important;
+}
+
+.__inputRow > input, .__inputRow > .v-select {
+  width: 100%;
+}
+
+.v-select > .vs__dropdown-toggle {
+  background-color: var(--bg-light1);
+  border-radius: 0.3rem;
+  padding: 0.5rem;
+  border: 0.1rem solid black;
+}
+
+.vs__actions .vs__clear {
+  fill: red;
 }
 </style>

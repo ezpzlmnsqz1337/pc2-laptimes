@@ -70,6 +70,7 @@
         placeholder="Select car"
         :options="cars"
         :reduce="car => car.uid"
+        :class="{__selected: carId}"
         label="name"
       />
       <Button
@@ -86,6 +87,7 @@
         :options="tracks"
         :reduce="track => track.uid"
         label="track"
+        :class="{__selected: trackId}"
         @option:selected="trackVariant=getTrackVariants($event.uid)[0]"
       />
     </div>
@@ -97,6 +99,7 @@
         v-model="trackVariant"
         placeholder="Select track variant"
         :options="getTrackVariants(trackId)"
+        :class="{__selected: trackVariant}"
       />
     </div>
     <div
@@ -107,6 +110,7 @@
         placeholder="Select driver"
         :options="drivers"
         :reduce="driver => driver.uid"
+        :class="{__selected: driverId}"
         label="name"
       />
       <Button
@@ -150,7 +154,7 @@
         >
       </div>
     </div>
-    <div class="__radioHeader">
+    <div class="__header">
       Transmission
     </div>
     <div class="__inputRow __noColumn">
@@ -163,7 +167,7 @@
       />
     </div>
 
-    <div class="__radioHeader">
+    <div class="__header">
       Weather
     </div>
     <div class="__inputRow __noColumn">
@@ -176,7 +180,7 @@
       />
     </div>
 
-    <div class="__radioHeader">
+    <div class="__header">
       Braking line
     </div>
     <div class="__inputRow __noColumn">
@@ -189,7 +193,7 @@
       />
     </div>
 
-    <div class="__radioHeader">
+    <div class="__header">
       Controls
     </div>
     <div class="__inputRow __noColumn">
@@ -202,13 +206,33 @@
       />
     </div>
 
+    <div class="__header">
+      Start type
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        no-any
+        name="ALstartType"
+        :values="Object.values(StartType)"
+        :value="startType"
+        @changed="e => startType = e"
+      />
+    </div>
+
+    <div class="__header">
+      Notes
+    </div>
+    <div class="__inputRow __noColumn">
+      <textarea v-model="notes" />
+    </div>
+
     <div class="__inputRow">
       <Button
         :type="ButtonType.PRIMARY"
         block
         class="__submit"
         :disabled="!valid"
-        @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, date: new Date().getTime()})"
+        @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), notes})"
       >
         Submit
       </Button>
@@ -223,6 +247,7 @@ import WeatherType from '@/constants/WeatherType'
 import BrakingLine from '@/constants/BrakingLine'
 import ControlType from '@/constants/ControlType'
 import ScreenType from '@/constants/ScreenType'
+import StartType from '@/constants/StartType'
 
 export default {
   name: 'AddLaptime',
@@ -240,6 +265,8 @@ export default {
       weather: WeatherType.SUN,
       brakingLine: BrakingLine.ON,
       controls: ControlType.STEERING_WHEEL,
+      startType: StartType.RUNNING,
+      notes: '',
       newDriverName: '',
       showNewDriverModal: false,
       newCarName: '',
@@ -249,6 +276,7 @@ export default {
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getTrackVariants']),
+    ...mapGetters('laptimeFilter', ['getFilter']),
     laptime () {
       const SECONDS_LENGTH = 2
       const MILLISECONDS_LENGTH = 3
@@ -268,7 +296,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar']),
+    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'getTimes']),
     ...mapMutations(['showScreen']),
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     validateLaptimeFormat () {
@@ -294,26 +322,19 @@ export default {
     showTimeInTable ({ carId, trackId, trackVariant }) {
       this.clearFilter()
       this.setFilter({ carId, trackId, trackVariant })
+      this.getTimes(this.getFilter())
       this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
     }
   }
 }
 </script>
 
-<style>
+<style scoped>
 .__timeWrapper {
   width: 30%;
   padding: 2rem;
   margin: 0 auto;
   text-align: center;
-}
-
-.__inputRow {
-  display: flex;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  width: 100%;
-  justify-content: center;
 }
 
 @media only screen and (max-width: 1280px) {
@@ -331,17 +352,6 @@ export default {
   .__inputRow {
     flex-direction: column;
   }
-}
-
-.__inputRow > input, .__inputRow > .v-select {
-  width: 100%;
-}
-
-.v-select > .vs__dropdown-toggle {
-  background-color: var(--bg-light1);
-  border-radius: 0.3rem;
-  padding: 0.5rem;
-  border: 0.1rem solid black;
 }
 
 .__lapTimeInputs {
@@ -439,18 +449,28 @@ export default {
   width: 5rem;
 }
 
-.__radioHeader {
+.__header {
   margin-bottom: 0.5rem;
   font-weight: bold;
   font-size: 1.1rem;
 }
 
-.__noColumn {
-  flex-direction: row !important;
-  border-bottom: 0.1rem solid white;
+.__selected ::v-deep .vs__dropdown-toggle {
+  border: 0.1rem solid #4081C2;
+  box-shadow: 0px 0px 5px 2px #4081C2;
 }
 
-.__noColumn > div {
-  padding: 1rem;
+.__selected ::v-deep span.vs__selected {
+  color: #4081C2;
+  font-weight: bold;
+}
+
+textarea {
+  width: 100%;
+  background-color: var(--bg-light1);
+  border-radius: 0.3rem;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 0.1rem solid black;
 }
 </style>
