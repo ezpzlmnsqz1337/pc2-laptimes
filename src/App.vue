@@ -15,11 +15,33 @@
       >
         Laptime board
       </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        :class="{__selected: activeScreen === ScreenType.TRACKS}"
+        @click="showScreen({screen: ScreenType.TRACKS})"
+      >
+        Statistics
+      </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        :class="{__selected: activeScreen === ScreenType.REALTIME_DATA}"
+        @click="showScreen({screen: ScreenType.REALTIME_DATA})"
+      >
+        Realtime data
+      </Button>
     </div>
     <div v-show="activeScreen === ScreenType.ADD_LAPTIME">
       <AddLaptime />
     </div>
-    <LaptimeBoard v-show="activeScreen === ScreenType.LAPTIME_BOARD" />
+    <div
+      v-show="activeScreen === ScreenType.LAPTIME_BOARD"
+      class="__laptimes"
+    >
+      <LaptimeFilter />
+      <LaptimeBoard />
+    </div>
+    <Statistics v-show="activeScreen === ScreenType.TRACKS" />
+    <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
   </div>
 </template>
 
@@ -27,20 +49,26 @@
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import AddLaptime from '@/components/AddLaptime'
 import LaptimeBoard from '@/components/LaptimeBoard'
+import LaptimeFilter from '@/components/LaptimeFilter'
+import Statistics from '@/components/Statistics'
+import RealtimeData from '@/components/RealtimeData'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'App',
   components: {
     AddLaptime,
-    LaptimeBoard
+    LaptimeBoard,
+    LaptimeFilter,
+    Statistics,
+    RealtimeData
   },
   computed: {
     ...mapState(['activeScreen'])
   },
   async mounted () {
     await this.bindDb()
-    this.getTimes(this.getFilter())
+    await this.setTimes(await this.getTimes(this.getFilter()))
   },
   unmounted () {
     unsubscribeAll()
@@ -48,7 +76,7 @@ export default {
   methods: {
     ...mapGetters('laptimeFilter', ['getFilter']),
     ...mapActions(['bindDb', 'getTimes']),
-    ...mapMutations(['showScreen'])
+    ...mapMutations(['setTimes', 'showScreen'])
   }
 }
 </script>
@@ -150,6 +178,15 @@ a {
 
 .__inputRow > input, .__inputRow > .v-select {
   width: 100%;
+}
+
+.__laptimes {
+  padding: 2rem;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
 }
 
 .v-select > .vs__dropdown-toggle {

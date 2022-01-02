@@ -63,6 +63,12 @@
 
   <div class="__timeWrapper">
     <h1>Add Laptime</h1>
+    <div
+      v-if="carName"
+      class="__gameInfoColumn"
+    >
+      {{ carName }}
+    </div>
     <div class="__inputRow">
       <!-- object value -->
       <v-select
@@ -80,6 +86,12 @@
         Add
       </Button>
     </div>
+    <div
+      v-if="trackLocation"
+      class="__gameInfoColumn"
+    >
+      {{ trackLocation }}
+    </div>
     <div class="__inputRow">
       <v-select
         v-model="trackId"
@@ -90,6 +102,12 @@
         :class="{__selected: trackId}"
         @option:selected="trackVariant=getTrackVariants($event.uid)[0]"
       />
+    </div>
+    <div
+      v-if="trackId && trackVariation"
+      class="__gameInfoColumn"
+    >
+      {{ trackVariation }}
     </div>
     <div
       v-if="trackId"
@@ -119,6 +137,12 @@
       >
         Add
       </Button>
+    </div>
+    <div
+      v-if="fastestLapTime"
+      class="__gameInfoColumn"
+    >
+      {{ fastestLapTime }}
     </div>
     <div class="__inputRow">
       <div
@@ -275,6 +299,7 @@ export default {
   },
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
+    ...mapState('realtimeData', ['participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
     ...mapGetters(['getTrackVariants']),
     ...mapGetters('laptimeFilter', ['getFilter']),
     laptime () {
@@ -293,6 +318,12 @@ export default {
     },
     valid () {
       return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
+    },
+    fastestLapTime () {
+      if (!this.participants.length > 0) return false
+      if (!this.participants[0].fastestLapTime) return false
+      const d = new Date(this.participants[0].fastestLapTime * 1000)
+      return `${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`
     }
   },
   methods: {
@@ -463,6 +494,10 @@ export default {
 .__selected :deep(span.vs__selected) {
   color: #4081C2;
   font-weight: bold;
+}
+
+.__gameInfoColumn {
+  width: 100%;
 }
 
 textarea {

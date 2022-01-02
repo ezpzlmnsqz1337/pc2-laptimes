@@ -1,10 +1,12 @@
-import { createLogger, createStore } from 'vuex'
+import { createStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase'
 import { enableIndexedDbPersistence, collection, doc, getDocs, limit, orderBy, query, setDoc, where } from 'firebase/firestore'
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 import ScreenType from '@/constants/ScreenType'
 import laptimeFilter from '@/store/modules/laptimeFilter'
+import realtimeData from '@/store/modules/realtimeData'
+import Distinct from '@/constants/Distinct'
 
 const debug = process.env.NODE_ENV !== 'production'
 
@@ -19,7 +21,8 @@ enableIndexedDbPersistence(db)
 
 export default createStore({
   modules: {
-    laptimeFilter
+    laptimeFilter,
+    realtimeData
   },
   state: {
     activeScreen: ScreenType.LAPTIME_BOARD,
@@ -81,8 +84,8 @@ export default createStore({
       console.log('Laptime: ', laptime, docRef)
       await setDoc(docRef, laptime, { merge: true })
     },
-    async getTimes ({ commit }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, distinct }) {
-      distinct = distinct === 'yes'
+    async getTimes ({ commit, dispatch }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, distinct }) {
+      distinct = distinct === Distinct.YES
       const constraints = []
 
       if (carId) constraints.push(where('carId', '==', carId))
@@ -98,17 +101,31 @@ export default createStore({
       constraints.push(orderBy('laptime'))
       constraints.push(limit(30))
 
+      const q = query(collection(db, 'times'), ...constraints)
+      const querySnapshot = await getDocs(q)
+      const times = distinct ? await dispatch('getDistinctTimes', querySnapshot.docs) : querySnapshot.docs.map(x => x.data())
+
+      return times
+    },
+    async getTracksTimes ({ dispatch }, { tracks }) {
+      const result = {}
+      tracks.forEach(async x => {
+        const q = query(collection(db, 'times'), where('trackId', '==', x.uid), orderBy('laptime'))
+        const querySnapshot = await getDocs(q)
+        result[x.uid] = await dispatch('getDistinctTimes', querySnapshot.docs)
+      })
+      return result
+    },
+    async getDistinctTimes ({ commit }, docs) {
       const times = []
       const drivers = []
       const cars = []
       const tracks = []
       const trackVariants = []
-      const q = query(collection(db, 'times'), ...constraints)
-      const querySnapshot = await getDocs(q)
-      querySnapshot.forEach(doc => {
+      docs.forEach(doc => {
         const t = doc.data()
         // filter duplicate times
-        if (distinct && drivers.includes(t.driverId) && cars.includes(t.carId) && tracks.includes(t.trackId) && trackVariants.includes(t.trackVariant)) return
+        if (drivers.includes(t.driverId) && cars.includes(t.carId) && tracks.includes(t.trackId) && trackVariants.includes(t.trackVariant)) return
         times.push(t)
         if (!drivers.includes(t.driverId)) drivers.push(t.driverId)
         if (!cars.includes(t.carId)) cars.push(t.carId)
@@ -116,7 +133,7 @@ export default createStore({
         if (!trackVariants.includes(t.trackVariant)) trackVariants.push(t.trackVariant)
       })
 
-      return commit('setTimes', times)
+      return times
     },
     async bindDb ({ commit }) {
       commit('reset')
@@ -126,5 +143,5 @@ export default createStore({
     }
   },
   strict: debug,
-  plugins: debug ? [createLogger()] : []
+  plugins: debug ? [] : []
 })
