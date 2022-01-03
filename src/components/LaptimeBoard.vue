@@ -6,7 +6,9 @@
         <th>Rank</th>
         <th>Driver</th>
         <th>Laptime</th>
-        <th>Losing</th>
+        <th class="__losing_lg">
+          Losing
+        </th>
         <th>Car</th>
         <th>Track</th>
         <th>Settings</th>
@@ -31,9 +33,15 @@
           </div>
         </td>
         <td class="__laptime">
-          {{ time.laptime }}
+          <div>{{ time.laptime }}</div>
+          <div
+            v-if="index > 0"
+            class="__losing __losing_sm"
+          >
+            {{ getLaptimeDiff(time.laptime) }}
+          </div>
         </td>
-        <td class="__losing">
+        <td class="__losing __losing_lg">
           <span v-if="index > 0">{{ getLaptimeDiff(time.laptime) }}</span>
         </td>
         <td class="__car">
@@ -214,22 +222,13 @@ export default {
 </script>
 
 <style scoped>
-.__laptimeBoardWrapper {
-  padding: 2rem;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
 .__laptimeBoard {
   padding: 1rem;
   border-radius: 0.3rem;
 }
 
 .__laptimeBoard table {
-  min-width: 55vw;
+  width: 100%;
   overflow: hidden;
   border-spacing:0;
   border-radius: 0.3rem;
@@ -288,7 +287,15 @@ tr:nth-child(4) :deep(.__driver span) {
   padding: 0.2rem;
 }
 
-.__losing span{
+.__losing_lg {
+  display: table-cell;
+}
+
+.__losing_sm {
+  display: none;
+}
+
+.__losing {
   white-space: nowrap;
   color: #c20000;
 }
@@ -361,21 +368,6 @@ tr:nth-child(4) :deep(.__driver span) {
 }
 
 @media only screen and (max-width: 1024px) {
-  .__laptimeBoardWrapper {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .__laptimeBoard table {
-    width: 90vw;
-  }
-}
-
-@media only screen and (max-width: 700px) {
-  .__laptimeBoardWrapper {
-    padding: 1rem;
-  }
-
   .__laptimeBoard table {
     font-size: 0.5rem;
   }
@@ -387,6 +379,15 @@ tr:nth-child(4) :deep(.__driver span) {
     padding: 1rem 0.2rem;
   }
 
+  .__losing_lg {
+    display: none;
+  }
+
+  .__losing_sm {
+    display: block;
+    white-space: nowrap;
+  }
+
   td {
     padding: 0.2rem;
   }
@@ -394,5 +395,13 @@ tr:nth-child(4) :deep(.__driver span) {
   .__laptimeBoard {
     padding: 0;
   }
+
+  .__settings > div {
+  padding: 0.15rem;
+  border-radius: 0.3rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.5rem;
+  min-width: 4rem;
+}
 }
 </style>

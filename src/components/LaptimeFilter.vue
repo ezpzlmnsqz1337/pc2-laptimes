@@ -21,7 +21,7 @@
         :reduce="track => track.uid"
         label="track"
         :class="{__activeFilter: trackId}"
-        @update:model-value="setFilter({trackId: $event})"
+        @update:model-value="setFilter({trackId: $event, trackVariant: null})"
       />
     </div>
     <div
@@ -179,12 +179,6 @@ export default {
 .__activeFilter :deep(span.vs__selected) {
   color: #4081C2;
   font-weight: bold;
-}
-
-@media only screen and (max-width: 1024px) {
-  .__filter {
-    width: 50%;
-  }
 }
 
 @media only screen and (max-width: 700px) {

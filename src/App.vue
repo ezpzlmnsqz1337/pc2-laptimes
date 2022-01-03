@@ -207,4 +207,21 @@ a {
   background: url('assets/icons/steering_wheel.svg');
   background-repeat: no-repeat;
 }
+
+@media only screen and (max-width: 1024px) {
+  .__laptimes {
+    flex-direction: column;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .__laptimes {
+    padding: 1rem;
+  }
+
+  .fa.fa-steering_wheel {
+    background: url('assets/icons/steering_wheel_sm.svg');
+    background-repeat: no-repeat;
+  }
+}
 </style>

@@ -328,7 +328,7 @@ export default {
   },
   methods: {
     ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'getTimes']),
-    ...mapMutations(['showScreen']),
+    ...mapMutations(['showScreen', 'setTimes']),
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     validateLaptimeFormat () {
       this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d\d\.\d{3}$/) === null
@@ -353,7 +353,7 @@ export default {
     showTimeInTable ({ carId, trackId, trackVariant }) {
       this.clearFilter()
       this.setFilter({ carId, trackId, trackVariant })
-      this.getTimes(this.getFilter())
+      this.getTimes(this.getFilter()).then(x => this.setTimes(x))
       this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
     }
   }

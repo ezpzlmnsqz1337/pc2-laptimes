@@ -135,7 +135,7 @@ export default {
     ])
   },
   created () {
-    const ws = new WebSocket('ws://localhost:8765')
+    const ws = new WebSocket('ws://wallpc:8765')
     ws.onmessage = this.onMessageCallback
   },
   methods: {
