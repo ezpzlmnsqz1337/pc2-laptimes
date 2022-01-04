@@ -52,7 +52,7 @@ import LaptimeBoard from '@/components/LaptimeBoard'
 import LaptimeFilter from '@/components/LaptimeFilter'
 import Statistics from '@/components/Statistics'
 import RealtimeData from '@/components/RealtimeData'
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'App',
@@ -68,15 +68,14 @@ export default {
   },
   async mounted () {
     await this.bindDb()
-    await this.setTimes(await this.getTimes(this.getFilter()))
+    this.refreshTimes()
   },
   unmounted () {
     unsubscribeAll()
   },
   methods: {
-    ...mapGetters('laptimeFilter', ['getFilter']),
-    ...mapActions(['bindDb', 'getTimes']),
-    ...mapMutations(['setTimes', 'showScreen'])
+    ...mapActions(['bindDb', 'refreshTimes']),
+    ...mapMutations(['showScreen'])
   }
 }
 </script>

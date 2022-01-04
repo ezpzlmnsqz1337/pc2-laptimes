@@ -57,7 +57,7 @@ export default {
       this.$nextTick(() => this.$refs.select.$el.focus())
     },
     update (e) {
-      this.$emit('value:update', e)
+      if (e) this.$emit('value:update', e)
       this.edit = false
     }
   }

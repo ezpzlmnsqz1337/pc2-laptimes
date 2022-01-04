@@ -64,6 +64,47 @@
   <div class="__timeWrapper">
     <h1>Add Laptime</h1>
     <div
+      v-if="fastestLapTime"
+      class="__gameInfoColumn"
+    >
+      {{ fastestLapTime }}
+    </div>
+    <div class="__inputRow">
+      <div
+        class="__lapTimeInputs"
+        :class="{__error: laptimeError}"
+      >
+        <input
+          v-model="minutes"
+          type="text"
+          class="__minutes"
+          placeholder="0"
+          @input="validateLaptimeFormat()"
+        >
+        <div class="__colon">
+          :
+        </div>
+        <input
+          v-model="seconds"
+          type="text"
+          class="__seconds"
+          placeholder="00"
+          @input="validateLaptimeFormat()"
+        >
+        <div class="__dot">
+          .
+        </div>
+        <input
+          v-model="milliseconds"
+          type="text"
+          class="__milliseconds"
+          placeholder="000"
+          @input="validateLaptimeFormat()"
+        >
+      </div>
+    </div>
+
+    <div
       v-if="carName"
       class="__gameInfoColumn"
     >
@@ -138,46 +179,7 @@
         Add
       </Button>
     </div>
-    <div
-      v-if="fastestLapTime"
-      class="__gameInfoColumn"
-    >
-      {{ fastestLapTime }}
-    </div>
-    <div class="__inputRow">
-      <div
-        class="__lapTimeInputs"
-        :class="{__error: laptimeError}"
-      >
-        <input
-          v-model="minutes"
-          type="text"
-          class="__minutes"
-          placeholder="0"
-          @input="validateLaptimeFormat()"
-        >
-        <div class="__colon">
-          :
-        </div>
-        <input
-          v-model="seconds"
-          type="text"
-          class="__seconds"
-          placeholder="00"
-          @input="validateLaptimeFormat()"
-        >
-        <div class="__dot">
-          .
-        </div>
-        <input
-          v-model="milliseconds"
-          type="text"
-          class="__milliseconds"
-          placeholder="000"
-          @input="validateLaptimeFormat()"
-        >
-      </div>
-    </div>
+
     <div class="__header">
       Transmission
     </div>
@@ -287,7 +289,7 @@ export default {
       laptimeError: false,
       transmission: TransmissionType.SEQUENTIAL,
       weather: WeatherType.SUN,
-      brakingLine: BrakingLine.ON,
+      brakingLine: BrakingLine.OFF,
       controls: ControlType.STEERING_WHEEL,
       startType: StartType.RUNNING,
       notes: '',
@@ -301,7 +303,6 @@ export default {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapState('realtimeData', ['participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
     ...mapGetters(['getTrackVariants']),
-    ...mapGetters('laptimeFilter', ['getFilter']),
     laptime () {
       const SECONDS_LENGTH = 2
       const MILLISECONDS_LENGTH = 3
@@ -327,8 +328,8 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'getTimes']),
-    ...mapMutations(['showScreen', 'setTimes']),
+    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'refreshTimes']),
+    ...mapMutations(['showScreen']),
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     validateLaptimeFormat () {
       this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d\d\.\d{3}$/) === null
@@ -353,7 +354,7 @@ export default {
     showTimeInTable ({ carId, trackId, trackVariant }) {
       this.clearFilter()
       this.setFilter({ carId, trackId, trackVariant })
-      this.getTimes(this.getFilter()).then(x => this.setTimes(x))
+      this.refreshTimes()
       this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
     }
   }

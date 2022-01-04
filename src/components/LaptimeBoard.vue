@@ -134,7 +134,6 @@ export default {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
     ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct']),
-    ...mapGetters('laptimeFilter', ['getFilter']),
     firstLaptime () {
       return this.times[0].laptime
     }
@@ -142,7 +141,8 @@ export default {
   methods: {
     ...mapMutations(['setTimes']),
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
-    ...mapActions(['updateLaptime', 'getTimes']),
+    ...mapActions(['refreshTimes', 'getTimes']),
+    ...mapActions({ ul: 'updateLaptime' }),
     getRowTitleText (laptime) {
       const date = new Date(laptime.date).toLocaleString()
       let result = `Date: ${date}`
@@ -187,14 +187,18 @@ export default {
         __controlsSteeringWheel: controls === ControlType.STEERING_WHEEL
       }
     },
+    async updateLaptime (laptime) {
+      if (!laptime) return
+      await this.ul(laptime)
+      this.refreshTimes()
+    },
     async setFilter (filter) {
-      filter = { ...this.getFilter(), ...filter }
       this.sf(filter)
-      this.setTimes(await this.getTimes(filter))
+      this.refreshTimes()
     },
     async clearFilter () {
       this.cf()
-      this.setTimes(await this.getTimes(this.getFilter()))
+      this.refreshTimes()
     },
     getLaptimeDiff (laptime) {
       const SECONDS_LENGTH = 2

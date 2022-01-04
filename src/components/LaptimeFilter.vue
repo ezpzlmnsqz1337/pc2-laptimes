@@ -139,23 +139,20 @@ export default {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
     ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct']),
-    ...mapGetters('laptimeFilter', ['getFilter']),
     firstLaptime () {
       return this.times[0].laptime
     }
   },
   methods: {
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
-    ...mapMutations(['setTimes']),
-    ...mapActions(['getTimes']),
+    ...mapActions(['refreshTimes']),
     async setFilter (filter) {
-      filter = { ...this.getFilter(), ...filter }
       this.sf(filter)
-      this.setTimes(await this.getTimes(filter))
+      this.refreshTimes()
     },
     async clearFilter () {
       this.cf()
-      this.setTimes(await this.getTimes(this.getFilter()))
+      this.refreshTimes()
     }
   }
 }

@@ -135,6 +135,11 @@ export default createStore({
 
       return times
     },
+    async refreshTimes ({ commit, dispatch, rootGetters }) {
+      const filter = rootGetters['laptimeFilter/getFilter']()
+      const times = await dispatch('getTimes', filter)
+      commit('setTimes', times)
+    },
     async bindDb ({ commit }) {
       commit('reset')
       bindFirestoreCollection(commit, 'cars', collection(db, 'cars'))
