@@ -7,6 +7,8 @@ import ScreenType from '@/constants/ScreenType'
 import laptimeFilter from '@/store/modules/laptimeFilter'
 import realtimeData from '@/store/modules/realtimeData'
 import Distinct from '@/constants/Distinct'
+import LaptimeBuilder from '@/builders/LaptimeBuilder'
+import WebsocketState from '@/constants/WebsocketState'
 
 const debug = process.env.NODE_ENV !== 'production'
 
@@ -25,6 +27,7 @@ export default createStore({
     realtimeData
   },
   state: {
+    websocketState: WebsocketState.CLOSED_OR_COULD_NOT_OPEN,
     activeScreen: ScreenType.LAPTIME_BOARD,
     cars: [],
     times: [],
@@ -50,8 +53,6 @@ export default createStore({
     }
   },
   mutations: {
-    reset (state) {
-    },
     setTimes (state, times) {
       if (!times) return
       state.times.splice(0)
@@ -59,6 +60,9 @@ export default createStore({
     },
     showScreen (state, { screen }) {
       state.activeScreen = screen
+    },
+    setWebsocketState (state, websocketState) {
+      state.websocketState = websocketState
     },
     ...vuexMutations
   },
@@ -84,6 +88,12 @@ export default createStore({
       console.log('Laptime: ', laptime, docRef)
       await setDoc(docRef, laptime, { merge: true })
     },
+    async getTimesForDriver ({ commit }, { driverId }) {
+      if (!driverId) return
+      const q = query(collection(db, 'times'), where('driverId', '==', driverId))
+      const querySnapshot = await getDocs(q)
+      return querySnapshot.docs.map(x => x.data())
+    },
     async getTimes ({ commit, dispatch }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, distinct }) {
       distinct = distinct === Distinct.YES
       const constraints = []
@@ -105,7 +115,8 @@ export default createStore({
       const querySnapshot = await getDocs(q)
       const times = distinct ? await dispatch('getDistinctTimes', querySnapshot.docs) : querySnapshot.docs.map(x => x.data())
 
-      return times
+      const ltb = LaptimeBuilder.getInstance()
+      return times.sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
     },
     async getTracksTimes ({ dispatch }, { tracks }) {
       const result = {}
@@ -141,7 +152,6 @@ export default createStore({
       commit('setTimes', times)
     },
     async bindDb ({ commit }) {
-      commit('reset')
       bindFirestoreCollection(commit, 'cars', collection(db, 'cars'))
       bindFirestoreCollection(commit, 'tracks', collection(db, 'tracks'))
       bindFirestoreCollection(commit, 'drivers', collection(db, 'drivers'))

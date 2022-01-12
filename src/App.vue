@@ -1,5 +1,8 @@
 <template>
   <div class="__wrapper">
+    <div class="__connectionState">
+      <span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span>
+    </div>
     <div class="__menu">
       <Button
         :type="ButtonType.SECONDARY"
@@ -53,6 +56,7 @@ import LaptimeFilter from '@/components/LaptimeFilter'
 import Statistics from '@/components/Statistics'
 import RealtimeData from '@/components/RealtimeData'
 import { mapActions, mapMutations, mapState } from 'vuex'
+import WebsocketState from './constants/WebsocketState'
 
 export default {
   name: 'App',
@@ -64,7 +68,24 @@ export default {
     RealtimeData
   },
   computed: {
-    ...mapState(['activeScreen'])
+    ...mapState(['activeScreen', 'websocketState']),
+    websocketStateText () {
+      return this.websocketState === WebsocketState.ESTABLISHED ? 'Connected' : 'Not connected'
+    },
+    websocketStateClass () {
+      return {
+        __connected: this.websocketState === WebsocketState.ESTABLISHED,
+        __notConnected: this.websocketState !== WebsocketState.ESTABLISHED
+      }
+    }
+  },
+  created () {
+    // connect to the websocket server
+    this.$rdb.connect('wallpc', 8765)
+    setInterval(() => {
+      // connect to ws for realtime data
+      this.setWebsocketState(this.$rdb.getWebsocketState())
+    }, 2500)
   },
   async mounted () {
     await this.bindDb()
@@ -75,7 +96,7 @@ export default {
   },
   methods: {
     ...mapActions(['bindDb', 'refreshTimes']),
-    ...mapMutations(['showScreen'])
+    ...mapMutations(['showScreen', 'setWebsocketState'])
   }
 }
 </script>
@@ -151,6 +172,19 @@ a {
   padding: 1rem;
 }
 
+.__connectionState {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.__notConnected {
+  color: red;
+}
+
+.__connected {
+  color: rgb(28, 197, 28);
+}
+
 /* custom scrollbar overrides */
 .ps .ps__rail-x:hover, .ps .ps__rail-y:hover, .ps .ps__rail-x:focus, .ps .ps__rail-y:focus, .ps .ps__rail-x.ps--clicking, .ps .ps__rail-y.ps--clicking {
   background-color: transparent !important;
@@ -167,7 +201,7 @@ a {
 }
 
 .__menu {
-  padding-top: 1rem;
+  padding-top: 0.5rem;
   text-align: center;
 }
 

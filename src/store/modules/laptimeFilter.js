@@ -37,8 +37,6 @@ const actions = {
 
 // mutations
 const mutations = {
-  reset (state) {
-  },
   setFilter (state, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, distinct }) {
     if (carId !== undefined) state.carId = carId
     if (trackId !== undefined) state.trackId = trackId

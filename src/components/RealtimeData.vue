@@ -135,8 +135,7 @@ export default {
     ])
   },
   created () {
-    const ws = new WebSocket('ws://wallpc:8765')
-    ws.onmessage = this.onMessageCallback
+    this.$rdb.addListener(this.onMessageCallback)
   },
   methods: {
     ...mapMutations('realtimeData', ['setValueByKey', 'setValues']),

@@ -38,11 +38,11 @@
             v-if="index > 0"
             class="__losing __losing_sm"
           >
-            {{ getLaptimeDiff(time.laptime) }}
+            {{ $ltb.getLaptimeDiff(firstLaptime, time.laptime) }}
           </div>
         </td>
         <td class="__losing __losing_lg">
-          <span v-if="index > 0">{{ getLaptimeDiff(time.laptime) }}</span>
+          <span v-if="index > 0">{{ $ltb.getLaptimeDiff(firstLaptime, time.laptime) }}</span>
         </td>
         <td class="__car">
           <div @click="setFilter({carId: time.carId})">
@@ -199,23 +199,6 @@ export default {
     async clearFilter () {
       this.cf()
       this.refreshTimes()
-    },
-    getLaptimeDiff (laptime) {
-      const SECONDS_LENGTH = 2
-      const MILLISECONDS_LENGTH = 3
-
-      const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
-
-      const l1 = this.firstLaptime.match(pattern)
-      const l2 = laptime.match(pattern)
-
-      const time1 = new Date(parseInt(l1[1]) * 60 * 1000 + parseInt(l1[2]) * 1000 + parseInt(l1[3]))
-      const time2 = new Date(parseInt(l2[1]) * 60 * 1000 + parseInt(l2[2]) * 1000 + parseInt(l2[3]))
-
-      const diff = new Date(time2.getTime() - time1.getTime())
-
-      const [m, s, ms] = [diff.getMinutes(), diff.getSeconds(), diff.getMilliseconds()].map(x => String(x))
-      return `+ ${m}:${s.padStart(SECONDS_LENGTH, '0')}.${ms.padStart(MILLISECONDS_LENGTH, '0')}`
     },
     getDriver (time) {
       const driver = this.getDriverById(time.driverId)

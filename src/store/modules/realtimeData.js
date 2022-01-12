@@ -119,8 +119,6 @@ const actions = {
 
 // mutations
 const mutations = {
-  reset (state) {
-  },
   setValueByKey (state, { key, value }) {
     if (state[key] === undefined) return
     state[key] = value

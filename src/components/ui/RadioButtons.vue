@@ -1,6 +1,8 @@
 <template>
   <div
+    ref="wrapper"
     class="__radioWrapper"
+    @keydown="keydownHandler($event)"
   >
     <div
       v-for="v in getValues"
@@ -10,7 +12,7 @@
         :type="ButtonType.PRIMARY"
         block
         :class="selectedClass(v)"
-        @click="selected = v;$emit('changed', selected)"
+        @click="setValue(v)"
       >
         <input
           :id="`${v}${name}Radio`"
@@ -63,6 +65,20 @@ export default {
     selectedClass (value) {
       return {
         __selected: this.value === value
+      }
+    },
+    setValue (value) {
+      this.selected = value
+      this.$emit('changed', this.selected)
+    },
+    keydownHandler (e) {
+      const currentIndex = this.getValues.indexOf(this.value)
+      if (this.$refs.wrapper === document.activeElement) {
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+          this.setValue(this.getValues[currentIndex - 1])
+        } else if (e.key === 'ArrowRight' && currentIndex < this.getValues.length - 1) {
+          this.setValue(this.getValues[currentIndex + 1])
+        }
       }
     }
   }

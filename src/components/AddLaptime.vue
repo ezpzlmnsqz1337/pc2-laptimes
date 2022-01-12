@@ -76,6 +76,7 @@
       >
         <input
           v-model="minutes"
+          tabindex="1"
           type="text"
           class="__minutes"
           placeholder="0"
@@ -86,6 +87,7 @@
         </div>
         <input
           v-model="seconds"
+          tabindex="2"
           type="text"
           class="__seconds"
           placeholder="00"
@@ -96,6 +98,7 @@
         </div>
         <input
           v-model="milliseconds"
+          tabindex="3"
           type="text"
           class="__milliseconds"
           placeholder="000"
@@ -111,9 +114,9 @@
       {{ carName }}
     </div>
     <div class="__inputRow">
-      <!-- object value -->
       <v-select
         v-model="carId"
+        :tabindex="4"
         placeholder="Select car"
         :options="cars"
         :reduce="car => car.uid"
@@ -136,6 +139,7 @@
     <div class="__inputRow">
       <v-select
         v-model="trackId"
+        :tabindex="5"
         placeholder="Select track"
         :options="tracks"
         :reduce="track => track.uid"
@@ -156,6 +160,7 @@
     >
       <v-select
         v-model="trackVariant"
+        :tabindex="6"
         placeholder="Select track variant"
         :options="getTrackVariants(trackId)"
         :class="{__selected: trackVariant}"
@@ -166,6 +171,7 @@
     >
       <v-select
         v-model="driverId"
+        :tabindex="7"
         placeholder="Select driver"
         :options="drivers"
         :reduce="driver => driver.uid"
@@ -185,6 +191,7 @@
     </div>
     <div class="__inputRow __noColumn">
       <RadioButtons
+        :tabindex="8"
         no-any
         name="ALtransmission"
         :values="Object.values(TransmissionType)"
@@ -198,6 +205,7 @@
     </div>
     <div class="__inputRow __noColumn">
       <RadioButtons
+        :tabindex="9"
         no-any
         name="ALweather"
         :values="Object.values(WeatherType)"
@@ -211,6 +219,7 @@
     </div>
     <div class="__inputRow __noColumn">
       <RadioButtons
+        :tabindex="10"
         no-any
         name="ALbrakingLine"
         :values="Object.values(BrakingLine)"
@@ -224,6 +233,7 @@
     </div>
     <div class="__inputRow __noColumn">
       <RadioButtons
+        :tabindex="11"
         no-any
         name="ALcontrols"
         :values="Object.values(ControlType)"
@@ -237,6 +247,7 @@
     </div>
     <div class="__inputRow __noColumn">
       <RadioButtons
+        :tabindex="12"
         no-any
         name="ALstartType"
         :values="Object.values(StartType)"
@@ -249,11 +260,15 @@
       Notes
     </div>
     <div class="__inputRow __noColumn">
-      <textarea v-model="notes" />
+      <textarea
+        v-model="notes"
+        :tabindex="13"
+      />
     </div>
 
     <div class="__inputRow">
       <Button
+        :tabindex="14"
         :type="ButtonType.PRIMARY"
         block
         class="__submit"
@@ -308,23 +323,22 @@ export default {
       const MILLISECONDS_LENGTH = 3
       // check not set
       if ((!this.minutes.length > 0 || this.seconds.length !== SECONDS_LENGTH || this.milliseconds.length !== MILLISECONDS_LENGTH)) return
-      const [minutes, seconds, milliseconds] = [parseInt(this.minutes), parseInt(this.seconds), parseInt(this.milliseconds)]
+      const [minutes, seconds, milliseconds] = [this.minutes, this.seconds, this.milliseconds].map(x => parseInt(x))
       // check greater than zero
       if ((minutes < 0 || seconds < 0 || milliseconds < 0)) return
       // check in range
       if (seconds >= 60 || milliseconds >= 1000) return
       // format string
-      const [m, s, ms] = [this.minutes, this.seconds, this.milliseconds]
-      return `${m}:${s.padStart(SECONDS_LENGTH, '0')}.${ms.padStart(MILLISECONDS_LENGTH, '0')}`
+      return `${this.minutes}:${this.seconds}.${this.milliseconds}`
     },
     valid () {
       return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
     },
     fastestLapTime () {
-      if (!this.participants.length > 0) return false
-      if (!this.participants[0].fastestLapTime) return false
+      if (this.participants.length === 0 || !this.participants[0].fastestLapTime) return false
+
       const d = new Date(this.participants[0].fastestLapTime * 1000)
-      return `${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`
+      return this.$ltb.dateToLaptime(d)
     }
   },
   methods: {

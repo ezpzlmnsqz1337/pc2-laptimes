@@ -21,6 +21,8 @@ import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
 import Toaster from '@meforma/vue-toaster'
 import '@fortawesome/fontawesome-free/css/all.css'
+import RealtimeDataBuilder from './builders/RealtimeDataBuilder'
+import LaptimeBuilder from './builders/LaptimeBuilder'
 
 const app = createApp(App)
 app.config.globalProperties.ButtonType = ButtonType
@@ -31,8 +33,12 @@ app.config.globalProperties.ControlType = ControlType
 app.config.globalProperties.StartType = StartType
 app.config.globalProperties.ScreenType = ScreenType
 app.config.globalProperties.Distinct = Distinct
-
 app.config.globalProperties.debounce = debounce
+
+// builders
+app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
+app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
+
 app.use(store)
 app.use(Toaster)
 app.use(PerfectScrollbar)
