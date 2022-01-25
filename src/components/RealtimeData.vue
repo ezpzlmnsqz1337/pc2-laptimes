@@ -1,55 +1,11 @@
 <template>
   <div class="__realtimeData">
     <div class="__telemetry">
-      <div>viewedParticipantIndex: {{ viewedParticipantIndex }}</div>
-      // Unfiltered input
-      <div>unfilteredThrottle: {{ unfilteredThrottle }}</div>
-      <div>unfilteredBrake: {{ unfilteredBrake }}</div>
-      <div>unfilteredSteering: {{ unfilteredSteering }}</div>
-      <div>unfilteredClutch: {{ unfilteredClutch }}</div>
-      // Flags
-      <div>raceStateFlags: {{ raceStateFlags }}</div>
-      // Data
-      <div>oilTempCelsius: {{ oilTempCelsius }}</div>
-      <div>oilPressureKPa: {{ oilPressureKPa }}</div>
-      <div>waterTempCelsius: {{ waterTempCelsius }}</div>
-      <div>waterPressureKPa: {{ waterPressureKPa }}</div>
-      <div>fuelPressureKPa: {{ fuelPressureKPa }}</div>
-      <div>fuelCapacity: {{ fuelCapacity }}</div>
       <div>brake: {{ brake }}</div>
       <div>throttle: {{ throttle }}</div>
-      <div>clutch: {{ clutch }}</div>
-      <div>fuelLevel: {{ fuelLevel }}</div>
       <div>speed: {{ speed }}</div>
       <div>rpm: {{ rpm }}</div>
       <div>maxRpm: {{ maxRpm }}</div>
-      <div>steering: {{ steering }}</div>
-      <div>gearNumGears: {{ gearNumGears }}</div>
-      <div>boostAmount: {{ boostAmount }}</div>
-      <div>crashState: {{ crashState }}</div>
-      // Motion and device
-      <div>odometerKM: {{ odometerKM }}</div>
-      <div>orientationX: {{ orientationX }}</div>
-      <div>orientationY: {{ orientationY }}</div>
-      <div>orientationZ: {{ orientationZ }}</div>
-      <div>localVelocityX: {{ localVelocityX }}</div>
-      <div>localVelocityY: {{ localVelocityY }}</div>
-      <div>localVelocityZ: {{ localVelocityZ }}</div>
-      <div>worldVelocityX: {{ worldVelocityX }}</div>
-      <div>worldVelocityY: {{ worldVelocityY }}</div>
-      <div>worldVelocityZ: {{ worldVelocityZ }}</div>
-      <div>angularVelocityX: {{ angularVelocityX }}</div>
-      <div>angularVelocityY: {{ angularVelocityY }}</div>
-      <div>angularVelocityZ: {{ angularVelocityZ }}</div>
-      <div>localAccelerationX: {{ localAccelerationX }}</div>
-      <div>localAccelerationY: {{ localAccelerationY }}</div>
-      <div>localAccelerationZ: {{ localAccelerationZ }}</div>
-      <div>worldAccelerationX: {{ worldAccelerationX }}</div>
-      <div>worldAccelerationY: {{ worldAccelerationY }}</div>
-      <div>worldAccelerationZ: {{ worldAccelerationZ }}</div>
-      <div>extentsCentreX: {{ extentsCentreX }}</div>
-      <div>extentsCentreY: {{ extentsCentreY }}</div>
-      <div>extentsCentreZ: {{ extentsCentreZ }}</div>
     </div>
     <div class="__raceData">
       <div>carName: {{ carName }}</div>
@@ -57,14 +13,24 @@
       <div>trackLocation: {{ trackLocation }}</div>
       <div>trackVariation: {{ trackVariation }}</div>
     </div>
-    <div class="__participants">
-      <div
-        v-for="(p, index) in participants"
-        :key="index"
-      >
-        <div>Name: {{ p.name }}</div>
-        <div>fastestLapTime: {{ displayTime(p.fastestLapTime) }}</div>
-        <br>
+    <div>
+      <div>
+        Realtime data:
+        <Button
+          :type="realtimeData ? ButtonType.SUCCESS : ButtonType.DANGER"
+          @click="toggleRealtimeData()"
+        >
+          {{ realtimeData ? 'Enabled' : 'Disabled' }}
+        </Button>
+      </div>
+      <div v-if="realtimeData">
+        Lights enabled:
+        <Button
+          :type="lightsEnabled ? ButtonType.SUCCESS : ButtonType.DANGER"
+          @click="toggleLights()"
+        >
+          {{ lightsEnabled ? 'Enabled' : 'Disabled' }}
+        </Button>
       </div>
     </div>
   </div>
@@ -72,86 +38,86 @@
 
 <script>
 import { mapMutations, mapState } from 'vuex'
+import PacketType from '@/constants/PacketType'
 
 export default {
   name: 'RealtimeData',
+  data () {
+    return {
+      realtimeData: true,
+      lightsEnabled: false
+    }
+  },
   computed: {
     ...mapState('realtimeData', [
-      'viewedParticipantIndex',
-      // Unfiltered input
-      'unfilteredThrottle',
-      'unfilteredBrake',
-      'unfilteredSteering',
-      'unfilteredClutch',
-      // Flags
-      'raceStateFlags',
       // Data
-      'oilTempCelsius',
-      'oilPressureKPa',
-      'waterTempCelsius',
-      'waterPressureKPa',
-      'fuelPressureKPa',
-      'fuelCapacity',
       'brake',
       'throttle',
       'clutch',
-      'fuelLevel',
       'speed',
       'rpm',
       'maxRpm',
-      'steering',
-      'gearNumGears',
-      'boostAmount',
-      'crashState',
-      // Motion and device
-      'odometerKM',
-      'orientationX',
-      'orientationY',
-      'orientationZ',
-      'localVelocityX',
-      'localVelocityY',
-      'localVelocityZ',
-      'worldVelocityX',
-      'worldVelocityY',
-      'worldVelocityZ',
-      'angularVelocityX',
-      'angularVelocityY',
-      'angularVelocityZ',
-      'localAccelerationX',
-      'localAccelerationY',
-      'localAccelerationZ',
-      'worldAccelerationX',
-      'worldAccelerationY',
-      'worldAccelerationZ',
-      'extentsCentreX',
-      'extentsCentreY',
-      'extentsCentreZ',
       // UDP1
       'carName',
       'carClassName',
       'trackLocation',
-      'trackVariation',
-      'participants'
+      'trackVariation'
     ])
   },
   created () {
-    this.$rdb.addListener(this.onMessageCallback)
+    this.REALTIME_DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
+    this.lightsUrl = 'http://malina:4500'
+    this.lightsId = 'C82B96407FD3'
   },
   methods: {
     ...mapMutations('realtimeData', ['setValueByKey', 'setValues']),
+    toggleLights () {
+      this.lightsEnabled = !this.lightsEnabled
+    },
+    toggleRealtimeData () {
+      if (this.realtimeData) {
+        this.$rdb.removeListener(this.REALTIME_DATA_LISTENER)
+      } else {
+        this.REALTIME_DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
+        this.$rdb.addListener(this.onMessageCallback)
+      }
+      this.realtimeData = !this.realtimeData
+    },
     onMessageCallback (msg) {
       try {
         const data = JSON.parse(msg.data)
         if (data.packetType === undefined) return
         // console.log('Packet type: ', data)
+        if (this.lightsEnabled && data.packetType === PacketType.TELEMETRY) {
+          this.setLightsColor(data.data)
+        }
         this.setValues(data)
       } catch (e) {
         console.log('Error: ', e.message, msg)
       }
     },
+    setLightsColor ({ throttle, rpm, maxRpm, brake }) {
+      let color = '#00ff00'
+      let brightness = rpm / maxRpm * 100
+      // if braking, red color, brightness is intensity of braking
+      if (brake > 0) {
+        color = '#ff0000'
+        brightness = brake / 255 * 100 // 255 is max brake
+      }
+      // if braking and throttle, yellow color, brightness is combination
+      if (brake > 0 && throttle > 0) {
+        color = '#ffff00'
+        brightness = brake / 500 * 100 // 500 is max brake + max throttle
+      }
+      // if no throttle, nor brake, yellow, brightness is rpm/maxRpm percent
+      if (throttle === 0 && brake === 0) {
+        color = '#ffff00'
+      }
+      this.$lb.setLightsColor(this.lightsUrl, this.lightsId, color, brightness)
+    },
     displayTime (seconds) {
       const d = new Date(seconds * 1000)
-      return `${d.getMinutes()}:${d.getSeconds()}:${d.getMilliseconds()}`
+      return this.$ltb.dateToLaptime(d)
     }
   }
 }

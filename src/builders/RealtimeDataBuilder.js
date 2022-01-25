@@ -50,6 +50,10 @@ export default class RealtimeDataBuilder {
       this.listeners.push(listener)
     }
 
+    removeListener (listener) {
+      console.log(listener)
+    }
+
     retry () {
       this.connect(this.hostname, this.port)
       this.retries++

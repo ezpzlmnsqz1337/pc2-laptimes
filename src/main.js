@@ -23,6 +23,7 @@ import Toaster from '@meforma/vue-toaster'
 import '@fortawesome/fontawesome-free/css/all.css'
 import RealtimeDataBuilder from './builders/RealtimeDataBuilder'
 import LaptimeBuilder from './builders/LaptimeBuilder'
+import LightsBuilder from './builders/LightsBuilder'
 
 const app = createApp(App)
 app.config.globalProperties.ButtonType = ButtonType
@@ -38,6 +39,7 @@ app.config.globalProperties.debounce = debounce
 // builders
 app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
 app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
+app.config.globalProperties.$lb = LightsBuilder.getInstance()
 
 app.use(store)
 app.use(Toaster)
