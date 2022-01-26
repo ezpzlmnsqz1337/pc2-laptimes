@@ -21,4 +21,14 @@ export default class LightsBuilder {
         body: JSON.stringify(data)
       })
     }
+
+    async setLightsPower (url, lightId, power) {
+      const data = { id: lightId, power }
+
+      await fetch(`${url}/api/power`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+    }
 }

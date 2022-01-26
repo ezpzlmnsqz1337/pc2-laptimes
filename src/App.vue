@@ -119,6 +119,9 @@ export default {
   --border-light1: #ffffff;
   --border-dark1: #424242;
   --anchor: #2183df;
+  --brake: #ff0000;
+  --throttle: #00ff00;
+  --clutch: #e4e43d;
 }
 
 * {
