@@ -165,7 +165,7 @@ export default {
       if (throttle === 0 && brake === 0) {
         color = '#ffff00'
       }
-      this.$lb.setLightsColor(this.lightsUrl, this.lightsId, color, brightness)
+      this.$lb.setLightsColor(this.lightsUrl, this.lightsId, color, brightness * this.lightsOpacity)
     },
     displayTime (seconds) {
       const d = new Date(seconds * 1000)

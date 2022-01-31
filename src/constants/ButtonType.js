@@ -3,5 +3,6 @@ export default Object.freeze({
   PRIMARY: 'primary',
   SECONDARY: 'secondary',
   SUCCESS: 'success',
-  DANGER: 'danger'
+  DANGER: 'danger',
+  WARNING: 'warning'
 })

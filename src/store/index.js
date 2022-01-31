@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase'
-import { enableIndexedDbPersistence, collection, doc, getDocs, limit, orderBy, query, setDoc, where } from 'firebase/firestore'
+import { enableIndexedDbPersistence, collection, doc, getDocs, limit, orderBy, query, setDoc, where, updateDoc } from 'firebase/firestore'
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 import ScreenType from '@/constants/ScreenType'
 import laptimeFilter from '@/store/modules/laptimeFilter'
@@ -37,6 +37,18 @@ export default createStore({
   getters: {
     getCarById: (state) => (id) => {
       return state.cars.find(x => x.uid === id)
+    },
+    getCarByGameId: (state) => (id) => {
+      return state.cars.find(x => x.gameId === id)
+    },
+    getTrackByGameId: (state) => (id) => {
+      return state.tracks.find(x => x.gameId === id)
+    },
+    getTrackLocationByGameId: (state) => (id) => {
+      return state.cars.find(x => x.gameId === id)
+    },
+    getTrackVariationGameId: (state) => (id) => {
+      return state.cars.find(x => x.gameId === id)
     },
     getTrackById: (state) => (id) => {
       return state.tracks.find(x => x.uid === id)
@@ -81,6 +93,18 @@ export default createStore({
       const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, notes }
       const docRef = doc(db, 'times', time.uid)
       await setDoc(docRef, time)
+    },
+    async linkCarToGameId ({ commit }, { carId, gameId }) {
+      if (!carId || !gameId) return
+      const docRef = doc(db, 'cars', carId)
+      console.log('Link: ', carId, docRef)
+      await updateDoc(docRef, { gameId })
+    },
+    async linkTrackToGameId ({ commit }, { trackId, gameId }) {
+      if (!trackId || !gameId) return
+      const docRef = doc(db, 'tracks', trackId)
+      console.log('Link: ', trackId, docRef)
+      await updateDoc(docRef, { gameId })
     },
     async updateLaptime ({ commit }, laptime) {
       if (!laptime.uid) return

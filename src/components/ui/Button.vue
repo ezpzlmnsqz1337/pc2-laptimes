@@ -40,6 +40,7 @@ export default {
         __secondary: this.type === ButtonType.SECONDARY,
         __success: this.type === ButtonType.SUCCESS,
         __danger: this.type === ButtonType.DANGER,
+        __warning: this.type === ButtonType.WARNING,
         __block: this.block
       }
     }
@@ -61,6 +62,8 @@ button {
   --btn-success-hover: #0e8b19;
   --btn-danger: #e02c2c;
   --btn-danger-hover: #c71818;
+  --btn-warning: #fffb26;
+  --btn-warning-hover: #94881a;
   --btn-disabled: #a0a0a0;
   --btn-disabled-text: #cacaca;
 }
@@ -124,6 +127,16 @@ button.__danger {
 
 button.__danger:hover {
   background-color: var(--btn-danger-hover);
+  color: var(--btn-text-light);
+}
+
+button.__warning {
+  background-color: var(--btn-warning);
+  color: var(--btn-text-dark);
+}
+
+button.__warning:hover {
+  background-color: var(--btn-warning-hover);
   color: var(--btn-text-light);
 }
 
