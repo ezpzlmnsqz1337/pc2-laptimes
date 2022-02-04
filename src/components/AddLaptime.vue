@@ -61,6 +61,68 @@
     </template>
   </Modal>
 
+  <Modal
+    v-if="showNewTrackModal"
+    @close="showNewTrackModal = false"
+  >
+    <template #header>
+      <h3>Add Track</h3>
+    </template>
+    <template #body>
+      <input
+        v-model="newTrackName"
+        class="__modalInput"
+        placeholder="Enter track name"
+        type="text"
+      >
+      <div class="__modalButtons">
+        <Button
+          :type="ButtonType.DANGER"
+          @click="showNewTrackModal = false"
+        >
+          Cancel
+        </Button>
+        <Button
+          :type="ButtonType.PRIMARY"
+          @click="addTrack()"
+        >
+          Add
+        </Button>
+      </div>
+    </template>
+  </Modal>
+
+  <Modal
+    v-if="showNewTrackVariantModal"
+    @close="showNewTrackVariantModal = false"
+  >
+    <template #header>
+      <h3>Add Track variant</h3>
+    </template>
+    <template #body>
+      <input
+        v-model="newTrackVariantName"
+        class="__modalInput"
+        placeholder="Enter track variant name"
+        type="text"
+      >
+      <div class="__modalButtons">
+        <Button
+          :type="ButtonType.DANGER"
+          @click="showNewTrackVariantModal = false"
+        >
+          Cancel
+        </Button>
+        <Button
+          :type="ButtonType.PRIMARY"
+          @click="addTrackVariant()"
+        >
+          Add
+        </Button>
+      </div>
+    </template>
+  </Modal>
+
   <div class="__heading">
     <h1>Add Laptime</h1>
   </div>
@@ -80,37 +142,46 @@
       </div>
       <div class="__inputRow">
         <div
-          class="__lapTimeInputs"
+          class="__laptimeInputs"
           :class="{__error: laptimeError}"
         >
           <input
+            ref="minutes"
             v-model="minutes"
             tabindex="1"
             type="text"
+            maxlength="2"
             class="__minutes"
             placeholder="0"
+            @keydown="onLaptimeInputKeyDown($event, null, 'seconds')"
             @input="validateLaptimeFormat()"
           >
           <div class="__colon">
             :
           </div>
           <input
+            ref="seconds"
             v-model="seconds"
             tabindex="2"
+            maxlength="2"
             type="text"
             class="__seconds"
             placeholder="00"
+            @keydown="onLaptimeInputKeyDown($event, 'minutes', 'milliseconds')"
             @input="validateLaptimeFormat()"
           >
           <div class="__dot">
             .
           </div>
           <input
+            ref="milliseconds"
             v-model="milliseconds"
             tabindex="3"
+            maxlength="3"
             type="text"
             class="__milliseconds"
             placeholder="000"
+            @keydown="onLaptimeInputKeyDown($event, 'seconds')"
             @input="validateLaptimeFormat()"
           >
         </div>
@@ -184,7 +255,12 @@
           label="track"
           :class="{__selected: trackId}"
           @option:selected="trackVariant=getTrackVariants($event.uid)[0]"
-        />
+        /><Button
+          :type="ButtonType.SUCCESS"
+          @click="showNewTrackModal = true"
+        >
+          Add
+        </Button>
       </div>
       <div
         v-if="trackId && trackVariation"
@@ -208,7 +284,12 @@
           placeholder="Select track variant"
           :options="getTrackVariants(trackId)"
           :class="{__selected: trackVariant}"
-        />
+        /><Button
+          :type="ButtonType.SUCCESS"
+          @click="showNewTrackVariantModal = true"
+        >
+          Add
+        </Button>
       </div>
       <div
         class="__inputRow"
@@ -358,7 +439,11 @@ export default {
       newDriverName: '',
       showNewDriverModal: false,
       newCarName: '',
-      showNewCarModal: false
+      newTrackName: '',
+      newTrackVariantName: '',
+      showNewCarModal: false,
+      showNewTrackModal: false,
+      showNewTrackVariantModal: false
     }
   },
   computed: {
@@ -366,17 +451,10 @@ export default {
     ...mapState('realtimeData', ['participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
     ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants', 'getCarByGameId', 'getTrackByGameId']),
     laptime () {
-      const SECONDS_LENGTH = 2
-      const MILLISECONDS_LENGTH = 3
-      // check not set
-      if ((!this.minutes.length > 0 || this.seconds.length !== SECONDS_LENGTH || this.milliseconds.length !== MILLISECONDS_LENGTH)) return
-      const [minutes, seconds, milliseconds] = [this.minutes, this.seconds, this.milliseconds].map(x => parseInt(x))
-      // check greater than zero
-      if ((minutes < 0 || seconds < 0 || milliseconds < 0)) return
-      // check in range
-      if (seconds >= 60 || milliseconds >= 1000) return
-      // format string
-      return `${this.minutes}:${this.seconds}.${this.milliseconds}`
+      const [m, s, ms] = [this.minutes, this.seconds, this.milliseconds]
+      if (!m || !s || !ms) return false
+
+      return this.$ltb.isLaptimeValid(m, s, ms) ? this.$ltb.laptimeFromComponents(m, s, ms) : false
     },
     valid () {
       return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
@@ -389,7 +467,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'refreshTimes', 'linkCarToGameId', 'linkTrackToGameId']),
+    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'addNewTrack', 'addNewTrackVariant', 'refreshTimes', 'linkCarToGameId', 'linkTrackToGameId']),
     ...mapMutations(['showScreen']),
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     carHasLink () {
@@ -409,12 +487,22 @@ export default {
       return false
     },
     validateLaptimeFormat () {
-      this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d\d\.\d{3}$/) === null
+      this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d{2}.\d{3}$/) === null
     },
     addCar () {
       this.addNewCar({ name: this.newCarName })
       this.newCarName = ''
       this.showNewCarModal = false
+    },
+    addTrack () {
+      this.addNewTrack({ track: this.newTrackName })
+      this.newTrackName = ''
+      this.showNewTrackModal = false
+    },
+    addTrackVariant () {
+      this.addNewTrackVariant({ trackId: this.trackId, variant: this.newTrackVariantName })
+      this.newTrackVariantName = ''
+      this.showNewTrackVariantModal = false
     },
     addDriver () {
       this.addNewDriver({ name: this.newDriverName })
@@ -422,7 +510,7 @@ export default {
       this.showNewDriverModal = false
     },
     submit (laptime) {
-      // this.addLaptime(laptime)
+      this.addLaptime(laptime)
       this.driverId = null
       this.$toast.success('Laptime added! Click here to show laptime table.', {
         onClick: () => this.showTimeInTable(laptime),
@@ -445,7 +533,6 @@ export default {
     },
     setCarName (carName) {
       const car = this.getCarByGameId(carName)
-      console.log('CAR', car)
       if (!car) {
         // if car does no
         this.$toast.error('Unable to set car')
@@ -455,10 +542,32 @@ export default {
     },
     setTrackLocation (trackLocation) {
       const track = this.getTrackByGameId(trackLocation)
+      if (!track) {
+        // if car does no
+        this.$toast.error('Unable to set track')
+        return
+      }
       this.trackId = track.uid
     },
     setTrackVariation (trackVariation) {
       this.trackVariation = this.getTrackVariantionByGameId(trackVariation)
+    },
+    onLaptimeInputKeyDown (e, leftInput, rightInput) {
+      if (e.key === 'ArrowRight') {
+        if (!rightInput) return
+        const ri = this.$refs[rightInput]
+        if (e.target.selectionStart === e.target.value.length) {
+          ri.focus()
+          ri.selectionStart = 0
+        }
+      } else if (e.key === 'ArrowLeft') {
+        if (!leftInput) return
+        const li = this.$refs[leftInput]
+        if (e.target.selectionStart === 0) {
+          li.focus()
+          li.selectionStart = li.value.length
+        }
+      }
     }
   }
 }
@@ -509,12 +618,12 @@ export default {
   }
 }
 
-.__lapTimeInputs {
+.__laptimeInputs {
   border-radius: 0.3rem;
   display: flex;
 }
 
-.__lapTimeInputs .__minutes {
+.__laptimeInputs .__minutes {
   width: 100%;
   text-align: right;
   border-right: 0;
@@ -523,7 +632,7 @@ export default {
   padding-right: 0.3rem;
 }
 
-.__lapTimeInputs .__seconds {
+.__laptimeInputs .__seconds {
   width: 3.1rem;
   border-right: 0;
   border-top-right-radius: 0;
@@ -536,7 +645,7 @@ export default {
   padding-right: 0.3rem;
 }
 
-.__lapTimeInputs .__milliseconds {
+.__laptimeInputs .__milliseconds {
   width: 100%;
   border-left: 0;
   border-top-left-radius: 0;
@@ -544,7 +653,7 @@ export default {
   padding-left: 0.3rem;
 }
 
-.__lapTimeInputs .__colon, .__lapTimeInputs .__dot {
+.__laptimeInputs .__colon, .__laptimeInputs .__dot {
   background-color: white;
   color: var(--text-dark1);
   font-size: 2rem;
@@ -553,28 +662,28 @@ export default {
   border-bottom: 0.1rem solid black;
 }
 
-.__lapTimeInputs input {
+.__laptimeInputs input {
   font-size: 2rem;
 }
 
-.__lapTimeInputs input:focus {
+.__laptimeInputs input:focus {
   outline: 0;
 }
 
-.__lapTimeInputs.__error .__minutes {
+.__laptimeInputs.__error .__minutes {
   border: 0.15rem solid red;
   color: red;
   border-right: none;
 }
 
-.__lapTimeInputs.__error .__seconds, .__lapTimeInputs.__error .__colon, .__lapTimeInputs.__error .__dot {
+.__laptimeInputs.__error .__seconds, .__laptimeInputs.__error .__colon, .__laptimeInputs.__error .__dot {
   border: 0.15rem solid red;
   color: red;
   border-right: none;
   border-left: none;
 }
 
-.__lapTimeInputs.__error .__milliseconds {
+.__laptimeInputs.__error .__milliseconds {
   border: 0.15rem solid red;
   color: red;
   border-left: none;

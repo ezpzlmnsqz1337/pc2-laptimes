@@ -36,4 +36,26 @@ export default class LaptimeBuilder {
 
       return `+ ${this.dateToLaptime(diff)}`
     }
+
+    isLaptimeValid (minutes, seconds, milliseconds) {
+      let [m, s, ms] = [minutes, seconds, milliseconds].map(x => String(x))
+      // check not set
+      if ((!minutes.length > 0 || seconds.length !== SECONDS_LENGTH || milliseconds.length !== MILLISECONDS_LENGTH)) return false
+
+      ;[m, s, ms] = [m, s, ms].map(x => parseInt(x))
+      // check greater than zero
+      if ((m < 0 || s < 0 || ms < 0)) return false
+      // check in range
+      if (s >= 60 || ms >= 1000) return false
+
+      return true
+    }
+
+    laptimeFromComponents (minutes, seconds, milliseconds) {
+      return this.dateToLaptime(new Date(
+        parseInt(minutes) * 60 * 1000 +
+        parseInt(seconds) * 1000 +
+        parseInt(milliseconds)
+      ))
+    }
 }

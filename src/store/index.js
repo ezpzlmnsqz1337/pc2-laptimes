@@ -1,7 +1,7 @@
 import { createStore } from 'vuex'
 import { v4 as uuidv4 } from 'uuid'
 import { db } from '@/firebase'
-import { enableIndexedDbPersistence, collection, doc, getDocs, limit, orderBy, query, setDoc, where, updateDoc } from 'firebase/firestore'
+import { enableIndexedDbPersistence, collection, doc, getDocs, limit, orderBy, query, setDoc, where, updateDoc, arrayUnion } from 'firebase/firestore'
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 import ScreenType from '@/constants/ScreenType'
 import laptimeFilter from '@/store/modules/laptimeFilter'
@@ -74,6 +74,7 @@ export default createStore({
       state.activeScreen = screen
     },
     setWebsocketState (state, websocketState) {
+      if (state.websocketState === websocketState) return
       state.websocketState = websocketState
     },
     ...vuexMutations
@@ -83,6 +84,15 @@ export default createStore({
       const car = { uid: uuidv4(), name }
       const docRef = doc(db, 'cars', car.uid)
       await setDoc(docRef, car)
+    },
+    async addNewTrack ({ commit }, { track }) {
+      const t = { uid: uuidv4(), track, variants: [] }
+      const docRef = doc(db, 'tracks', t.uid)
+      await setDoc(docRef, t)
+    },
+    async addNewTrackVariant ({ commit }, { trackId, variant }) {
+      const docRef = doc(db, 'tracks', trackId)
+      await updateDoc(docRef, { variants: arrayUnion(variant) })
     },
     async addNewDriver ({ commit }, { name }) {
       const driver = { uid: uuidv4(), name }

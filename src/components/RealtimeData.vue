@@ -170,20 +170,6 @@ export default {
     displayTime (seconds) {
       const d = new Date(seconds * 1000)
       return this.$ltb.dateToLaptime(d)
-    },
-    watch: {
-      // whenever question changes, this function will run
-      rpm (newValue, oldValue) {
-        let bgColor = '#1a27db'
-        const width = newValue / this.maxRpm * 100
-
-        if (width > 70) bgColor = '#ffff00'
-        if (width > 80) bgColor = '#d40400'
-        if (width > 90) bgColor = '#ff0000'
-
-        this.$refs.rpm.style.backgroundColor = bgColor
-        this.$refs.rpm.style.width = `${width}%`
-      }
     }
   }
 }

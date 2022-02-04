@@ -16,12 +16,6 @@
         </tr>
       </table>
     </div>
-    <div
-      v-for="d in getDriversData()"
-      :key="d.uid"
-    >
-      {{ d.name }}
-    </div>
   </div>
 </template>
 
