@@ -38,11 +38,14 @@ export default class LaptimeBuilder {
     }
 
     isLaptimeValid (minutes, seconds, milliseconds) {
+      const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
       let [m, s, ms] = [minutes, seconds, milliseconds].map(x => String(x))
       // check not set
       if ((!minutes.length > 0 || seconds.length !== SECONDS_LENGTH || milliseconds.length !== MILLISECONDS_LENGTH)) return false
+      if (!`${minutes}:${seconds}.${milliseconds}`.match(pattern)) return false
 
       ;[m, s, ms] = [m, s, ms].map(x => parseInt(x))
+
       // check greater than zero
       if ((m < 0 || s < 0 || ms < 0)) return false
       // check in range

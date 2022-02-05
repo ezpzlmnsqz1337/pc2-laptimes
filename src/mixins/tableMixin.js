@@ -25,6 +25,10 @@ export default {
       const car = this.getCarById(time.carId)
       return car ? car.name : 'Loading...'
     },
+    getCarImage (time) {
+      const car = this.getCarById(time.carId)
+      return car ? `images/${car.imageUrl}` : 'Loading...'
+    },
     getRowTitleText (laptime) {
       const date = new Date(laptime.date).toLocaleString()
       let result = `Date: ${date}`

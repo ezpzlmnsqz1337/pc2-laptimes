@@ -310,6 +310,16 @@
           Add
         </Button>
       </div>
+      <div class="__header __lg">
+        Notes
+      </div>
+      <div class="__inputRow __noColumn  __lg">
+        <textarea
+          v-model="notes"
+          class="__textarea"
+          :tabindex="8"
+        />
+      </div>
     </div>
 
     <div class="__secondPanel">
@@ -383,17 +393,17 @@
         />
       </div>
 
-      <div class="__header">
+      <div class="__header __sm">
         Notes
       </div>
-      <div class="__inputRow __noColumn">
+      <div class="__inputRow __noColumn __sm">
         <textarea
           v-model="notes"
           :tabindex="13"
         />
       </div>
 
-      <div class="__inputRow">
+      <div class="__inputRow __sm">
         <Button
           :tabindex="14"
           :type="ButtonType.PRIMARY"
@@ -405,6 +415,20 @@
           Submit
         </Button>
       </div>
+    </div>
+  </div>
+  <div class="__timeWrapper">
+    <div class="__inputRow __lg">
+      <Button
+        :tabindex="14"
+        :type="ButtonType.PRIMARY"
+        block
+        class="__submit"
+        :disabled="!valid"
+        @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), notes})"
+      >
+        Submit
+      </Button>
     </div>
   </div>
 </template>
@@ -592,6 +616,14 @@ export default {
   width: 40%;
 }
 
+.__lg {
+  display: inherit;
+}
+
+.__sm {
+  display: none;
+}
+
 @media only screen and (max-width: 1280px) {
   .__timeWrapper {
     flex-direction: row;
@@ -615,6 +647,13 @@ export default {
 
   .__inputRow {
     flex-direction: column;
+  }
+  .__lg {
+    display: none;
+  }
+
+  .__sm {
+    display: inherit;
   }
 }
 
@@ -745,4 +784,9 @@ textarea {
   margin-bottom: 1rem;
   border: 0.1rem solid black;
 }
+
+.__lg > textarea {
+  height: 16rem;
+}
+
 </style>

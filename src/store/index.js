@@ -116,6 +116,11 @@ export default createStore({
       console.log('Link: ', trackId, docRef)
       await updateDoc(docRef, { gameId })
     },
+    async setCarImage ({ commit }, { carId, imageUrl }) {
+      if (!carId || !imageUrl) return
+      const docRef = doc(db, 'cars', carId)
+      await updateDoc(docRef, { imageUrl })
+    },
     async updateLaptime ({ commit }, laptime) {
       if (!laptime.uid) return
       const docRef = doc(db, 'times', laptime.uid)

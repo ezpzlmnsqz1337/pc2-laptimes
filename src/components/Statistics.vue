@@ -69,8 +69,9 @@
                   <th class="__losing_lg">
                     Losing
                   </th>
-                  <th>Car</th>
-                  <th>Track</th>
+                  <th colspan="2">
+                    Car
+                  </th>
                   <th>Settings</th>
                 </tr>
                 <tr
@@ -99,9 +100,11 @@
                   <td class="__car">
                     {{ getCar(time) }}
                   </td>
-                  <td class="__track">
-                    <div>{{ getTrackName(time) }}</div>
-                    <div>{{ time.trackVariant }}</div>
+                  <td class="__carImage">
+                    <img
+                      :src="getCarImage(time)"
+                      :alt="getCar(time)"
+                    >
                   </td>
                   <td class="__settings">
                     <div
@@ -177,14 +180,21 @@ export default {
     ...mapState(['cars', 'drivers', 'tracks'])
   },
   mounted () {
-    setTimeout(async () => {
-      this.drivers.forEach(async x => {
-        const times = await this.getTimesForDriver({ driverId: x.uid })
-        this.totalRaces.push({ driver: x.name, races: times.length })
-        this.totalRaces.sort((a, b) => (b.races - a.races))
-      })
+    setTimeout(() => this.refresh(), 500)
+  },
+  methods: {
+    ...mapActions(['getTracksTimes', 'getTimesForDriver', 'getTimes']),
+    async refresh () {
+      this.totalRaces = []
+      this.medals = []
+      this.trackCarBoardData = []
 
       const laptimes = await this.getTimes({ queryLimit: 0 })
+
+      this.drivers.forEach(async x => {
+        this.totalRaces.push({ driver: x.name, races: laptimes.filter(y => y.driverId === x.uid).length })
+        this.totalRaces.sort((a, b) => (b.races - a.races))
+      })
 
       this.tracks.forEach(x => {
         x.variants.forEach(v => {
@@ -203,11 +213,7 @@ export default {
       })
 
       this.medals.sort((a, b) => b.first - a.first)
-    }, 2000)
-    this.$forceUpdate()
-  },
-  methods: {
-    ...mapActions(['getTracksTimes', 'getTimesForDriver', 'getTimes']),
+    },
     addMedal (laptimes) {
       // filter duplicate drivers
       Array.from(new Set(laptimes.map(x => x.driverId)))
@@ -269,6 +275,10 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+}
+
+.__carImage > img{
+  width: 8rem;
 }
 
 .__textContainer {

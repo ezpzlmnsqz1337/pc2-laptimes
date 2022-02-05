@@ -32,6 +32,13 @@
       >
         Realtime data
       </Button>
+      <!-- <Button
+        :type="ButtonType.SECONDARY"
+        :class="{__selected: activeScreen === ScreenType.SET_CAR_IMAGE}"
+        @click="showScreen({screen: ScreenType.SET_CAR_IMAGE})"
+      >
+        Set car image
+      </Button> -->
     </div>
     <div v-show="activeScreen === ScreenType.ADD_LAPTIME">
       <AddLaptime />
@@ -45,6 +52,7 @@
     </div>
     <Statistics v-show="activeScreen === ScreenType.TRACKS" />
     <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
+    <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
   </div>
 </template>
 
@@ -55,6 +63,7 @@ import LaptimeBoard from '@/components/LaptimeBoard'
 import LaptimeFilter from '@/components/LaptimeFilter'
 import Statistics from '@/components/Statistics'
 import RealtimeData from '@/components/RealtimeData'
+// import SetCarImage from '@/components/SetCarImage'
 import { mapActions, mapMutations, mapState } from 'vuex'
 import WebsocketState from './constants/WebsocketState'
 
@@ -66,6 +75,7 @@ export default {
     LaptimeFilter,
     Statistics,
     RealtimeData
+    // SetCarImage
   },
   computed: {
     ...mapState(['activeScreen', 'websocketState']),
@@ -81,11 +91,11 @@ export default {
   },
   created () {
     // connect to the websocket server
-    // this.$rdb.connect('wallpc', 8765)
-    // setInterval(() => {
-    //   // connect to ws for realtime data
-    //   this.setWebsocketState(this.$rdb.getWebsocketState())
-    // }, 2500)
+    this.$rdb.connect('wallpc', 8765)
+    setInterval(() => {
+      // connect to ws for realtime data
+      this.setWebsocketState(this.$rdb.getWebsocketState())
+    }, 2500)
   },
   async mounted () {
     await this.bindDb()
@@ -147,6 +157,18 @@ input[type=text], input[type=password], input[type=email], input[type=number]{
   padding: 0.5rem;
   border-radius: 0.3rem;
   border: 0.1rem solid black;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
 }
 
 select{
