@@ -41,19 +41,19 @@ td div:hover {
   font-weight: bold;
 }
 
-tr:nth-child(2) :deep(.__driver span) {
+tr:nth-child(2) .__driver span {
   color: gold;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-tr:nth-child(3) :deep(.__driver span) {
+tr:nth-child(3) .__driver span {
   color: silver;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
 }
 
-tr:nth-child(4) :deep(.__driver span) {
+tr:nth-child(4) .__driver span {
   color: #cd7f32;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
@@ -127,6 +127,10 @@ tr:nth-child(4) :deep(.__driver span) {
   color: var(--text-light1);
 }
 
+.__settings {
+  width: 9rem;
+}
+
 .__settings:hover {
   cursor: pointer;
 }
@@ -162,6 +166,10 @@ tr:nth-child(4) :deep(.__driver span) {
 
   td {
     padding: 0.2rem;
+  }
+
+  .__settings {
+    width: 6rem;
   }
 
   .__settings > div {

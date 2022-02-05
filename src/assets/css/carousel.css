@@ -1,0 +1,26 @@
+.carousel {
+  margin: 0 2rem;
+}
+
+:root {
+  --vc-clr-primary: #3293f5;
+  --vc-clr-secondary:  #b8b8b8;
+}
+
+.carousel__prev:hover, .carousel__next:hover {
+  --vc-nav-background-color: #197cfd;
+}
+
+.carousel__pagination {
+  padding-left: 0;
+}
+
+@media only screen and (max-width: 1024px) {
+  .carousel {
+    margin: 0;
+  }
+
+  .carousel__prev, .carousel__next {
+    display: none;
+  }
+}
