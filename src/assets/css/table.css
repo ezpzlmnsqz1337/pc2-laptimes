@@ -1,0 +1,174 @@
+table {
+  width: 100%;
+  overflow: hidden;
+  border-spacing: 0;
+  border-radius: 0.3rem;
+  font-size: 1rem;
+}
+
+th {
+  border-bottom: 1px solid var(--border-dark1);
+  background-color: #4081c2;
+  color: var(--text-light1);
+  padding: 1rem 0.5rem;
+}
+
+tr:nth-child(even) {
+  background-color: #888888;
+}
+
+tr:nth-child(odd) {
+  color: var(--text-dark1);
+  background-color: white;
+}
+
+tr:hover {
+  color: var(--text-dark1);
+  background-color: #93c4f5;
+}
+
+td {
+  padding: 0.5rem;
+}
+
+td div:hover {
+  cursor: pointer;
+  color: var(--hover);
+}
+
+.__id,
+.__driver {
+  font-weight: bold;
+}
+
+tr:nth-child(2) :deep(.__driver span) {
+  color: gold;
+  background-color: var(--bg-dark3);
+  padding: 0.2rem;
+}
+
+tr:nth-child(3) :deep(.__driver span) {
+  color: silver;
+  background-color: var(--bg-dark3);
+  padding: 0.2rem;
+}
+
+tr:nth-child(4) :deep(.__driver span) {
+  color: #cd7f32;
+  background-color: var(--bg-dark3);
+  padding: 0.2rem;
+}
+
+.__losing_lg {
+  display: table-cell;
+}
+
+.__losing_sm {
+  display: none;
+}
+
+.__losing {
+  white-space: nowrap;
+  color: #c20000;
+}
+
+.__weatherSunny {
+  background-color: #fbff00;
+  color: var(--text-dark1);
+}
+
+.__weatherRainy {
+  background-color: #274db4;
+  color: var(--text-light1);
+}
+
+.__weatherSnow {
+  background-color: #f3f3f3;
+  color: var(--text-dark1);
+}
+
+.__brakingLineOff {
+  background-color: #e00707;
+  color: var(--text-light1);
+}
+
+.__brakingLineOn {
+  background-color: #059711;
+  color: var(--text-light1);
+}
+
+.__transmissionAutomatic {
+  background-color: #059711;
+  color: var(--text-light1);
+}
+
+.__transmissionSequential {
+  background-color: #274db4;
+  color: var(--text-light1);
+}
+
+.__transmissionHPattern {
+  background-color: #954401;
+  color: var(--text-light1);
+}
+
+.__controlsKeyboard {
+  background-color: #059711;
+  color: var(--text-light1);
+}
+
+.__controlsGamepad {
+  background-color: #233974;
+  color: var(--text-light1);
+}
+
+.__controlsSteeringWheel {
+  background-color: #424242;
+  color: var(--text-light1);
+}
+
+.__settings:hover {
+  cursor: pointer;
+}
+
+.__settings > div {
+  padding: 0.3rem;
+  border-radius: 0.3rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.7rem;
+  min-width: 6rem;
+}
+
+@media only screen and (max-width: 1024px) {
+  table {
+    font-size: 0.5rem;
+  }
+
+  th {
+    border-bottom: 1px solid var(--border-dark1);
+    background-color: #4081c2;
+    color: var(--text-light1);
+    padding: 1rem 0.2rem;
+  }
+
+  .__losing_lg {
+    display: none;
+  }
+
+  .__losing_sm {
+    display: block;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.2rem;
+  }
+
+  .__settings > div {
+    padding: 0.15rem;
+    border-radius: 0.3rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.5rem;
+    min-width: 4rem;
+  }
+}

@@ -557,15 +557,15 @@ export default {
         if (!rightInput) return
         const ri = this.$refs[rightInput]
         if (e.target.selectionStart === e.target.value.length) {
-          ri.focus()
           ri.selectionStart = 0
+          ri.focus()
         }
       } else if (e.key === 'ArrowLeft') {
         if (!leftInput) return
         const li = this.$refs[leftInput]
         if (e.target.selectionStart === 0) {
-          li.focus()
           li.selectionStart = li.value.length
+          li.focus()
         }
       }
     }

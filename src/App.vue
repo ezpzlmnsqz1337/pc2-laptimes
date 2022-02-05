@@ -81,11 +81,11 @@ export default {
   },
   created () {
     // connect to the websocket server
-    this.$rdb.connect('wallpc', 8765)
-    setInterval(() => {
-      // connect to ws for realtime data
-      this.setWebsocketState(this.$rdb.getWebsocketState())
-    }, 2500)
+    // this.$rdb.connect('wallpc', 8765)
+    // setInterval(() => {
+    //   // connect to ws for realtime data
+    //   this.setWebsocketState(this.$rdb.getWebsocketState())
+    // }, 2500)
   },
   async mounted () {
     await this.bindDb()

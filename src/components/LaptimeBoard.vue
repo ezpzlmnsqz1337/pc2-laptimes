@@ -122,17 +122,15 @@
 </template>
 
 <script>
-import BrakingLine from '@/constants/BrakingLine'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import WeatherType from '@/constants/WeatherType'
-import TransmissionType from '@/constants/TransmissionType'
-import ControlType from '@/constants/ControlType'
+import tableMixin from '@/mixins/tableMixin'
 
 export default {
   name: 'LaptimeBoard',
+  mixins: [tableMixin],
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
-    ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
+    ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants']),
     ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct']),
     firstLaptime () {
       return this.times[0].laptime
@@ -143,50 +141,6 @@ export default {
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
     ...mapActions(['refreshTimes', 'getTimes']),
     ...mapActions({ ul: 'updateLaptime' }),
-    getRowTitleText (laptime) {
-      const date = new Date(laptime.date).toLocaleString()
-      let result = `Date: ${date}`
-      if (laptime.notes) result += `\nNotes: ${laptime.notes}`
-      return result
-    },
-    brakingLineClass (brakingLine) {
-      return {
-        __brakingLineOn: brakingLine === BrakingLine.ON,
-        __brakingLineOff: brakingLine === BrakingLine.OFF
-      }
-    },
-    weatherClass (weather) {
-      return {
-        __weatherSunny: weather === WeatherType.SUN,
-        __weatherRainy: weather === WeatherType.RAIN,
-        __weatherSnow: weather === WeatherType.SNOW
-      }
-    },
-    weatherIcon (weather) {
-      if (!weather) return
-      switch (weather) {
-        case WeatherType.SUN:
-          return 'sun'
-        case WeatherType.RAIN:
-          return 'cloud-rain'
-        case WeatherType.SNOW:
-          return 'snowflake'
-      }
-    },
-    transmissionClass (transmission) {
-      return {
-        __transmissionAutomatic: transmission === TransmissionType.AUTOMATIC,
-        __transmissionSequential: transmission === TransmissionType.SEQUENTIAL,
-        __transmissionHPattern: transmission === TransmissionType.H_PATTERN
-      }
-    },
-    controlsClass (controls) {
-      return {
-        __controlsKeyboard: controls === ControlType.KEYBOARD,
-        __controlsGamepad: controls === ControlType.GAMEPAD,
-        __controlsSteeringWheel: controls === ControlType.STEERING_WHEEL
-      }
-    },
     async updateLaptime (laptime) {
       if (!laptime) return
       await this.ul(laptime)
@@ -199,196 +153,22 @@ export default {
     async clearFilter () {
       this.cf()
       this.refreshTimes()
-    },
-    getDriver (time) {
-      const driver = this.getDriverById(time.driverId)
-      return driver ? driver.name : 'Loading'
     }
   }
 }
 </script>
 
 <style scoped>
+@import '../assets/css/table.css';
+
 .__laptimeBoard {
   padding: 1rem;
   border-radius: 0.3rem;
 }
 
-.__laptimeBoard table {
-  width: 100%;
-  overflow: hidden;
-  border-spacing:0;
-  border-radius: 0.3rem;
-  font-size: 1rem;
-}
-
-th {
-  border-bottom: 1px solid var(--border-dark1);
-  background-color: #4081c2;
-  color: var(--text-light1);
-  padding: 1rem 0.5rem;
-}
-
-tr:nth-child(even) {
-  background-color: #888888;
-}
-
-tr:nth-child(odd) {
-  color: var(--text-dark1);
-  background-color: white;
-}
-
-tr:hover {
-  color: var(--text-dark1);
-  background-color: #93c4f5;
-}
-
-td {
-  padding: 0.5rem;
-}
-
-td div:hover {
-  cursor: pointer;
-  color: var(--hover);
-}
-
-.__id, .__driver  {
-  font-weight: bold;
-}
-
-tr:nth-child(2) :deep(.__driver span) {
-  color: gold;
-  background-color: var(--bg-dark3);
-  padding: 0.2rem;
-}
-
-tr:nth-child(3) :deep(.__driver span) {
-  color: silver;
-  background-color: var(--bg-dark3);
-  padding: 0.2rem;
-}
-
-tr:nth-child(4) :deep(.__driver span) {
-  color: #cd7f32;
-  background-color: var(--bg-dark3);
-  padding: 0.2rem;
-}
-
-.__losing_lg {
-  display: table-cell;
-}
-
-.__losing_sm {
-  display: none;
-}
-
-.__losing {
-  white-space: nowrap;
-  color: #c20000;
-}
-
-.__weatherSunny {
-  background-color: #fbff00;
-  color: var(--text-dark1);
-}
-
-.__weatherRainy {
-  background-color: #274db4;
-  color: var(--text-light1);
-}
-
-.__weatherSnow {
-  background-color: #f3f3f3;
-  color: var(--text-dark1);
-}
-
-.__brakingLineOff {
-  background-color: #e00707;
-  color: var(--text-light1);
-}
-
-.__brakingLineOn {
-  background-color: #059711;
-  color: var(--text-light1);
-}
-
-.__transmissionAutomatic {
-  background-color: #059711;
-  color: var(--text-light1);
-}
-
-.__transmissionSequential {
-  background-color: #274db4;
-  color: var(--text-light1);
-}
-
-.__transmissionHPattern {
-  background-color: #954401;
-  color: var(--text-light1);
-}
-
-.__controlsKeyboard {
-  background-color: #059711;
-  color: var(--text-light1);
-}
-
-.__controlsGamepad {
-  background-color: #233974;
-  color: var(--text-light1);
-}
-
-.__controlsSteeringWheel {
-  background-color: #424242;
-  color: var(--text-light1);
-}
-
-.__settings:hover {
-  cursor: pointer;
-}
-
-.__settings > div {
-  padding: 0.3rem;
-  border-radius: 0.3rem;
-  margin-bottom: 0.3rem;
-  font-size: 0.7rem;
-  min-width: 6rem;
-}
-
 @media only screen and (max-width: 1024px) {
-  .__laptimeBoard table {
-    font-size: 0.5rem;
-  }
-
-  th {
-    border-bottom: 1px solid var(--border-dark1);
-    background-color: #4081c2;
-    color: var(--text-light1);
-    padding: 1rem 0.2rem;
-  }
-
-  .__losing_lg {
-    display: none;
-  }
-
-  .__losing_sm {
-    display: block;
-    white-space: nowrap;
-  }
-
-  td {
-    padding: 0.2rem;
-  }
-
   .__laptimeBoard {
     padding: 0;
   }
-
-  .__settings > div {
-  padding: 0.15rem;
-  border-radius: 0.3rem;
-  margin-bottom: 0.3rem;
-  font-size: 0.5rem;
-  min-width: 4rem;
-}
 }
 </style>

@@ -128,7 +128,7 @@ export default createStore({
       const querySnapshot = await getDocs(q)
       return querySnapshot.docs.map(x => x.data())
     },
-    async getTimes ({ commit, dispatch }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, distinct }) {
+    async getTimes ({ commit, dispatch }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, distinct, queryLimit = 30 }) {
       distinct = distinct === Distinct.YES
       const constraints = []
 
@@ -143,7 +143,7 @@ export default createStore({
       if (startType) constraints.push(where('startType', '==', startType))
       if (date) constraints.push(where('date', '==', date))
       constraints.push(orderBy('laptime'))
-      constraints.push(limit(30))
+      if (queryLimit > 0) constraints.push(limit(queryLimit))
 
       const q = query(collection(db, 'times'), ...constraints)
       const querySnapshot = await getDocs(q)
