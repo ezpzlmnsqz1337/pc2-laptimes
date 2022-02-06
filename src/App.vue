@@ -1,7 +1,10 @@
 <template>
   <div class="__wrapper">
     <div class="__menuWrapper">
-      <div class="__connectionState">
+      <div
+        v-if="isAdmin()"
+        class="__connectionState"
+      >
         <span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span>
       </div>
       <div class="__menu">
@@ -103,11 +106,13 @@ export default {
   },
   created () {
     // connect to the websocket server
-    this.$rdb.connect('wallpc', 8765)
-    setInterval(() => {
+    if (this.isAdmin()) {
+      this.$rdb.connect('wallpc', 8765)
+      setInterval(() => {
       // connect to ws for realtime data
-      this.setWebsocketState(this.$rdb.getWebsocketState())
-    }, 2500)
+        this.setWebsocketState(this.$rdb.getWebsocketState())
+      }, 2500)
+    }
   },
   async mounted () {
     await this.bindDb()

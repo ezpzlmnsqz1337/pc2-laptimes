@@ -41,6 +41,10 @@ td div:hover {
   font-weight: bold;
 }
 
+.__car .__textContainer, .__track .__textContainer{
+  justify-content: center !important;
+}
+
 tr:nth-child(2) .__driver span {
   color: gold;
   background-color: var(--bg-dark3);
