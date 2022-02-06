@@ -32,7 +32,8 @@ export default createStore({
     cars: [],
     times: [],
     tracks: [],
-    drivers: []
+    drivers: [],
+    lastAddedLaptime: null
   },
   getters: {
     getCarById: (state) => (id) => {
@@ -73,6 +74,9 @@ export default createStore({
     showScreen (state, { screen }) {
       state.activeScreen = screen
     },
+    setLastAddedLaptime (state, { laptime }) {
+      state.lastAddedLaptime = laptime
+    },
     setWebsocketState (state, websocketState) {
       if (state.websocketState === websocketState) return
       state.websocketState = websocketState
@@ -102,6 +106,7 @@ export default createStore({
     async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, notes }) {
       const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, notes }
       const docRef = doc(db, 'times', time.uid)
+      commit('setLastAddedLaptime', { laptime: time })
       await setDoc(docRef, time)
     },
     async linkCarToGameId ({ commit }, { carId, gameId }) {

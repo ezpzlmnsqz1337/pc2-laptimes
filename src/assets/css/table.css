@@ -37,7 +37,7 @@ td div:hover {
 }
 
 .__id,
-.__driver {
+.__driver{
   font-weight: bold;
 }
 
@@ -136,6 +136,7 @@ tr:nth-child(4) .__driver span {
 }
 
 .__settings > div {
+  box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   padding: 0.3rem;
   border-radius: 0.3rem;
   margin-bottom: 0.3rem;

@@ -536,9 +536,9 @@ export default {
     submit (laptime) {
       this.addLaptime(laptime)
       this.driverId = null
-      this.$toast.success('Laptime added! Click here to show laptime table.', {
-        onClick: () => this.showTimeInTable(laptime),
-        duration: false,
+      this.showTimeInTable(laptime)
+      this.$toast.success('Laptime added successfully!', {
+        duration: 3000,
         maxToasts: 1,
         queue: false
       })

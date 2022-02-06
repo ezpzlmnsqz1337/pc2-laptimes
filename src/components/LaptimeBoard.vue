@@ -17,6 +17,7 @@
         v-for="(time, index) in times"
         :key="index"
         class="__row"
+        :class="{ __lastAddedLaptime: lastAddedLaptime && lastAddedLaptime.uid === time.uid}"
         :title="getRowTitleText(time)"
       >
         <td class="__id">
@@ -129,7 +130,7 @@ export default {
   name: 'LaptimeBoard',
   mixins: [tableMixin],
   computed: {
-    ...mapState(['cars', 'tracks', 'drivers', 'times']),
+    ...mapState(['cars', 'tracks', 'drivers', 'times', 'lastAddedLaptime']),
     ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants']),
     ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct']),
     firstLaptime () {
@@ -170,5 +171,16 @@ export default {
   .__laptimeBoard {
     padding: 0;
   }
+}
+
+.__lastAddedLaptime {
+  --blink-color: #3a9ee0;
+  animation: blink 1s 10;
+}
+
+@keyframes blink {
+  0% { box-shadow: inset 0 0 1.5rem 0.8rem var(--blink-color); }
+  50% { box-shadow: inset 0 0 0 0 var(--blink-color); }
+  100% { box-shadow: inset 0 0 1.5rem 0.8rem var(--blink-color); }
 }
 </style>

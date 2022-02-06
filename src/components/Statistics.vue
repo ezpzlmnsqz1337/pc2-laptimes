@@ -295,9 +295,13 @@ export default {
       padding: 0 0 1rem 0;
   }
 
-.__generalStatisticsSection .__item {
+  .__generalStatisticsSection .__item {
     width: 100%;
     text-align: center;
+  }
+
+  .__carImage > img{
+    width: 4rem;
   }
 }
 </style>

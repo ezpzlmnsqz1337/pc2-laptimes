@@ -50,6 +50,7 @@ export default {
 
 <style scoped>
 button {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   --btn-text-dark: var(--text-dark1);
   --btn-text-light: var(--text-light1);
   --btn-default: #ffffff;

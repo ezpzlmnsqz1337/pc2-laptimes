@@ -1,37 +1,38 @@
 <template>
   <div class="__wrapper">
-    <div class="__connectionState">
-      <span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span>
-    </div>
-    <div class="__menu">
-      <Button
-        :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME}"
-        @click="showScreen({screen: ScreenType.ADD_LAPTIME})"
-      >
-        Add laptime
-      </Button>
-      <Button
-        :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.LAPTIME_BOARD}"
-        @click="showScreen({screen: ScreenType.LAPTIME_BOARD})"
-      >
-        Laptime board
-      </Button>
-      <Button
-        :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.TRACKS}"
-        @click="showScreen({screen: ScreenType.TRACKS})"
-      >
-        Statistics
-      </Button>
-      <Button
-        :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.REALTIME_DATA}"
-        @click="showScreen({screen: ScreenType.REALTIME_DATA})"
-      >
-        Realtime data
-      </Button>
+    <div class="__menuWrapper">
+      <div class="__connectionState">
+        <span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span>
+      </div>
+      <div class="__menu">
+        <Button
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME}"
+          @click="showScreen({screen: ScreenType.ADD_LAPTIME})"
+        >
+          Add laptime
+        </Button>
+        <Button
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeScreen === ScreenType.LAPTIME_BOARD}"
+          @click="showScreen({screen: ScreenType.LAPTIME_BOARD})"
+        >
+          Laptime board
+        </Button>
+        <Button
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeScreen === ScreenType.TRACKS}"
+          @click="showScreen({screen: ScreenType.TRACKS})"
+        >
+          Statistics
+        </Button>
+        <Button
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeScreen === ScreenType.REALTIME_DATA}"
+          @click="showScreen({screen: ScreenType.REALTIME_DATA})"
+        >
+          Realtime data
+        </Button>
       <!-- <Button
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === ScreenType.SET_CAR_IMAGE}"
@@ -39,6 +40,7 @@
       >
         Set car image
       </Button> -->
+      </div>
     </div>
     <div v-show="activeScreen === ScreenType.ADD_LAPTIME">
       <AddLaptime />
@@ -112,6 +114,7 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 :root {
   --hover: #188cff;
   --active: #205b95;
@@ -145,7 +148,7 @@ body {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-light1);
@@ -223,6 +226,25 @@ a {
   background-color: var(--bg-dark3);
   height: 100vh;
   overflow-y: scroll;
+  padding-top: 5.5rem;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.__wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.__menuWrapper {
+  background-color: var(--bg-dark3);
+  border-bottom: 0.1rem solid var(--border-light1);
+  top: 0;
+  position: fixed;
+  width: 100vw;
+  padding-bottom: 1rem;
+  z-index: 999;
 }
 
 .__menu {
@@ -280,6 +302,10 @@ a {
   .fa.fa-steering_wheel {
     background: url('assets/icons/steering_wheel_sm.svg');
     background-repeat: no-repeat;
+  }
+
+  .__menu button {
+    font-size: 0.6rem;
   }
 }
 </style>
