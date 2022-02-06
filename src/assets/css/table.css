@@ -137,7 +137,7 @@ tr:nth-child(4) .__driver span {
 
 .__settings > div {
   box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
-  padding: 0.3rem;
+  padding: 0.3rem 0.7rem;;
   border-radius: 0.3rem;
   margin-bottom: 0.3rem;
   font-size: 0.7rem;
@@ -170,14 +170,22 @@ tr:nth-child(4) .__driver span {
   }
 
   .__settings {
-    width: 6rem;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
-  .__settings > div {
-    padding: 0.15rem;
+  .__settings > div {    
+    padding: 0.15rem 0.3rem;
     border-radius: 0.3rem;
     margin-bottom: 0.3rem;
     font-size: 0.5rem;
-    min-width: 4rem;
+    min-width: 1.3rem;
+    width: 1.3rem;
+  }
+
+  .__settings span{
+    display: none;
   }
 }

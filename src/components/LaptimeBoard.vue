@@ -78,7 +78,7 @@
           >
             <EditableSelect
               :text="time.transmission"
-              :icon="time.transmission"
+              :icon="transmissionIcon(time.transmission)"
               :options="Object.values(TransmissionType).map(x => ({name: x}))"
               @value:update="updateLaptime({uid: time.uid, transmission: $event.name})"
             />
@@ -163,6 +163,7 @@ export default {
 @import '../assets/css/table.css';
 
 .__laptimeBoard {
+  width: 100%;
   padding: 1rem;
   border-radius: 0.3rem;
 }

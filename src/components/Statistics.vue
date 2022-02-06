@@ -111,7 +111,7 @@
                       :class="transmissionClass(time.transmission)"
                     >
                       <div class="__textContainer">
-                        <div :class="`fa fa-${time.transmission}`" />
+                        <div :class="`fa fa-${transmissionIcon(time.transmission)}`" />
                         <span>{{ time.transmission }}</span>
                       </div>
                     </div>
@@ -159,6 +159,7 @@ import { mapActions, mapState } from 'vuex'
 import tableMixin from '@/mixins/tableMixin'
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
+import WeatherType from '@/constants/WeatherType'
 
 export default {
   name: 'Statistics',
@@ -180,7 +181,7 @@ export default {
     ...mapState(['cars', 'drivers', 'tracks'])
   },
   mounted () {
-    setTimeout(() => this.refresh(), 500)
+    this.refresh()
   },
   methods: {
     ...mapActions(['getTracksTimes', 'getTimesForDriver', 'getTimes']),
@@ -201,11 +202,11 @@ export default {
           const row = []
           const trackAndVariant = laptimes.filter(y => x.uid === y.trackId && v === y.trackVariant)
           if (!trackAndVariant.length) return
-          this.cars.forEach((y, index) => {
+          this.cars.forEach(y => {
             let trackAndVariantAndCar = trackAndVariant.filter(z => z.carId === y.uid)
             if (!trackAndVariantAndCar.length) return
             trackAndVariantAndCar = trackAndVariantAndCar.map(z => ({ ...z, losing: this.$ltb.getLaptimeDiff(trackAndVariantAndCar[0].laptime, z.laptime) }))
-            this.addMedal(trackAndVariantAndCar)
+            this.handleMedals(trackAndVariantAndCar)
             row.push(trackAndVariantAndCar)
           })
           this.trackCarBoardData.push(row)
@@ -213,6 +214,11 @@ export default {
       })
 
       this.medals.sort((a, b) => b.first - a.first)
+    },
+    handleMedals (laptimes) {
+      this.addMedal(laptimes.filter(x => x.weather === WeatherType.SUN))
+      this.addMedal(laptimes.filter(x => x.weather === WeatherType.RAIN))
+      this.addMedal(laptimes.filter(x => x.weather === WeatherType.SNOW))
     },
     addMedal (laptimes) {
       // filter duplicate drivers
@@ -283,11 +289,18 @@ export default {
 
 .__textContainer {
   display: flex;
-  justify-content: space-around;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .__center {
   text-align: center;
+}
+
+@media only screen and (max-width: 1024px) {
+  .__textContainer {
+    justify-content: center;
+  }
 }
 
 @media only screen and (max-width: 700px) {

@@ -23,7 +23,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'EditableSelect',
   props: {
@@ -52,7 +51,7 @@ export default {
   },
   methods: {
     startEditing (e) {
-      if (!e.ctrlKey) return
+      if (!this.isAdmin() || !e.ctrlKey) return
       this.edit = true
       this.$nextTick(() => this.$refs.select.$el.focus())
     },
@@ -67,7 +66,14 @@ export default {
 <style scoped>
 .__textContainer {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media only screen and (max-width: 1024px) {
+  .__textContainer {
+    justify-content: center;
+  }
 }
 
 :deep(.vs__dropdown-toggle) {

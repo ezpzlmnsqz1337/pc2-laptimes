@@ -66,6 +66,17 @@ export default {
         __transmissionHPattern: transmission === TransmissionType.H_PATTERN
       }
     },
+    transmissionIcon (transmission) {
+      if (!transmission) return
+      switch (transmission) {
+        case TransmissionType.AUTOMATIC:
+          return 'font'
+        case TransmissionType.SEQUENTIAL:
+          return 'sort'
+        case TransmissionType.H_PATTERN:
+          return 'hospital-symbol'
+      }
+    },
     controlsClass (controls) {
       return {
         __controlsKeyboard: controls === ControlType.KEYBOARD,

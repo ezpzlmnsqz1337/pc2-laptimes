@@ -6,6 +6,7 @@
       </div>
       <div class="__menu">
         <Button
+          v-if="isAdmin()"
           :type="ButtonType.SECONDARY"
           :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME}"
           @click="showScreen({screen: ScreenType.ADD_LAPTIME})"
@@ -27,6 +28,7 @@
           Statistics
         </Button>
         <Button
+          v-if="isAdmin()"
           :type="ButtonType.SECONDARY"
           :class="{__selected: activeScreen === ScreenType.REALTIME_DATA}"
           @click="showScreen({screen: ScreenType.REALTIME_DATA})"
@@ -42,18 +44,26 @@
       </Button> -->
       </div>
     </div>
-    <div v-show="activeScreen === ScreenType.ADD_LAPTIME">
-      <AddLaptime />
-    </div>
-    <div
-      v-show="activeScreen === ScreenType.LAPTIME_BOARD"
-      class="__laptimes"
-    >
-      <LaptimeFilter />
-      <LaptimeBoard />
-    </div>
-    <Statistics v-show="activeScreen === ScreenType.TRACKS" />
-    <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
+    <keep-alive>
+      <div v-if="activeScreen === ScreenType.ADD_LAPTIME">
+        <AddLaptime />
+      </div>
+    </keep-alive>
+    <keep-alive>
+      <div
+        v-if="activeScreen === ScreenType.LAPTIME_BOARD"
+        class="__laptimes"
+      >
+        <LaptimeFilter />
+        <LaptimeBoard />
+      </div>
+    </keep-alive>
+    <keep-alive>
+      <Statistics v-if="activeScreen === ScreenType.TRACKS" />
+    </keep-alive>
+    <keep-alive>
+      <RealtimeData v-if="activeScreen === ScreenType.REALTIME_DATA" />
+    </keep-alive>
     <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
   </div>
 </template>
@@ -197,7 +207,7 @@ a {
 }
 
 .__noColumn > div {
-  padding: 1rem;
+  padding: 0.5rem 1rem;
 }
 
 .__connectionState {
@@ -261,7 +271,7 @@ a {
 }
 
 .__laptimes {
-  padding: 2rem;
+  padding: 0 2rem 0 2rem;
   margin: 0 auto;
   text-align: center;
   display: flex;
@@ -282,7 +292,10 @@ a {
 
 .fa.fa-steering_wheel {
   display: block;
+  margin-top: 0.1rem;
+  margin-left: -0.1rem;
   width: 1rem;
+  height: 0.8rem;
   font-size: 2rem;
   background: url('assets/icons/steering_wheel.svg');
   background-repeat: no-repeat;
@@ -292,16 +305,18 @@ a {
   .__laptimes {
     flex-direction: column;
   }
+
+  .fa.fa-steering_wheel {
+    background: url('assets/icons/steering_wheel_sm.svg');
+    background-repeat: no-repeat;
+    height: 0.5rem;
+    margin-left: 0;
+  }
 }
 
 @media only screen and (max-width: 700px) {
   .__laptimes {
     padding: 1rem;
-  }
-
-  .fa.fa-steering_wheel {
-    background: url('assets/icons/steering_wheel_sm.svg');
-    background-repeat: no-repeat;
   }
 
   .__menu button {

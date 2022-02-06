@@ -9,7 +9,7 @@
       :key="v"
     >
       <Button
-        :type="ButtonType.PRIMARY"
+        :type="ButtonType.SECONDARY"
         block
         :class="selectedClass(v)"
         @click="setValue(v)"
@@ -100,8 +100,17 @@ label {
   cursor: pointer;
 }
 
+button {
+  inset: 1rem;
+}
+
+button:hover {
+  background-color: #005db9 !important;
+}
+
 button.__selected {
-  background-color: #00366b;
+  background-color: #1d6ebe !important;
+  font-weight: bold;
   color: var(--text-light1);
 }
 </style>

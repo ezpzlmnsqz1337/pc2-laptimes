@@ -122,15 +122,17 @@
     </div>
 
     <Button
-      :type="ButtonType.SECONDARY"
+      :type="ButtonType.DANGER"
+      :disabled="!isFilterSet()"
       @click="clearFilter()"
     >
-      Clear filter
+      <div class="fa fa-ban" /><span class="__clearFilterBtnText">Clear filter</span>
     </Button>
   </div>
 </template>
 
 <script>
+import Distinct from '@/constants/Distinct'
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
@@ -146,6 +148,10 @@ export default {
   methods: {
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
     ...mapActions(['refreshTimes']),
+    isFilterSet () {
+      return this.carId || this.trackId || this.trackVariant || this.transmission ||
+              this.weather || this.brakingLine || this.controls || this.startType || this.distinct === Distinct.NO
+    },
     async setFilter (filter) {
       this.sf(filter)
       this.refreshTimes()
@@ -176,6 +182,10 @@ export default {
 .__activeFilter :deep(span.vs__selected) {
   color: #4081C2;
   font-weight: bold;
+}
+
+.__clearFilterBtnText {
+  padding-left: 0.4rem;
 }
 
 @media only screen and (max-width: 700px) {

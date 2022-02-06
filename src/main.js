@@ -40,6 +40,7 @@ app.config.globalProperties.debounce = debounce
 app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
 app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
 app.config.globalProperties.$lb = LightsBuilder.getInstance()
+app.config.globalProperties.isAdmin = () => ['localhost:8080', 'malina:3000'].includes(window.location.host)
 
 app.use(store)
 app.use(Toaster)
