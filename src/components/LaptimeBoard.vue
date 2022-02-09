@@ -14,6 +14,19 @@
         <th>Settings</th>
       </tr>
       <tr
+        v-show="!times.length"
+      >
+        <td
+          colspan="7"
+          class="__loading"
+        >
+          <PulseLoader
+            color="#188cff"
+            size="15px"
+          />
+        </td>
+      </tr>
+      <tr
         v-for="(time, index) in times"
         :key="index"
         class="__row"
@@ -137,11 +150,21 @@ export default {
       return this.times[0].laptime
     }
   },
+  mounted () {
+    this.setRandomFilter()
+  },
   methods: {
     ...mapMutations(['setTimes']),
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
     ...mapActions(['refreshTimes', 'getTimes']),
     ...mapActions({ ul: 'updateLaptime' }),
+    async setRandomFilter () {
+      const times = await this.getTimes({ queryLimit: 0 })
+      // select random laptime
+      const index = Math.round(Math.random() * times.length)
+      const { trackId, trackVariant, carId, weather } = times[index]
+      this.setFilter({ trackId, trackVariant, carId, weather })
+    },
     async updateLaptime (laptime) {
       if (!laptime) return
       await this.ul(laptime)

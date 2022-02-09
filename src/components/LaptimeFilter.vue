@@ -122,6 +122,12 @@
     </div>
 
     <Button
+      :type="ButtonType.SECONDARY"
+      @click="setRandomFilter()"
+    >
+      <div class="fa fa-random" /><span class="__randomBtnText">Random</span>
+    </Button>
+    <Button
       :type="ButtonType.DANGER"
       :disabled="!isFilterSet()"
       @click="clearFilter()"
@@ -137,6 +143,11 @@ import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
 export default {
   name: 'LaptimeFilter',
+  data () {
+    return {
+      randomizing: false
+    }
+  },
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
@@ -146,11 +157,23 @@ export default {
     }
   },
   methods: {
+    ...mapMutations(['setTimes']),
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
-    ...mapActions(['refreshTimes']),
+    ...mapActions(['refreshTimes', 'getTimes']),
     isFilterSet () {
       return this.carId || this.trackId || this.trackVariant || this.transmission ||
               this.weather || this.brakingLine || this.controls || this.startType || this.distinct === Distinct.NO
+    },
+    async setRandomFilter () {
+      if (this.randomizing) return
+      this.randomizing = true
+      this.setTimes([])
+      const times = await this.getTimes({ queryLimit: 0 })
+      // select random laptime
+      const index = Math.round(Math.random() * times.length)
+      const { trackId, trackVariant, carId, weather } = times[index]
+      this.setFilter({ trackId, trackVariant, carId, weather })
+      this.randomizing = false
     },
     async setFilter (filter) {
       this.sf(filter)
@@ -174,6 +197,10 @@ export default {
   padding: 1rem;
 }
 
+.__inputRow {
+  margin-bottom: 0.7rem;
+}
+
 .__activeFilter :deep(.vs__dropdown-toggle) {
   border: 0.1rem solid #4081C2;
   box-shadow: 0px 0px 5px 2px #4081C2;
@@ -184,7 +211,7 @@ export default {
   font-weight: bold;
 }
 
-.__clearFilterBtnText {
+.__clearFilterBtnText, .__randomBtnText {
   padding-left: 0.4rem;
 }
 

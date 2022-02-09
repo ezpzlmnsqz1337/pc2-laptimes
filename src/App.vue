@@ -106,13 +106,13 @@ export default {
   },
   created () {
     // connect to the websocket server
-    if (this.isAdmin()) {
-      this.$rdb.connect('wallpc', 8765)
-      setInterval(() => {
-      // connect to ws for realtime data
-        this.setWebsocketState(this.$rdb.getWebsocketState())
-      }, 2500)
-    }
+    // if (this.isAdmin()) {
+    //   this.$rdb.connect('wallpc', 8765)
+    //   setInterval(() => {
+    //   // connect to ws for realtime data
+    //     this.setWebsocketState(this.$rdb.getWebsocketState())
+    //   }, 2500)
+    // }
   },
   async mounted () {
     await this.bindDb()
@@ -160,6 +160,10 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
+}
+
+h2 {
+  margin-top: 0.5rem;
 }
 
 #app {

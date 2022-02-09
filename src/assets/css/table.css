@@ -13,11 +13,11 @@ th {
   padding: 1rem 0.5rem;
 }
 
-tr:nth-child(even) {
+tr:nth-child(odd) {
   background-color: #888888;
 }
 
-tr:nth-child(odd) {
+tr:nth-child(even) {
   color: var(--text-dark1);
   background-color: white;
 }
@@ -37,6 +37,7 @@ td div:hover {
 }
 
 .__loading {
+  background-color: #888888;
   padding: 2.4rem 0;
 }
 
@@ -49,22 +50,36 @@ td div:hover {
   justify-content: center !important;
 }
 
-tr:nth-child(2) .__driver span {
-  color: gold;
-  background-color: var(--bg-dark3);
+.__driver span {
+  border-radius: 0.3rem;
   padding: 0.2rem;
 }
 
 tr:nth-child(3) .__driver span {
-  color: silver;
+  box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
+  color: gold;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid gold;
 }
 
 tr:nth-child(4) .__driver span {
+  box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
+  color: silver;
+  background-color: var(--bg-dark3);
+  padding: 0.2rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid silver;
+}
+
+tr:nth-child(5) .__driver span {
+  box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   color: #cd7f32;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
+  border-radius: 0.3rem;
+  border: 0.1rem solid #cd7f32;
 }
 
 .__losing_lg {
