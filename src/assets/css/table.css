@@ -36,6 +36,10 @@ td div:hover {
   color: var(--hover);
 }
 
+.__loading {
+  padding: 2.4rem 0;
+}
+
 .__id,
 .__driver{
   font-weight: bold;

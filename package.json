@@ -20,6 +20,7 @@
     "uuid": "^8.3.2",
     "vue": "^3.0.0",
     "vue-select": "4.0.0-beta.1",
+    "vue-spinner": "^1.0.4",
     "vue3-carousel": "^0.1.36",
     "vue3-perfect-scrollbar": "^1.5.5",
     "vuedraggable": "^4.1.0",

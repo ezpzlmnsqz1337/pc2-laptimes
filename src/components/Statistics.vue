@@ -1,10 +1,35 @@
 <template>
   <div class="__statistics">
+    <div class="__controls">
+      <Button
+        :type="ButtonType.SECONDARY"
+        @click="refresh()"
+      >
+        <div
+          class="fa fa-redo"
+        /><span>Refresh</span>
+      </Button>
+    </div>
     <div class="__generalStatisticsSection">
-      <div class="__item">
+      <div
+        class="__item"
+      >
         <h2>Total races</h2>
         <table class="__totalRacesTable">
           <tr><th>Driver</th><th>No. of races</th></tr>
+          <tr
+            v-show="!totalRaces.length"
+          >
+            <td
+              colspan="2"
+              class="__loading"
+            >
+              <PulseLoader
+                color="#188cff"
+                size="15px"
+              />
+            </td>
+          </tr>
           <tr
             v-for="tr in totalRaces"
             :key="tr.driver"
@@ -18,10 +43,25 @@
           </tr>
         </table>
       </div>
-      <div class="__item">
+      <div
+        class="__item"
+      >
         <h2>Medals</h2>
         <table class="__totalRacesTable">
           <tr><th>Driver</th><th>1st</th><th>2nd</th><th>3rd</th></tr>
+          <tr
+            v-show="!medals.length"
+          >
+            <td
+              colspan="4"
+              class="__loading"
+            >
+              <PulseLoader
+                color="#188cff"
+                size="15px"
+              />
+            </td>
+          </tr>
           <tr
             v-for="m in medals"
             :key="m.driverId"
@@ -44,8 +84,13 @@
       </div>
     </div>
 
-    <div class="__trackCarMatrixSection">
-      <h2 class="__center">
+    <div
+      class="__trackCarMatrixSection"
+    >
+      <h2
+        v-if="trackCarBoardData.length"
+        class="__center"
+      >
         Track times
       </h2>
       <div class="__trackCarMatrix">
@@ -73,6 +118,17 @@
                     Car
                   </th>
                   <th>Settings</th>
+                </tr>
+                <tr v-show="!trackCarBoardData.length">
+                  <td
+                    colspan="7"
+                    class="__loading"
+                  >
+                    <PulseLoader
+                      color="#188cff"
+                      size="15px"
+                    />
+                  </td>
                 </tr>
                 <tr
                   v-for="(time, indexTime) in column"
@@ -251,6 +307,10 @@ export default {
   padding: 1rem;
 }
 
+.__controls{
+  text-align: center;
+}
+
 .__generalStatisticsSection {
   display: flex;
   justify-content: center;
@@ -295,6 +355,10 @@ export default {
 
 .__center {
   text-align: center;
+}
+
+.__controls .fa {
+  margin-right: 0.3rem;
 }
 
 @media only screen and (max-width: 1024px) {

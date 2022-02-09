@@ -1,409 +1,425 @@
 <template>
-  <Modal
-    v-if="showNewDriverModal"
-    @close="showNewDriverModal = false"
-  >
-    <template #header>
-      <h3>Add driver</h3>
-    </template>
-    <template #body>
-      <input
-        v-model="newDriverName"
-        class="__modalInput"
-        placeholder="Enter driver name"
-        type="text"
-      >
-      <div class="__modalButtons">
-        <Button
-          :type="ButtonType.DANGER"
-          @click="showNewDriverModal = false"
+  <div class="__addLaptime">
+    <Modal
+      v-if="showNewDriverModal"
+      @close="showNewDriverModal = false"
+    >
+      <template #header>
+        <h3>Add driver</h3>
+      </template>
+      <template #body>
+        <input
+          v-model="newDriverName"
+          class="__modalInput"
+          placeholder="Enter driver name"
+          type="text"
         >
-          Cancel
-        </Button>
-        <Button
-          :type="ButtonType.PRIMARY"
-          @click="addDriver()"
-        >
-          Add
-        </Button>
-      </div>
-    </template>
-  </Modal>
+        <div class="__modalButtons">
+          <Button
+            :type="ButtonType.DANGER"
+            @click="showNewDriverModal = false"
+          >
+            Cancel
+          </Button>
+          <Button
+            :type="ButtonType.PRIMARY"
+            @click="addDriver()"
+          >
+            Add
+          </Button>
+        </div>
+      </template>
+    </Modal>
 
-  <Modal
-    v-if="showNewCarModal"
-    @close="showNewCarModal = false"
-  >
-    <template #header>
-      <h3>Add Car</h3>
-    </template>
-    <template #body>
-      <input
-        v-model="newCarName"
-        class="__modalInput"
-        placeholder="Enter car name"
-        type="text"
-      >
-      <div class="__modalButtons">
-        <Button
-          :type="ButtonType.DANGER"
-          @click="showNewCarModal = false"
+    <Modal
+      v-if="showNewCarModal"
+      @close="showNewCarModal = false"
+    >
+      <template #header>
+        <h3>Add Car</h3>
+      </template>
+      <template #body>
+        <input
+          v-model="newCarName"
+          class="__modalInput"
+          placeholder="Enter car name"
+          type="text"
         >
-          Cancel
-        </Button>
-        <Button
-          :type="ButtonType.PRIMARY"
-          @click="addCar()"
-        >
-          Add
-        </Button>
-      </div>
-    </template>
-  </Modal>
+        <div class="__modalButtons">
+          <Button
+            :type="ButtonType.DANGER"
+            @click="showNewCarModal = false"
+          >
+            Cancel
+          </Button>
+          <Button
+            :type="ButtonType.PRIMARY"
+            @click="addCar()"
+          >
+            Add
+          </Button>
+        </div>
+      </template>
+    </Modal>
 
-  <Modal
-    v-if="showNewTrackModal"
-    @close="showNewTrackModal = false"
-  >
-    <template #header>
-      <h3>Add Track</h3>
-    </template>
-    <template #body>
-      <input
-        v-model="newTrackName"
-        class="__modalInput"
-        placeholder="Enter track name"
-        type="text"
-      >
-      <div class="__modalButtons">
-        <Button
-          :type="ButtonType.DANGER"
-          @click="showNewTrackModal = false"
+    <Modal
+      v-if="showNewTrackModal"
+      @close="showNewTrackModal = false"
+    >
+      <template #header>
+        <h3>Add Track</h3>
+      </template>
+      <template #body>
+        <input
+          v-model="newTrackName"
+          class="__modalInput"
+          placeholder="Enter track name"
+          type="text"
         >
-          Cancel
-        </Button>
-        <Button
-          :type="ButtonType.PRIMARY"
-          @click="addTrack()"
-        >
-          Add
-        </Button>
-      </div>
-    </template>
-  </Modal>
+        <div class="__modalButtons">
+          <Button
+            :type="ButtonType.DANGER"
+            @click="showNewTrackModal = false"
+          >
+            Cancel
+          </Button>
+          <Button
+            :type="ButtonType.PRIMARY"
+            @click="addTrack()"
+          >
+            Add
+          </Button>
+        </div>
+      </template>
+    </Modal>
 
-  <Modal
-    v-if="showNewTrackVariantModal"
-    @close="showNewTrackVariantModal = false"
-  >
-    <template #header>
-      <h3>Add Track variant</h3>
-    </template>
-    <template #body>
-      <input
-        v-model="newTrackVariantName"
-        class="__modalInput"
-        placeholder="Enter track variant name"
-        type="text"
-      >
-      <div class="__modalButtons">
-        <Button
-          :type="ButtonType.DANGER"
-          @click="showNewTrackVariantModal = false"
+    <Modal
+      v-if="showNewTrackVariantModal"
+      @close="showNewTrackVariantModal = false"
+    >
+      <template #header>
+        <h3>Add Track variant</h3>
+      </template>
+      <template #body>
+        <input
+          v-model="newTrackVariantName"
+          class="__modalInput"
+          placeholder="Enter track variant name"
+          type="text"
         >
-          Cancel
-        </Button>
-        <Button
-          :type="ButtonType.PRIMARY"
-          @click="addTrackVariant()"
-        >
-          Add
-        </Button>
-      </div>
-    </template>
-  </Modal>
+        <div class="__modalButtons">
+          <Button
+            :type="ButtonType.DANGER"
+            @click="showNewTrackVariantModal = false"
+          >
+            Cancel
+          </Button>
+          <Button
+            :type="ButtonType.PRIMARY"
+            @click="addTrackVariant()"
+          >
+            Add
+          </Button>
+        </div>
+      </template>
+    </Modal>
 
-  <div class="__heading">
-    <h1>Add Laptime</h1>
-  </div>
-  <div class="__timeWrapper">
-    <div class="__firstPanel">
-      <div
-        v-if="fastestLapTime"
-        class="__gameInfoColumn"
-      >
-        <div>In game best lap: {{ fastestLapTime }}</div>
-        <Button
-          :type="ButtonType.SECONDARY"
-          @click="setLaptime(fastestLapTime)"
-        >
-          Set
-        </Button>
-      </div>
-      <div class="__inputRow">
+    <div class="__heading">
+      <h1>Add Laptime</h1>
+    </div>
+    <div class="__timeWrapper">
+      <div class="__firstPanel">
         <div
-          class="__laptimeInputs"
-          :class="{__error: laptimeError}"
+          v-if="fastestLapTime"
+          class="__gameInfoColumn"
         >
-          <input
-            ref="minutes"
-            v-model="minutes"
-            tabindex="1"
-            type="text"
-            maxlength="2"
-            class="__minutes"
-            placeholder="0"
-            @keydown="onLaptimeInputKeyDown($event, null, 'seconds')"
-            @input="validateLaptimeFormat()"
+          <div>In game best lap: {{ fastestLapTime }}</div>
+          <Button
+            :type="ButtonType.SECONDARY"
+            @click="setLaptime(fastestLapTime)"
           >
-          <div class="__colon">
-            :
+            Set
+          </Button>
+        </div>
+        <div class="__inputRow">
+          <div
+            class="__laptimeInputs"
+            :class="{__error: laptimeError}"
+          >
+            <input
+              ref="minutes"
+              v-model="minutes"
+              tabindex="1"
+              type="text"
+              maxlength="2"
+              class="__minutes"
+              placeholder="0"
+              @keydown="onLaptimeInputKeyDown($event, null, 'seconds')"
+              @input="validateLaptimeFormat()"
+            >
+            <div class="__colon">
+              :
+            </div>
+            <input
+              ref="seconds"
+              v-model="seconds"
+              tabindex="2"
+              maxlength="2"
+              type="text"
+              class="__seconds"
+              placeholder="00"
+              @keydown="onLaptimeInputKeyDown($event, 'minutes', 'milliseconds')"
+              @input="validateLaptimeFormat()"
+            >
+            <div class="__dot">
+              .
+            </div>
+            <input
+              ref="milliseconds"
+              v-model="milliseconds"
+              tabindex="3"
+              maxlength="3"
+              type="text"
+              class="__milliseconds"
+              placeholder="000"
+              @keydown="onLaptimeInputKeyDown($event, 'seconds')"
+              @input="validateLaptimeFormat()"
+            >
           </div>
-          <input
-            ref="seconds"
-            v-model="seconds"
-            tabindex="2"
-            maxlength="2"
-            type="text"
-            class="__seconds"
-            placeholder="00"
-            @keydown="onLaptimeInputKeyDown($event, 'minutes', 'milliseconds')"
-            @input="validateLaptimeFormat()"
+        </div>
+
+        <div
+          v-if="carName"
+          class="__gameInfoColumn"
+        >
+          <div>In game car name: {{ carName }}</div>
+          <Button
+            v-if="carHasLink()"
+            :type="ButtonType.SECONDARY"
+            @click="setCarName(carName)"
           >
-          <div class="__dot">
-            .
-          </div>
-          <input
-            ref="milliseconds"
-            v-model="milliseconds"
-            tabindex="3"
-            maxlength="3"
-            type="text"
-            class="__milliseconds"
-            placeholder="000"
-            @keydown="onLaptimeInputKeyDown($event, 'seconds')"
-            @input="validateLaptimeFormat()"
+            Set
+          </Button>
+          <Button
+            v-if="carId && !carHasLink()"
+            :type="ButtonType.DANGER"
+            @click="linkCarToGameId({carId: carId, gameId: carName})"
           >
+            Link
+          </Button>
+        </div>
+        <div class="__inputRow">
+          <v-select
+            v-model="carId"
+            :tabindex="4"
+            placeholder="Select car"
+            :options="cars"
+            :reduce="car => car.uid"
+            :class="{__selected: carId}"
+            label="name"
+          />
+          <Button
+            :type="ButtonType.SUCCESS"
+            @click="showNewCarModal = true"
+          >
+            Add
+          </Button>
+        </div>
+
+        <div
+          v-if="trackLocation"
+          class="__gameInfoColumn"
+        >
+          <div>In game track location: {{ trackLocation }}</div>
+          <Button
+            v-if="trackHasLink()"
+            :type="ButtonType.SECONDARY"
+            @click="setTrackLocation(trackLocation)"
+          >
+            Set
+          </Button>
+          <Button
+            v-if="trackId && !trackHasLink()"
+            :type="ButtonType.DANGER"
+            @click="linkTrackToGameId({trackId: trackId, gameId: trackLocation})"
+          >
+            Link
+          </Button>
+        </div>
+        <div class="__inputRow">
+          <v-select
+            v-model="trackId"
+            :tabindex="5"
+            placeholder="Select track"
+            :options="tracks"
+            :reduce="track => track.uid"
+            label="track"
+            :class="{__selected: trackId}"
+            @option:selected="trackVariant=getTrackVariants($event.uid)[0]"
+          /><Button
+            :type="ButtonType.SUCCESS"
+            @click="showNewTrackModal = true"
+          >
+            Add
+          </Button>
+        </div>
+        <div
+          v-if="trackId && trackVariation"
+          class="__gameInfoColumn"
+        >
+          <div>In game track variant: {{ trackVariation }}</div>
+          <Button
+            :type="ButtonType.SECONDARY"
+            @click="setTrackVariation(trackVariation)"
+          >
+            Set
+          </Button>
+        </div>
+        <div
+          v-if="trackId"
+          class="__inputRow"
+        >
+          <v-select
+            v-model="trackVariant"
+            :tabindex="6"
+            placeholder="Select track variant"
+            :options="getTrackVariants(trackId)"
+            :class="{__selected: trackVariant}"
+          /><Button
+            :type="ButtonType.SUCCESS"
+            @click="showNewTrackVariantModal = true"
+          >
+            Add
+          </Button>
+        </div>
+        <div
+          class="__inputRow"
+        >
+          <v-select
+            v-model="driverId"
+            :tabindex="7"
+            placeholder="Select driver"
+            :options="drivers"
+            :reduce="driver => driver.uid"
+            :class="{__selected: driverId}"
+            label="name"
+          />
+          <Button
+            :type="ButtonType.SUCCESS"
+            @click="showNewDriverModal = true"
+          >
+            Add
+          </Button>
+        </div>
+        <div class="__header __lg">
+          Notes
+        </div>
+        <div class="__inputRow __noColumn  __lg">
+          <textarea
+            v-model="notes"
+            class="__textarea"
+            :tabindex="8"
+          />
         </div>
       </div>
 
-      <div
-        v-if="carName"
-        class="__gameInfoColumn"
-      >
-        <div>In game car name: {{ carName }}</div>
-        <Button
-          v-if="carHasLink()"
-          :type="ButtonType.SECONDARY"
-          @click="setCarName(carName)"
-        >
-          Set
-        </Button>
-        <Button
-          v-if="carId && !carHasLink()"
-          :type="ButtonType.DANGER"
-          @click="linkCarToGameId({carId: carId, gameId: carName})"
-        >
-          Link
-        </Button>
-      </div>
-      <div class="__inputRow">
-        <v-select
-          v-model="carId"
-          :tabindex="4"
-          placeholder="Select car"
-          :options="cars"
-          :reduce="car => car.uid"
-          :class="{__selected: carId}"
-          label="name"
-        />
-        <Button
-          :type="ButtonType.SUCCESS"
-          @click="showNewCarModal = true"
-        >
-          Add
-        </Button>
-      </div>
+      <div class="__secondPanel">
+        <div class="__header">
+          Transmission
+        </div>
+        <div class="__inputRow __noColumn">
+          <RadioButtons
+            :tabindex="8"
+            no-any
+            name="ALtransmission"
+            :values="Object.values(TransmissionType)"
+            :value="transmission"
+            @changed="e => transmission = e"
+          />
+        </div>
 
-      <div
-        v-if="trackLocation"
-        class="__gameInfoColumn"
-      >
-        <div>In game track location: {{ trackLocation }}</div>
-        <Button
-          v-if="trackHasLink()"
-          :type="ButtonType.SECONDARY"
-          @click="setTrackLocation(trackLocation)"
-        >
-          Set
-        </Button>
-        <Button
-          v-if="trackId && !trackHasLink()"
-          :type="ButtonType.DANGER"
-          @click="linkTrackToGameId({trackId: trackId, gameId: trackLocation})"
-        >
-          Link
-        </Button>
-      </div>
-      <div class="__inputRow">
-        <v-select
-          v-model="trackId"
-          :tabindex="5"
-          placeholder="Select track"
-          :options="tracks"
-          :reduce="track => track.uid"
-          label="track"
-          :class="{__selected: trackId}"
-          @option:selected="trackVariant=getTrackVariants($event.uid)[0]"
-        /><Button
-          :type="ButtonType.SUCCESS"
-          @click="showNewTrackModal = true"
-        >
-          Add
-        </Button>
-      </div>
-      <div
-        v-if="trackId && trackVariation"
-        class="__gameInfoColumn"
-      >
-        <div>In game track variant: {{ trackVariation }}</div>
-        <Button
-          :type="ButtonType.SECONDARY"
-          @click="setTrackVariation(trackVariation)"
-        >
-          Set
-        </Button>
-      </div>
-      <div
-        v-if="trackId"
-        class="__inputRow"
-      >
-        <v-select
-          v-model="trackVariant"
-          :tabindex="6"
-          placeholder="Select track variant"
-          :options="getTrackVariants(trackId)"
-          :class="{__selected: trackVariant}"
-        /><Button
-          :type="ButtonType.SUCCESS"
-          @click="showNewTrackVariantModal = true"
-        >
-          Add
-        </Button>
-      </div>
-      <div
-        class="__inputRow"
-      >
-        <v-select
-          v-model="driverId"
-          :tabindex="7"
-          placeholder="Select driver"
-          :options="drivers"
-          :reduce="driver => driver.uid"
-          :class="{__selected: driverId}"
-          label="name"
-        />
-        <Button
-          :type="ButtonType.SUCCESS"
-          @click="showNewDriverModal = true"
-        >
-          Add
-        </Button>
-      </div>
-      <div class="__header __lg">
-        Notes
-      </div>
-      <div class="__inputRow __noColumn  __lg">
-        <textarea
-          v-model="notes"
-          class="__textarea"
-          :tabindex="8"
-        />
+        <div class="__header">
+          Weather
+        </div>
+        <div class="__inputRow __noColumn">
+          <RadioButtons
+            :tabindex="9"
+            no-any
+            name="ALweather"
+            :values="Object.values(WeatherType)"
+            :value="weather"
+            @changed="e => weather = e"
+          />
+        </div>
+
+        <div class="__header">
+          Braking line
+        </div>
+        <div class="__inputRow __noColumn">
+          <RadioButtons
+            :tabindex="10"
+            no-any
+            name="ALbrakingLine"
+            :values="Object.values(BrakingLine)"
+            :value="brakingLine"
+            @changed="e => brakingLine = e"
+          />
+        </div>
+
+        <div class="__header">
+          Controls
+        </div>
+        <div class="__inputRow __noColumn">
+          <RadioButtons
+            :tabindex="11"
+            no-any
+            name="ALcontrols"
+            :values="Object.values(ControlType)"
+            :value="controls"
+            @changed="e => controls = e"
+          />
+        </div>
+
+        <div class="__header">
+          Start type
+        </div>
+        <div class="__inputRow __noColumn">
+          <RadioButtons
+            :tabindex="12"
+            no-any
+            name="ALstartType"
+            :values="Object.values(StartType)"
+            :value="startType"
+            @changed="e => startType = e"
+          />
+        </div>
+
+        <div class="__header __sm">
+          Notes
+        </div>
+        <div class="__inputRow __noColumn __sm">
+          <textarea
+            v-model="notes"
+            :tabindex="13"
+          />
+        </div>
+
+        <div class="__inputRow __sm">
+          <Button
+            :tabindex="14"
+            :type="ButtonType.PRIMARY"
+            block
+            class="__submit"
+            :disabled="!valid"
+            @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), notes})"
+          >
+            Submit
+          </Button>
+        </div>
       </div>
     </div>
-
-    <div class="__secondPanel">
-      <div class="__header">
-        Transmission
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          :tabindex="8"
-          no-any
-          name="ALtransmission"
-          :values="Object.values(TransmissionType)"
-          :value="transmission"
-          @changed="e => transmission = e"
-        />
-      </div>
-
-      <div class="__header">
-        Weather
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          :tabindex="9"
-          no-any
-          name="ALweather"
-          :values="Object.values(WeatherType)"
-          :value="weather"
-          @changed="e => weather = e"
-        />
-      </div>
-
-      <div class="__header">
-        Braking line
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          :tabindex="10"
-          no-any
-          name="ALbrakingLine"
-          :values="Object.values(BrakingLine)"
-          :value="brakingLine"
-          @changed="e => brakingLine = e"
-        />
-      </div>
-
-      <div class="__header">
-        Controls
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          :tabindex="11"
-          no-any
-          name="ALcontrols"
-          :values="Object.values(ControlType)"
-          :value="controls"
-          @changed="e => controls = e"
-        />
-      </div>
-
-      <div class="__header">
-        Start type
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          :tabindex="12"
-          no-any
-          name="ALstartType"
-          :values="Object.values(StartType)"
-          :value="startType"
-          @changed="e => startType = e"
-        />
-      </div>
-
-      <div class="__header __sm">
-        Notes
-      </div>
-      <div class="__inputRow __noColumn __sm">
-        <textarea
-          v-model="notes"
-          :tabindex="13"
-        />
-      </div>
-
-      <div class="__inputRow __sm">
+    <div class="__timeWrapper">
+      <div class="__inputRow __lg">
         <Button
           :tabindex="14"
           :type="ButtonType.PRIMARY"
@@ -415,20 +431,6 @@
           Submit
         </Button>
       </div>
-    </div>
-  </div>
-  <div class="__timeWrapper">
-    <div class="__inputRow __lg">
-      <Button
-        :tabindex="14"
-        :type="ButtonType.PRIMARY"
-        block
-        class="__submit"
-        :disabled="!valid"
-        @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), notes})"
-      >
-        Submit
-      </Button>
     </div>
   </div>
 </template>

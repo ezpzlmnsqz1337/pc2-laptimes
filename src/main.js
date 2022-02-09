@@ -24,6 +24,7 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import RealtimeDataBuilder from './builders/RealtimeDataBuilder'
 import LaptimeBuilder from './builders/LaptimeBuilder'
 import LightsBuilder from './builders/LightsBuilder'
+import PulseLoader from 'vue-spinner/src/PulseLoader'
 
 const app = createApp(App)
 app.config.globalProperties.ButtonType = ButtonType
@@ -50,4 +51,5 @@ app.component('Modal', Modal)
 app.component('EditableSelect', EditableSelect)
 app.component('RadioButtons', RadioButtons)
 app.component('VSelect', vSelect)
+app.component('PulseLoader', PulseLoader)
 app.mount('#app')

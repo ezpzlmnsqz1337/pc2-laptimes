@@ -48,19 +48,19 @@
       </div>
     </div>
     <keep-alive>
-      <div v-if="activeScreen === ScreenType.ADD_LAPTIME">
-        <AddLaptime />
-      </div>
+      <AddLaptime v-if="activeScreen === ScreenType.ADD_LAPTIME" />
     </keep-alive>
-    <keep-alive>
-      <div
-        v-if="activeScreen === ScreenType.LAPTIME_BOARD"
-        class="__laptimes"
-      >
-        <LaptimeFilter />
-        <LaptimeBoard />
-      </div>
-    </keep-alive>
+    <div
+      v-show="activeScreen === ScreenType.LAPTIME_BOARD"
+      class="__laptimes"
+    >
+      <keep-alive>
+        <LaptimeFilter v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
+      </keep-alive>
+      <keep-alive>
+        <LaptimeBoard v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
+      </keep-alive>
+    </div>
     <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.TRACKS" />
     </keep-alive>
