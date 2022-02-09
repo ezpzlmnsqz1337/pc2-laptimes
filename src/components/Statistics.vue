@@ -228,6 +228,7 @@ export default {
   mixins: [tableMixin],
   data () {
     return {
+      refreshing: false,
       totalRaces: [],
       medals: [],
       trackCarBoardData: []
@@ -242,6 +243,8 @@ export default {
   methods: {
     ...mapActions(['getTracksTimes', 'getTimesForDriver', 'getTimes']),
     async refresh () {
+      if (this.refreshing) return
+      this.refreshing = true
       this.totalRaces = []
       this.medals = []
       this.trackCarBoardData = []
@@ -270,6 +273,7 @@ export default {
       })
 
       this.medals.sort((a, b) => b.first - a.first)
+      this.refreshing = false
     },
     handleMedals (laptimes) {
       this.addMedal(laptimes.filter(x => x.weather === WeatherType.SUN))
