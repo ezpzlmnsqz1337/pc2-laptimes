@@ -194,14 +194,14 @@
         >
           <div>In game car name: {{ carName }}</div>
           <Button
-            v-if="carHasLink()"
+            v-if="canSetCar()"
             :type="ButtonType.SECONDARY"
             @click="setCarName(carName)"
           >
             Set
           </Button>
           <Button
-            v-if="carId && !carHasLink()"
+            v-if="carId && !canSetCar() && !carAlreadyLinked()"
             :type="ButtonType.DANGER"
             @click="linkCarToGameId({carId: carId, gameId: carName})"
           >
@@ -232,14 +232,14 @@
         >
           <div>In game track location: {{ trackLocation }}</div>
           <Button
-            v-if="trackHasLink()"
+            v-if="canSetTrack()"
             :type="ButtonType.SECONDARY"
             @click="setTrackLocation(trackLocation)"
           >
             Set
           </Button>
           <Button
-            v-if="trackId && !trackHasLink()"
+            v-if="trackId && !canSetTrack() && !trackAlreadyLinked()"
             :type="ButtonType.DANGER"
             @click="linkTrackToGameId({trackId: trackId, gameId: trackLocation})"
           >
@@ -475,7 +475,7 @@ export default {
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapState('realtimeData', ['participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
-    ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants', 'getCarByGameId', 'getTrackByGameId']),
+    ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants', 'getCarByGameId', 'getTrackByGameId', 'getTrackVariants']),
     laptime () {
       const [m, s, ms] = [this.minutes, this.seconds, this.milliseconds]
       if (!m || !s || !ms) return false
@@ -496,21 +496,19 @@ export default {
     ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'addNewTrack', 'addNewTrackVariant', 'refreshTimes', 'linkCarToGameId', 'linkTrackToGameId']),
     ...mapMutations(['showScreen']),
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
-    carHasLink () {
-      const car1 = this.getCarByGameId(this.carName)
-      if (car1) return true
-
-      const car2 = this.getCarById(this.carId)
-      if (car2 && car2.gameId) return true
-      return false
+    canSetCar () {
+      return Boolean(this.getCarByGameId(this.carName))
     },
-    trackHasLink () {
-      const track1 = this.getTrackByGameId(this.trackLocation)
-      if (track1) return true
-
-      const track2 = this.getTrackById(this.trackId)
-      if (track2 && track2.gameId) return true
-      return false
+    carAlreadyLinked () {
+      const car = this.getCarById(this.carId)
+      return car && car.gameId
+    },
+    canSetTrack () {
+      return Boolean(this.getTrackByGameId(this.trackLocation))
+    },
+    trackAlreadyLinked () {
+      const track = this.getTrackById(this.trackId)
+      return track && track.gameId
     },
     validateLaptimeFormat () {
       this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d{2}.\d{3}$/) === null
@@ -560,8 +558,7 @@ export default {
     setCarName (carName) {
       const car = this.getCarByGameId(carName)
       if (!car) {
-        // if car does no
-        this.$toast.error('Unable to set car')
+        this.$toast.error('Unable to set car. Car does not exist.')
         return
       }
       this.carId = car.uid
@@ -569,14 +566,18 @@ export default {
     setTrackLocation (trackLocation) {
       const track = this.getTrackByGameId(trackLocation)
       if (!track) {
-        // if car does no
-        this.$toast.error('Unable to set track')
+        this.$toast.error('Unable to set track. Track does not exist.')
         return
       }
       this.trackId = track.uid
     },
     setTrackVariation (trackVariation) {
-      this.trackVariation = this.getTrackVariantionByGameId(trackVariation)
+      const variant = this.getTrackVariants(this.trackId).find(x => x.includes(trackVariation))
+      if (!variant) {
+        this.$toast.error('Unable to set track variant. Track variant does not exist.')
+        return
+      }
+      this.trackVariant = variant
     },
     onLaptimeInputKeyDown (e, leftInput, rightInput) {
       if (e.key === 'ArrowRight') {
@@ -788,7 +789,7 @@ textarea {
 }
 
 .__lg > textarea {
-  height: 16rem;
+  height: 7rem;
 }
 
 </style>

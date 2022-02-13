@@ -154,7 +154,6 @@ export default {
     this.setRandomFilter()
   },
   methods: {
-    ...mapMutations(['setTimes']),
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
     ...mapActions(['refreshTimes', 'getTimes']),
     ...mapActions({ ul: 'updateLaptime' }),

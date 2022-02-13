@@ -45,12 +45,6 @@ export default createStore({
     getTrackByGameId: (state) => (id) => {
       return state.tracks.find(x => x.gameId === id)
     },
-    getTrackLocationByGameId: (state) => (id) => {
-      return state.cars.find(x => x.gameId === id)
-    },
-    getTrackVariationGameId: (state) => (id) => {
-      return state.cars.find(x => x.gameId === id)
-    },
     getTrackById: (state) => (id) => {
       return state.tracks.find(x => x.uid === id)
     },
