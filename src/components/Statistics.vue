@@ -243,7 +243,7 @@
                       :class="brakingLineClass(time.brakingLine)"
                     >
                       <div class="__textContainer">
-                        <div :class="`fa fa-${BrakingLine.ON ? 'check-circle' : 'times-circle'}`" />
+                        <div :class="`fa fa-${time.brakingLine === BrakingLine.ON ? 'check-circle' : 'times-circle'}`" />
                         <span>{{ time.brakingLine }}</span>
                       </div>
                     </div>
