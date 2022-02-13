@@ -65,7 +65,7 @@
       <Statistics v-if="activeScreen === ScreenType.TRACKS" />
     </keep-alive>
     <keep-alive>
-      <RealtimeData v-if="activeScreen === ScreenType.REALTIME_DATA" />
+      <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
     </keep-alive>
     <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
   </div>

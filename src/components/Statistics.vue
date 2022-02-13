@@ -47,13 +47,13 @@
         class="__item"
       >
         <h2>Medals</h2>
-        <table class="__totalRacesTable">
-          <tr><th>Driver</th><th>1st</th><th>2nd</th><th>3rd</th></tr>
+        <table class="__medalsTable">
+          <tr><th>Driver</th><th>1st</th><th>2nd</th><th>3rd</th><th>Points</th></tr>
           <tr
             v-show="!medals.length"
           >
             <td
-              colspan="4"
+              colspan="5"
               class="__loading"
             >
               <PulseLoader
@@ -71,13 +71,16 @@
               {{ getDriver({driverId: m.driverId}) }}
             </td>
             <td class="__first">
-              {{ m.first }}
+              <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: 1})">{{ m.first }}</span>
             </td>
             <td class="__second">
-              {{ m.second }}
+              <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: 2})">{{ m.second }}</span>
             </td>
             <td class="__third">
-              {{ m.third }}
+              <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: 3})">{{ m.third }}</span>
+            </td>
+            <td class="__points">
+              <span>{{ calculatePoints(m) }}</span>
             </td>
           </tr>
         </table>
@@ -93,20 +96,77 @@
       >
         Track times
       </h2>
+      <div class="__filter">
+        <div class="__item">
+          <div class="__header">
+            Distinct
+          </div>
+          <div>
+            <RadioButtons
+              name="distinct"
+              :values="Object.values(Distinct)"
+              :value="distinct"
+              @changed="e => setFilter({distinct: e})"
+            />
+          </div>
+        </div>
+        <div
+          v-if="driverId"
+          class="__item"
+        >
+          <div class="__header">
+            Driver
+          </div>
+          <Button :type="ButtonType.SECONDARY">
+            {{ getDriverById(driverId).name }}
+          </Button>
+        </div>
+        <div
+          v-if="position"
+          class="__item"
+        >
+          <div class="__header">
+            Position
+          </div>
+          <Button :type="ButtonType.SECONDARY">
+            {{ position }}.
+          </Button>
+        </div>
+        <div
+          v-if="driverId || position"
+          class="__item"
+        >
+          <div class="__header">
+            Actions
+          </div>
+          <Button
+            :type="ButtonType.DANGER"
+            @click="clearFilter()"
+          >
+            <div class="fa fa-ban" /><span>Clear filter</span>
+          </Button>
+        </div>
+      </div>
       <div class="__trackCarMatrix">
         <div
           v-for="(row, indexRow) in trackCarBoardData"
           :key="`row${indexRow}`"
           class="__row"
         >
-          <Carousel :items-to-show="1">
+          <Carousel
+            :items-to-show="1"
+          >
             <Slide
               v-for="(column, indexCol) in row"
               :key="`column-${indexRow}${indexCol}`"
               class="__item"
             >
-              <h3>{{ getTrack(column[0]) }} - {{ getCar(column[0]) }}</h3>
-              <table class="__trackCarBoard">
+              <h3>
+                {{ getTrack(column[0]) }} - {{ getCar(column[0]) }}
+              </h3>
+              <table
+                class="__trackCarBoard"
+              >
                 <tr class="__header">
                   <th>Rank</th>
                   <th>Driver</th>
@@ -211,11 +271,12 @@
 </template>
 
 <script>
-import { mapActions, mapState } from 'vuex'
+import { mapActions, mapMutations, mapState } from 'vuex'
 import tableMixin from '@/mixins/tableMixin'
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import WeatherType from '@/constants/WeatherType'
+import Distinct from '@/constants/Distinct'
 
 export default {
   name: 'Statistics',
@@ -235,12 +296,14 @@ export default {
     }
   },
   computed: {
-    ...mapState(['cars', 'drivers', 'tracks'])
+    ...mapState(['cars', 'drivers', 'tracks']),
+    ...mapState('statistics', ['distinct', 'driverId', 'position'])
   },
   mounted () {
     this.refresh()
   },
   methods: {
+    ...mapMutations('statistics', { sf: 'setFilter', cf: 'clearFilter' }),
     ...mapActions(['getTracksTimes', 'getTimesForDriver', 'getTimes']),
     async refresh () {
       if (this.refreshing) return
@@ -265,15 +328,44 @@ export default {
             let trackAndVariantAndCar = trackAndVariant.filter(z => z.carId === y.uid)
             if (!trackAndVariantAndCar.length) return
             trackAndVariantAndCar = trackAndVariantAndCar.map(z => ({ ...z, losing: this.$ltb.getLaptimeDiff(trackAndVariantAndCar[0].laptime, z.laptime) }))
+            // filtering out duplicates if distinct is set to true
+            if (this.distinct === Distinct.YES) trackAndVariantAndCar = this.handleDistinct(trackAndVariantAndCar)
+
             this.handleMedals(trackAndVariantAndCar)
-            row.push(trackAndVariantAndCar)
+            // only push laptime board when it matches the filter
+            if (this.handlePositionFilter(trackAndVariantAndCar)) row.push(trackAndVariantAndCar)
           })
-          this.trackCarBoardData.push(row)
+          // if any laptime board remain in this row after filtering, add it
+          if (row.length > 0) this.trackCarBoardData.push(row)
         })
       })
 
-      this.medals.sort((a, b) => b.first - a.first)
+      this.medals.sort((a, b) => this.calculatePoints(b) - this.calculatePoints(a))
       this.refreshing = false
+    },
+    setFilter (filter) {
+      this.cf()
+      this.sf(filter)
+      this.refresh()
+    },
+    clearFilter () {
+      this.cf()
+      this.refresh()
+    },
+    handlePositionFilter (laptimes) {
+      if (!this.driverId || !this.position || this.distinct !== Distinct.YES) return true
+      // if enough times AND driver is at the wanted position
+      return laptimes.length >= this.position && laptimes[this.position - 1].driverId === this.driverId
+    },
+    handleDistinct (laptimes) {
+      const drivers = []
+      return laptimes.filter(x => {
+        if (drivers.includes(x.driverId)) {
+          return false
+        }
+        drivers.push(x.driverId)
+        return true
+      })
     },
     handleMedals (laptimes) {
       this.addMedal(laptimes.filter(x => x.weather === WeatherType.SUN))
@@ -298,6 +390,12 @@ export default {
             driver.third++
           }
         })
+    },
+    calculatePoints (medals) {
+      const firstPlacePoints = 3
+      const secondPlacePoints = 2
+      const thirdPlacePoints = 1
+      return medals.first * firstPlacePoints + medals.second * secondPlacePoints + medals.third * thirdPlacePoints
     }
   }
 }
@@ -309,6 +407,7 @@ export default {
 
 .__statistics {
   padding: 1rem;
+  padding-bottom: 6rem;
 }
 
 .__controls{
@@ -325,7 +424,37 @@ export default {
   width: 20vw;
 }
 
-.__totalRacesTable {
+.__filter {
+  position: fixed;
+  bottom: 0;
+  width: 100vw;
+  margin-left: -1rem;
+  z-index: 999;
+  border-top: 0.1rem solid var(--border-light1);
+  background-color: var(--bg-dark3);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.__filter .__item {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  text-align: center;
+}
+
+.__filter .__header {
+  margin-bottom: 0.3rem;
+}
+
+.__first:hover > span, .__second:hover > span, .__third:hover > span {
+  cursor: pointer;
+  color: var(--hover);
+}
+
+.__totalRacesTable, .__medalsTable {
   text-align: center;
   margin-bottom: 2rem;
 }
@@ -368,6 +497,14 @@ export default {
 @media only screen and (max-width: 1024px) {
   .__textContainer {
     justify-content: center;
+  }
+
+  .__filter :deep button {
+    font-size: 0.5rem !important;
+  }
+
+  .__filter :deep label {
+    font-size: 0.5rem !important;
   }
 }
 

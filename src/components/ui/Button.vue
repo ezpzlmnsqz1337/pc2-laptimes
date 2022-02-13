@@ -79,6 +79,10 @@ button {
   border-radius: 0.3rem;
 }
 
+button:deep .fa {
+  margin-right: 0.3rem;
+}
+
 button:disabled, button:disabled:hover {
   cursor: not-allowed;
   background-color: var(--btn-disabled) !important;

@@ -125,14 +125,14 @@
       :type="ButtonType.SECONDARY"
       @click="setRandomFilter()"
     >
-      <div class="fa fa-random" /><span class="__randomBtnText">Random</span>
+      <div class="fa fa-random" /><span>Random</span>
     </Button>
     <Button
       :type="ButtonType.DANGER"
       :disabled="!isFilterSet()"
       @click="clearFilter()"
     >
-      <div class="fa fa-ban" /><span class="__clearFilterBtnText">Clear filter</span>
+      <div class="fa fa-ban" /><span>Clear filter</span>
     </Button>
   </div>
 </template>
@@ -209,10 +209,6 @@ export default {
 .__activeFilter :deep(span.vs__selected) {
   color: #4081C2;
   font-weight: bold;
-}
-
-.__clearFilterBtnText, .__randomBtnText {
-  padding-left: 0.4rem;
 }
 
 @media only screen and (max-width: 700px) {

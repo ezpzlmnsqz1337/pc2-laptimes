@@ -5,6 +5,7 @@ import { enableIndexedDbPersistence, collection, doc, getDocs, limit, orderBy, q
 import { bindFirestoreCollection, vuexMutations } from '@/vuex-firestore-binding'
 import ScreenType from '@/constants/ScreenType'
 import laptimeFilter from '@/store/modules/laptimeFilter'
+import statistics from '@/store/modules/statistics'
 import realtimeData from '@/store/modules/realtimeData'
 import Distinct from '@/constants/Distinct'
 import LaptimeBuilder from '@/builders/LaptimeBuilder'
@@ -24,7 +25,8 @@ enableIndexedDbPersistence(db)
 export default createStore({
   modules: {
     laptimeFilter,
-    realtimeData
+    realtimeData,
+    statistics
   },
   state: {
     websocketState: WebsocketState.CLOSED_OR_COULD_NOT_OPEN,
