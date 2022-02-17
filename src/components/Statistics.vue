@@ -48,12 +48,12 @@
       >
         <h2>Medals</h2>
         <table class="__medalsTable">
-          <tr><th>Driver</th><th>1st</th><th>2nd</th><th>3rd</th><th>Points</th></tr>
+          <tr><th>Driver</th><th>1st</th><th>2nd</th><th>3rd</th><th>Points</th><th>Rank</th></tr>
           <tr
             v-show="!medals.length"
           >
             <td
-              colspan="5"
+              colspan="6"
               class="__loading"
             >
               <PulseLoader
@@ -63,7 +63,7 @@
             </td>
           </tr>
           <tr
-            v-for="m in medals"
+            v-for="(m, index) in medals"
             :key="m.driverId"
             class="__driver"
           >
@@ -81,6 +81,12 @@
             </td>
             <td class="__points">
               <span>{{ calculatePoints(m) }}</span>
+            </td>
+            <td class="__rank">
+              <img
+                :src="getRank(m.driverId, index)"
+                alt="rank"
+              >
             </td>
           </tr>
         </table>
@@ -391,6 +397,30 @@ export default {
           }
         })
     },
+    getRank (driverId, position) {
+      const MIN_RACES_FOR_RANK = 10
+
+      const driver = this.getDriverById(driverId)
+      if (!driver) return require('@/assets/ranks/unranked.png')
+      if (driver.name === 'jara') return require('@/assets/ranks/silver-1.png')
+
+      const driverTotalRaces = this.totalRaces.find(x => x.driver === driver.name)
+      if (!driverTotalRaces) { return require('@/assets/ranks/unranked.png') }
+      if (driverTotalRaces.races.length < MIN_RACES_FOR_RANK) { return require('@/assets/ranks/unranked.png') }
+
+      switch (position) {
+        case 0:
+          return require('@/assets/ranks/global.png')
+        case 1:
+          return require('@/assets/ranks/serif.png')
+        case 2:
+          return require('@/assets/ranks/ak.png')
+        case 3:
+        case 4:
+          return require('@/assets/ranks/gold-1.png')
+      }
+      return require('@/assets/ranks/unranked2.png')
+    },
     calculatePoints (medals) {
       const firstPlacePoints = 3
       const secondPlacePoints = 2
@@ -416,12 +446,13 @@ export default {
 
 .__generalStatisticsSection {
   display: flex;
+  flex-direction: row;
   justify-content: center;
 }
 
 .__generalStatisticsSection .__item {
   padding: 1rem;
-  width: 20vw;
+  text-align: center;
 }
 
 .__filter {
@@ -457,6 +488,22 @@ export default {
 .__totalRacesTable, .__medalsTable {
   text-align: center;
   margin-bottom: 2rem;
+}
+
+.__totalRacesTable td{
+  height: 2.47rem;
+}
+
+.__medalsTable .__rank {
+  padding: 0;
+  padding-right: 0.5rem;
+}
+
+.__medalsTable .__rank img{
+  width: 5rem;
+  margin-top: 0.2rem;
+  border-radius: 0.3rem;
+  box-shadow: 0.2rem 0.2rem 0.3rem 0.2rem #333333;
 }
 
 .__trackCarMatrix {
@@ -503,8 +550,21 @@ export default {
     font-size: 0.5rem !important;
   }
 
+  .__generalStatisticsSection {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .__filter :deep label {
     font-size: 0.5rem !important;
+  }
+
+  .__totalRacesTable, .__medalsTable {
+    font-size: 1rem !important;
+  }
+
+  .__generalStatisticsSection .__item {
+    width: 80%;
   }
 }
 
@@ -515,7 +575,10 @@ export default {
 
   .__generalStatisticsSection .__item {
     width: 100%;
-    text-align: center;
+  }
+
+  .__totalRacesTable, .__medalsTable {
+    font-size: 0.8rem !important;
   }
 
   .__carImage > img{
