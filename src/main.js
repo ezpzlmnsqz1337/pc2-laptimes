@@ -36,6 +36,8 @@ app.config.globalProperties.StartType = StartType
 app.config.globalProperties.ScreenType = ScreenType
 app.config.globalProperties.Distinct = Distinct
 app.config.globalProperties.debounce = debounce
+app.config.globalProperties.mapValueInRange = (x, inMin, inMax, outMin, outMax) => (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
+app.config.globalProperties.isInRange = (n, min, max) => min <= n && n <= max
 
 // builders
 app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()

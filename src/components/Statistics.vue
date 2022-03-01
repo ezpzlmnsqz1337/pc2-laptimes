@@ -283,6 +283,7 @@ import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import WeatherType from '@/constants/WeatherType'
 import Distinct from '@/constants/Distinct'
+import Rank from '@/constants/Rank'
 
 export default {
   name: 'Statistics',
@@ -401,25 +402,56 @@ export default {
       const MIN_RACES_FOR_RANK = 10
 
       const driver = this.getDriverById(driverId)
-      if (!driver) return require('@/assets/ranks/unranked.png')
-      if (driver.name === 'jara') return require('@/assets/ranks/silver-1.png')
+      if (!driver) return Rank.UNRANKED
+      // if (driver.name === 'mazel') return Rank.GLOBAL
+      // if (driver.name === 'jara') return Rank.SILVER1
 
       const driverTotalRaces = this.totalRaces.find(x => x.driver === driver.name)
-      if (!driverTotalRaces) { return require('@/assets/ranks/unranked.png') }
-      if (driverTotalRaces.races.length < MIN_RACES_FOR_RANK) { return require('@/assets/ranks/unranked.png') }
+      if (!driverTotalRaces) return Rank.UNRANKED
+      if (driverTotalRaces.races < MIN_RACES_FOR_RANK) return Rank.UNRANKED
 
-      switch (position) {
-        case 0:
-          return require('@/assets/ranks/global.png')
-        case 1:
-          return require('@/assets/ranks/serif.png')
-        case 2:
-          return require('@/assets/ranks/ak.png')
-        case 3:
-        case 4:
-          return require('@/assets/ranks/gold-1.png')
+      const driverMedals = this.medals.find(x => x.driverId === driver.uid)
+
+      // get max points currently
+      const maxBonus = this.calculateBonus(this.medals[0], this.totalRaces[0].races)
+      const maxPoints = driverTotalRaces.races / this.calculatePoints(this.medals[0]) * 10 + maxBonus
+
+      const bonus = this.calculateBonus(driverMedals, driverTotalRaces.races)
+      const points = driverTotalRaces.races / this.calculatePoints(driverMedals) * 10 + bonus
+
+      const weightedPoints = this.mapValueInRange(points, 0, maxPoints, 0, 1)
+
+      if (this.isInRange(weightedPoints, 0.91, 1)) return Rank.GLOBAL
+      if (this.isInRange(weightedPoints, 0.51, 0.90)) return Rank.SUPREME
+      if (this.isInRange(weightedPoints, 0.31, 0.50)) return Rank.LEM
+      if (this.isInRange(weightedPoints, 0.20, 0.30)) return Rank.EAGLE
+      if (this.isInRange(weightedPoints, 0.10, 0.19)) return Rank.SHERIF
+      if (this.isInRange(weightedPoints, 0.08, 0.09)) return Rank.DOUBLE_AK
+      if (this.isInRange(weightedPoints, 0.061, 0.07)) return Rank.AK1
+      if (this.isInRange(weightedPoints, 0.059, 0.060)) return Rank.AK
+      if (this.isInRange(weightedPoints, 0.057, 0.058)) return Rank.GOLD4
+      if (this.isInRange(weightedPoints, 0.055, 0.056)) return Rank.GOLD3
+      if (this.isInRange(weightedPoints, 0.053, 0.054)) return Rank.GOLD2
+      if (this.isInRange(weightedPoints, 0.051, 0.052)) return Rank.GOLD1
+      if (this.isInRange(weightedPoints, 0.049, 0.050)) return Rank.SILVER_ELITE_MASTER
+      if (this.isInRange(weightedPoints, 0.047, 0.048)) return Rank.SILVER_ELITE
+      if (this.isInRange(weightedPoints, 0.045, 0.046)) return Rank.SILVER4
+      if (this.isInRange(weightedPoints, 0.043, 0.044)) return Rank.SILVER3
+      if (this.isInRange(weightedPoints, 0.041, 0.042)) return Rank.SILVER2
+      if (this.isInRange(weightedPoints, 0.039, 0.040)) return Rank.SILVER1
+      return Rank.EXPIRED
+    },
+    calculateBonus ({ first, second, third }, totalRaces) {
+      let bonus = 0
+
+      for (let i = 0; i < 1000; i = i + 10) {
+        if (((first / totalRaces) * 100) > i) bonus += i
+        if (((second / totalRaces) * 100) > i) bonus += i
+        if (((third / totalRaces) * 100) > i) bonus += i
+        if (totalRaces > i) bonus += i
       }
-      return require('@/assets/ranks/unranked2.png')
+
+      return bonus
     },
     calculatePoints (medals) {
       const firstPlacePoints = 3
