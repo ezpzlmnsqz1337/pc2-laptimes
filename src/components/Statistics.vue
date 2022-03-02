@@ -431,14 +431,14 @@ export default {
       if (this.isInRange(weightedPoints, 0.059, 0.060)) return Rank.AK
       if (this.isInRange(weightedPoints, 0.057, 0.058)) return Rank.GOLD4
       if (this.isInRange(weightedPoints, 0.055, 0.056)) return Rank.GOLD3
-      if (this.isInRange(weightedPoints, 0.053, 0.054)) return Rank.GOLD2
-      if (this.isInRange(weightedPoints, 0.051, 0.052)) return Rank.GOLD1
-      if (this.isInRange(weightedPoints, 0.049, 0.050)) return Rank.SILVER_ELITE_MASTER
-      if (this.isInRange(weightedPoints, 0.047, 0.048)) return Rank.SILVER_ELITE
-      if (this.isInRange(weightedPoints, 0.045, 0.046)) return Rank.SILVER4
-      if (this.isInRange(weightedPoints, 0.043, 0.044)) return Rank.SILVER3
-      if (this.isInRange(weightedPoints, 0.041, 0.042)) return Rank.SILVER2
-      if (this.isInRange(weightedPoints, 0.039, 0.040)) return Rank.SILVER1
+      if (this.isInRange(weightedPoints, 0.051, 0.054)) return Rank.GOLD2
+      if (this.isInRange(weightedPoints, 0.046, 0.050)) return Rank.GOLD1
+      if (this.isInRange(weightedPoints, 0.041, 0.045)) return Rank.SILVER_ELITE_MASTER
+      if (this.isInRange(weightedPoints, 0.036, 0.040)) return Rank.SILVER_ELITE
+      if (this.isInRange(weightedPoints, 0.031, 0.035)) return Rank.SILVER4
+      if (this.isInRange(weightedPoints, 0.023, 0.030)) return Rank.SILVER3
+      if (this.isInRange(weightedPoints, 0.011, 0.022)) return Rank.SILVER2
+      if (this.isInRange(weightedPoints, 0.000, 0.010)) return Rank.SILVER1
       return Rank.EXPIRED
     },
     calculateBonus ({ first, second, third }, totalRaces) {
