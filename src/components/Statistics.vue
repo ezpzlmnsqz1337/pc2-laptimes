@@ -421,7 +421,7 @@ export default {
 
       const weightedPoints = this.mapValueInRange(points, 0, maxPoints, 0, 1)
 
-      if (this.isInRange(weightedPoints, 0.91, 1)) return Rank.GLOBAL
+      if (weightedPoints > 0.91) return Rank.GLOBAL
       if (this.isInRange(weightedPoints, 0.51, 0.90)) return Rank.SUPREME
       if (this.isInRange(weightedPoints, 0.31, 0.50)) return Rank.LEM
       if (this.isInRange(weightedPoints, 0.20, 0.30)) return Rank.EAGLE
@@ -439,6 +439,7 @@ export default {
       if (this.isInRange(weightedPoints, 0.023, 0.030)) return Rank.SILVER3
       if (this.isInRange(weightedPoints, 0.011, 0.022)) return Rank.SILVER2
       if (this.isInRange(weightedPoints, 0.000, 0.010)) return Rank.SILVER1
+      console.log(driver.name, weightedPoints)
       return Rank.EXPIRED
     },
     calculateBonus ({ first, second, third }, totalRaces) {
