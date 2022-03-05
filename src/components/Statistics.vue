@@ -419,26 +419,28 @@ export default {
       const bonus = this.calculateBonus(driverMedals, driverTotalRaces.races)
       const points = driverTotalRaces.races / this.calculatePoints(driverMedals) * 10 + bonus
 
-      const weightedPoints = this.mapValueInRange(points, 0, maxPoints, 0, 1)
+      const weightedPoints = this.mapValueInRange(points, 0, maxPoints, 0, 1) * 1000
 
-      if (weightedPoints > 0.91) return Rank.GLOBAL
-      if (this.isInRange(weightedPoints, 0.51, 0.90)) return Rank.SUPREME
-      if (this.isInRange(weightedPoints, 0.31, 0.50)) return Rank.LEM
-      if (this.isInRange(weightedPoints, 0.20, 0.30)) return Rank.EAGLE
-      if (this.isInRange(weightedPoints, 0.10, 0.19)) return Rank.SHERIF
-      if (this.isInRange(weightedPoints, 0.08, 0.09)) return Rank.DOUBLE_AK
-      if (this.isInRange(weightedPoints, 0.061, 0.07)) return Rank.AK1
-      if (this.isInRange(weightedPoints, 0.059, 0.060)) return Rank.AK
-      if (this.isInRange(weightedPoints, 0.057, 0.058)) return Rank.GOLD4
-      if (this.isInRange(weightedPoints, 0.055, 0.056)) return Rank.GOLD3
-      if (this.isInRange(weightedPoints, 0.051, 0.054)) return Rank.GOLD2
-      if (this.isInRange(weightedPoints, 0.046, 0.050)) return Rank.GOLD1
-      if (this.isInRange(weightedPoints, 0.041, 0.045)) return Rank.SILVER_ELITE_MASTER
-      if (this.isInRange(weightedPoints, 0.036, 0.040)) return Rank.SILVER_ELITE
-      if (this.isInRange(weightedPoints, 0.031, 0.035)) return Rank.SILVER4
-      if (this.isInRange(weightedPoints, 0.023, 0.030)) return Rank.SILVER3
-      if (this.isInRange(weightedPoints, 0.011, 0.022)) return Rank.SILVER2
-      if (this.isInRange(weightedPoints, 0.000, 0.010)) return Rank.SILVER1
+      console.log(driver.name, weightedPoints)
+
+      if (weightedPoints > 910) return Rank.GLOBAL
+      if (this.isInRange(weightedPoints, 510, 910)) return Rank.SUPREME
+      if (this.isInRange(weightedPoints, 310, 510)) return Rank.LEM
+      if (this.isInRange(weightedPoints, 200, 310)) return Rank.EAGLE
+      if (this.isInRange(weightedPoints, 100, 200)) return Rank.SHERIF
+      if (this.isInRange(weightedPoints, 80, 100)) return Rank.DOUBLE_AK
+      if (this.isInRange(weightedPoints, 61, 80)) return Rank.AK1
+      if (this.isInRange(weightedPoints, 59, 61)) return Rank.AK
+      if (this.isInRange(weightedPoints, 57, 59)) return Rank.GOLD4
+      if (this.isInRange(weightedPoints, 55, 57)) return Rank.GOLD3
+      if (this.isInRange(weightedPoints, 51, 55)) return Rank.GOLD2
+      if (this.isInRange(weightedPoints, 46, 51)) return Rank.GOLD1
+      if (this.isInRange(weightedPoints, 41, 46)) return Rank.SILVER_ELITE_MASTER
+      if (this.isInRange(weightedPoints, 36, 41)) return Rank.SILVER_ELITE
+      if (this.isInRange(weightedPoints, 31, 36)) return Rank.SILVER4
+      if (this.isInRange(weightedPoints, 23, 61)) return Rank.SILVER3
+      if (this.isInRange(weightedPoints, 11, 23)) return Rank.SILVER2
+      if (this.isInRange(weightedPoints, 0, 11)) return Rank.SILVER1
       console.log(driver.name, weightedPoints)
       return Rank.EXPIRED
     },
