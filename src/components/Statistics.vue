@@ -206,6 +206,16 @@
                   </td>
                   <td class="__driver">
                     <span>{{ getDriver(time) }}</span>
+
+                    <div
+                      v-if="time.notes"
+                      class="__comment"
+                    >
+                      <i
+                        class="fas fa-comment"
+                        @click="$toast.info(time.notes)"
+                      />
+                    </div>
                   </td>
                   <td class="__laptime">
                     <div>{{ time.laptime }}</div>
@@ -577,10 +587,6 @@ export default {
 }
 
 @media only screen and (max-width: 1024px) {
-  .__textContainer {
-    justify-content: center;
-  }
-
   .__filter :deep button {
     font-size: 0.5rem !important;
   }
@@ -604,6 +610,10 @@ export default {
 }
 
 @media only screen and (max-width: 700px) {
+  .__textContainer {
+    justify-content: center;
+  }
+
   .__trackCarMatrix .__item {
       padding: 0 0 1rem 0;
   }

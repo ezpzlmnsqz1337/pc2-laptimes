@@ -45,6 +45,15 @@
               @value:update="updateLaptime({uid: time.uid, driverId: $event.uid})"
             />
           </div>
+          <div
+            v-if="time.notes"
+            class="__comment"
+          >
+            <i
+              class="fas fa-comment"
+              @click="$toast.info(time.notes)"
+            />
+          </div>
         </td>
         <td class="__laptime">
           <div>{{ time.laptime }}</div>

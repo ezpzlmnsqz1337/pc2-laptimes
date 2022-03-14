@@ -70,7 +70,7 @@ export default {
   align-items: center;
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: 700px) {
   .__textContainer {
     justify-content: center;
   }

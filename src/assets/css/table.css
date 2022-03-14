@@ -43,7 +43,15 @@ td div:hover {
 
 .__id,
 .__driver{
+  position: relative;
   font-weight: bold;
+}
+
+.__comment {
+  position: absolute;
+  top: 1rem;
+  padding: 0.5rem 0.5rem 0.5rem 0;
+  width: 100%;
 }
 
 .__car .__textContainer, .__track .__textContainer{
@@ -167,6 +175,18 @@ tr:nth-child(5) .__driver span {
   min-width: 6rem;
 }
 
+@media only screen and (max-width: 1300px) {
+  .__losing_lg {
+    display: none;
+  }
+
+  .__losing_sm {
+    display: block;
+    white-space: nowrap;
+  }
+
+}
+
 @media only screen and (max-width: 1024px) {
   table {
     font-size: 0.5rem;
@@ -179,17 +199,33 @@ tr:nth-child(5) .__driver span {
     padding: 1rem 0.2rem;
   }
 
-  .__losing_lg {
-    display: none;
-  }
-
-  .__losing_sm {
-    display: block;
-    white-space: nowrap;
-  }
-
   td {
     padding: 0.2rem;
+  }
+
+  .__comment {
+    top: 0.5rem;
+    width: 75%;
+  }
+  
+  .__settings {
+    width: 6rem;
+    padding-right: 0.3rem;
+  }
+
+  .__settings > div {    
+    padding: 0.15rem 0.3rem;
+    border-radius: 0.3rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.5rem;    
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .__comment {
+    top: 0.5rem;
+    padding: 0.2rem 0.2rem 0.2rem 0;
+    width: 100%;
   }
 
   .__settings {
