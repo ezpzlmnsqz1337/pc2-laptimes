@@ -110,6 +110,18 @@
     </div>
 
     <div class="__header">
+      Game
+    </div>
+    <div class="__inputRow __noColumn">
+      <RadioButtons
+        name="distinct"
+        :values="Object.values(Game)"
+        :value="game"
+        @changed="e => setFilter({game: e})"
+      />
+    </div>
+
+    <div class="__header">
       Distinct
     </div>
     <div class="__inputRow __noColumn">
@@ -151,7 +163,7 @@ export default {
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
-    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct']),
+    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'game', 'distinct']),
     firstLaptime () {
       return this.times[0].laptime
     }
@@ -162,7 +174,7 @@ export default {
     ...mapActions(['refreshTimes', 'getTimes']),
     isFilterSet () {
       return this.carId || this.trackId || this.trackVariant || this.transmission ||
-              this.weather || this.brakingLine || this.controls || this.startType || this.distinct === Distinct.NO
+              this.weather || this.brakingLine || this.controls || this.startType || this.game || this.distinct === Distinct.NO
     },
     async setRandomFilter () {
       if (this.randomizing) return

@@ -12,6 +12,7 @@ import BrakingLine from '@/constants/BrakingLine'
 import ControlType from '@/constants/ControlType'
 import StartType from '@/constants/StartType'
 import ScreenType from '@/constants/ScreenType'
+import Game from '@/constants/Game'
 import Distinct from '@/constants/Distinct'
 import Modal from '@/components/ui/Modal'
 import { debounce } from 'debounce'
@@ -34,6 +35,7 @@ app.config.globalProperties.BrakingLine = BrakingLine
 app.config.globalProperties.ControlType = ControlType
 app.config.globalProperties.StartType = StartType
 app.config.globalProperties.ScreenType = ScreenType
+app.config.globalProperties.Game = Game
 app.config.globalProperties.Distinct = Distinct
 app.config.globalProperties.debounce = debounce
 app.config.globalProperties.mapValueInRange = (x, inMin, inMax, outMin, outMax) => (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin

@@ -200,22 +200,14 @@
                   v-for="(time, indexTime) in column"
                   :key="`item-${indexRow}${indexCol}${indexTime}`"
                   :title="getRowTitleText(time)"
+                  :class="{__hasNotes: time.notes }"
+                  @click="$toast.info(time.notes || 'No comment')"
                 >
                   <td class="__id">
                     {{ indexTime + 1 }}
                   </td>
                   <td class="__driver">
                     <span>{{ getDriver(time) }}</span>
-
-                    <div
-                      v-if="time.notes"
-                      class="__comment"
-                    >
-                      <i
-                        class="fas fa-comment"
-                        @click="$toast.info(time.notes)"
-                      />
-                    </div>
                   </td>
                   <td class="__laptime">
                     <div>{{ time.laptime }}</div>
@@ -451,7 +443,7 @@ export default {
       if (this.isInRange(weightedPoints, 23, 61)) return Rank.SILVER3
       if (this.isInRange(weightedPoints, 11, 23)) return Rank.SILVER2
       if (this.isInRange(weightedPoints, 0, 11)) return Rank.SILVER1
-      console.log(driver.name, weightedPoints)
+
       return Rank.EXPIRED
     },
     calculateBonus ({ first, second, third }, totalRaces) {
