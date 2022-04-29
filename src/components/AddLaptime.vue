@@ -321,6 +321,20 @@
             :tabindex="8"
           />
         </div>
+
+        <div class="__header __lg">
+          Game
+        </div>
+        <div class="__inputRow __lg">
+          <RadioButtons
+            :tabindex="8"
+            no-any
+            name="ALgame"
+            :values="Object.values(Game)"
+            :value="game"
+            @changed="e => game = e"
+          />
+        </div>
       </div>
 
       <div class="__secondPanel">
@@ -395,6 +409,20 @@
         </div>
 
         <div class="__header __sm">
+          Game
+        </div>
+        <div class="__inputRow __noColumn __sm">
+          <RadioButtons
+            :tabindex="8"
+            no-any
+            name="ALgame"
+            :values="Object.values(Game)"
+            :value="game"
+            @changed="e => game = e"
+          />
+        </div>
+
+        <div class="__header __sm">
           Notes
         </div>
         <div class="__inputRow __noColumn __sm">
@@ -411,7 +439,7 @@
             block
             class="__submit"
             :disabled="!valid"
-            @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), notes})"
+            @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), game, notes})"
           >
             Submit
           </Button>
@@ -426,7 +454,7 @@
           block
           class="__submit"
           :disabled="!valid"
-          @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), notes})"
+          @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), game, notes})"
         >
           Submit
         </Button>
@@ -443,6 +471,7 @@ import BrakingLine from '@/constants/BrakingLine'
 import ControlType from '@/constants/ControlType'
 import ScreenType from '@/constants/ScreenType'
 import StartType from '@/constants/StartType'
+import Game from '@/constants/Game'
 
 export default {
   name: 'AddLaptime',
@@ -461,6 +490,7 @@ export default {
       brakingLine: BrakingLine.OFF,
       controls: ControlType.STEERING_WHEEL,
       startType: StartType.RUNNING,
+      game: Game.PC2,
       notes: '',
       newDriverName: '',
       showNewDriverModal: false,

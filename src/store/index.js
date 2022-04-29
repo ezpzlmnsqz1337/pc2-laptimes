@@ -99,8 +99,8 @@ export default createStore({
       const docRef = doc(db, 'drivers', driver.uid)
       await setDoc(docRef, driver)
     },
-    async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, notes }) {
-      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, notes }
+    async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, game, notes }) {
+      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, game, notes }
       const docRef = doc(db, 'times', time.uid)
       commit('setLastAddedLaptime', { laptime: time })
       await setDoc(docRef, time)
@@ -134,7 +134,7 @@ export default createStore({
       const querySnapshot = await getDocs(q)
       return querySnapshot.docs.map(x => x.data())
     },
-    async getTimes ({ commit, dispatch }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, distinct, queryLimit = 30 }) {
+    async getTimes ({ commit, dispatch }, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, date, game, distinct, queryLimit = 30 }) {
       distinct = distinct === Distinct.YES
       const constraints = []
 
@@ -148,6 +148,7 @@ export default createStore({
       if (controls) constraints.push(where('controls', '==', controls))
       if (startType) constraints.push(where('startType', '==', startType))
       if (date) constraints.push(where('date', '==', date))
+      if (game) constraints.push(where('game', '==', game))
       constraints.push(orderBy('laptime'))
       if (queryLimit > 0) constraints.push(limit(queryLimit))
 
@@ -191,7 +192,7 @@ export default createStore({
       const times = await dispatch('getTimes', filter)
       commit('setTimes', times)
     },
-    async bindDb ({ commit }) {
+    async bindDb ({ commit, dispatch }) {
       bindFirestoreCollection(commit, 'cars', collection(db, 'cars'))
       bindFirestoreCollection(commit, 'tracks', collection(db, 'tracks'))
       bindFirestoreCollection(commit, 'drivers', collection(db, 'drivers'))

@@ -21,17 +21,23 @@
           class="__loading"
         >
           <PulseLoader
+            v-if="loading"
             color="#188cff"
             size="15px"
           />
+          <span
+            v-if="!loading"
+            class="__noLaptimesFound"
+          >No laptimes found matching your filter.</span>
         </td>
       </tr>
       <tr
         v-for="(time, index) in times"
         :key="index"
         class="__row"
-        :class="{ __lastAddedLaptime: lastAddedLaptime && lastAddedLaptime.uid === time.uid}"
+        :class="{ __lastAddedLaptime: lastAddedLaptime && lastAddedLaptime.uid === time.uid, __hasNotes: time.notes}"
         :title="getRowTitleText(time)"
+        @click="$toast.info(time.notes || 'No comment')"
       >
         <td class="__id">
           {{ index+1 }}.
@@ -43,15 +49,6 @@
               :text="getDriver(time)"
               :options="drivers"
               @value:update="updateLaptime({uid: time.uid, driverId: $event.uid})"
-            />
-          </div>
-          <div
-            v-if="time.notes"
-            class="__comment"
-          >
-            <i
-              class="fas fa-comment"
-              @click="$toast.info(time.notes)"
             />
           </div>
         </td>
@@ -151,6 +148,11 @@ import tableMixin from '@/mixins/tableMixin'
 export default {
   name: 'LaptimeBoard',
   mixins: [tableMixin],
+  data () {
+    return {
+      loading: true
+    }
+  },
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times', 'lastAddedLaptime']),
     ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants']),
@@ -167,24 +169,32 @@ export default {
     ...mapActions(['refreshTimes', 'getTimes']),
     ...mapActions({ ul: 'updateLaptime' }),
     async setRandomFilter () {
+      this.loading = true
       const times = await this.getTimes({ queryLimit: 0 })
       // select random laptime
       const index = Math.round(Math.random() * times.length)
-      const { trackId, trackVariant, carId, weather } = times[index]
-      this.setFilter({ trackId, trackVariant, carId, weather })
+      const { trackId, trackVariant, carId, weather, game } = times[index]
+      this.setFilter({ trackId, trackVariant, carId, weather, game })
+      this.loading = false
     },
     async updateLaptime (laptime) {
       if (!laptime) return
+      this.loading = true
       await this.ul(laptime)
-      this.refreshTimes()
+      await this.refreshTimes()
+      this.loading = false
     },
     async setFilter (filter) {
+      this.loading = true
       this.sf(filter)
-      this.refreshTimes()
+      await this.refreshTimes()
+      this.loading = false
     },
     async clearFilter () {
+      this.loading = true
       this.cf()
-      this.refreshTimes()
+      await this.refreshTimes()
+      this.loading = false
     }
   }
 }
