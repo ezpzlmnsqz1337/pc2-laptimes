@@ -92,6 +92,14 @@
         </table>
       </div>
     </div>
+    <div class="__racesPerDaySection">
+      <h2 class="__center">
+        Races per day
+      </h2>
+      <div class="__chart">
+        <RacesDaysBarChart height="1400" />
+      </div>
+    </div>
 
     <div
       class="__trackCarMatrixSection"
@@ -286,6 +294,7 @@ import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 import WeatherType from '@/constants/WeatherType'
 import Distinct from '@/constants/Distinct'
 import Rank from '@/constants/Rank'
+import RacesDaysBarChart from '@/components/RacesDaysBarChart'
 
 export default {
   name: 'Statistics',
@@ -293,7 +302,8 @@ export default {
     Carousel,
     Slide,
     Pagination,
-    Navigation
+    Navigation,
+    RacesDaysBarChart
   },
   mixins: [tableMixin],
   data () {
@@ -490,6 +500,15 @@ export default {
 .__generalStatisticsSection .__item {
   padding: 1rem;
   text-align: center;
+}
+
+.__racesPerDaySection {
+  padding: 1rem;
+}
+
+.__racesPerDaySection > .__chart {
+  background-color: var(--bg-light1);
+  border-radius: 0.3rem;
 }
 
 .__filter {
