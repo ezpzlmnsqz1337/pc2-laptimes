@@ -62,6 +62,9 @@ export default {
       chartOptions: {
         responsive: true,
         indexAxis: 'y',
+        font: {
+          family: "'Open Sans', Helvetica, Arial, sans-serif"
+        },
         layout: {
           color: 'black',
           padding: 50
@@ -74,11 +77,40 @@ export default {
           y: {
             stacked: true,
             ticks: {
-              tickWidth: 30
+              tickWidth: 30,
+              font: {
+                size: 18
+              }
             }
           }
+        },
+        plugins: {
+          legend: {
+            labels: {
+              font: {
+                size: 18
+              },
+              padding: 10
+            }
+          },
+          tooltip: {
+            position: 'average',
+            titleSpacing: 0,
+            titleMarginBottom: 0,
+            titleFont: {
+              size: 0
+            },
+            displayColors: false,
+            bodyFont: {
+              size: 18
+            },
+            padding: 10,
+            yAlign: 'bottom'
+          }
         }
-      }
+      },
+      chartColors: ['#8928c9', '#d9ad96', '#a7fa55', '#2388eb', '#d67840', '#7cf7ca', '#1d6ebe',
+        '#e32d34', '#7027b0', '#000000', '#57aee6', '#ffffff', '#e0ad92']
     }
   },
   computed: {
@@ -90,17 +122,10 @@ export default {
   },
   methods: {
     ...mapActions(['getTimes']),
-    async getData () {
-      // clear chart data
-      this.chartData.labels.splice(0)
-      this.chartData.datasets.splice(0)
-
+    countNumberOfRaces (laptimes) {
       const result = {}
-
-      const laptimes = (await this.getTimes({ queryLimit: 0 })).sort((a, b) => b.date - a.date)
       laptimes.forEach(x => {
         const driverName = this.getDriverById(x.driverId).name
-        console.log(driverName)
         const date = new Date(x.date).toLocaleDateString()
         if (!result[date]) {
           result[date] = { totalRaces: 0, drivers: {} }
@@ -111,8 +136,10 @@ export default {
         }
         result[date].drivers[driverName] += 1
       })
-
-      Object.keys(result).forEach(date => {
+      return result
+    },
+    generateChartData (noOfRaces) {
+      Object.keys(noOfRaces).forEach(date => {
         this.chartData.labels.push(date)
         // total races
         // const tr = this.getDataSetByLabel('Total')
@@ -122,29 +149,24 @@ export default {
         // every driver
         this.drivers.forEach(({ name }) => {
           const ds = this.getDataSetByLabel(name)
-          ds.data.push(result[date].drivers[name] || 0)
+          ds.data.push(noOfRaces[date].drivers[name] || 0)
           ds.stack = 'drivers'
         })
       })
 
-      const colors = [
-        '#123456',
-        '#423165',
-        '#654321',
-        '#436521',
-        '#346381',
-        '#432615',
-        '#346251',
-        '#432165',
-        '#491012',
-        '#000000',
-        '#ffffff',
-        '#524138'
-      ]
-
       this.chartData.datasets.forEach((x, index) => {
-        x.backgroundColor = colors[index]
+        x.backgroundColor = this.chartColors[index]
       })
+    },
+    async getData () {
+      // clear chart data
+      this.chartData.labels.splice(0)
+      this.chartData.datasets.splice(0)
+
+      const laptimes = (await this.getTimes({ queryLimit: 0 })).sort((a, b) => b.date - a.date)
+      const noOfRaces = this.countNumberOfRaces(laptimes)
+
+      this.generateChartData(noOfRaces)
     },
     getDataSetByLabel (label) {
       let ds = this.chartData.datasets.find(x => x.label === label)

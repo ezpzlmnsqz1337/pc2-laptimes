@@ -24,6 +24,7 @@ import Toaster from '@meforma/vue-toaster'
 import '@fortawesome/fontawesome-free/css/all.css'
 import RealtimeDataBuilder from './builders/RealtimeDataBuilder'
 import LaptimeBuilder from './builders/LaptimeBuilder'
+import StatisticsBuilder from './builders/StatisticsBuilder'
 import LightsBuilder from './builders/LightsBuilder'
 import PulseLoader from 'vue-spinner/src/PulseLoader'
 
@@ -45,6 +46,7 @@ app.config.globalProperties.isInRange = (n, min, max) => min <= n && n <= max
 app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
 app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
 app.config.globalProperties.$lb = LightsBuilder.getInstance()
+app.config.globalProperties.$sb = StatisticsBuilder.getInstance()
 app.config.globalProperties.isAdmin = () => ['localhost:8080', 'malina:3000'].includes(window.location.host)
 
 app.use(store)

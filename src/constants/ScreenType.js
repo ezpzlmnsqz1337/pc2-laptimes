@@ -3,5 +3,8 @@ export default Object.freeze({
   LAPTIME_BOARD: 'laptime_board',
   TRACKS: 'tracks',
   REALTIME_DATA: 'realtime_data',
-  SET_CAR_IMAGE: 'set_car_image'
+  SET_CAR_IMAGE: 'set_car_image',
+  MEDALS: 'medals',
+  CHARTS: 'charts',
+  LEADERBOARDS: 'leaderboards'
 })
