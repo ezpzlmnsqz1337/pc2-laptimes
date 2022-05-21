@@ -59,6 +59,9 @@ export default createStore({
     },
     getDriverById: (state) => (id) => {
       return state.drivers.find(x => x.uid === id)
+    },
+    getDriverByName: (state) => (name) => {
+      return state.drivers.find(x => x.name.toLowerCase() === name.toLowerCase())
     }
   },
   mutations: {

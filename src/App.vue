@@ -25,8 +25,8 @@
         </Button>
         <Button
           :type="ButtonType.SECONDARY"
-          :class="{__selected: activeScreen === ScreenType.TRACKS}"
-          @click="showScreen({screen: ScreenType.TRACKS})"
+          :class="{__selected: activeScreen === ScreenType.STATISTICS}"
+          @click="showScreen({screen: ScreenType.STATISTICS})"
         >
           Statistics
         </Button>
@@ -62,7 +62,7 @@
       </keep-alive>
     </div>
     <keep-alive>
-      <Statistics v-if="activeScreen === ScreenType.TRACKS" />
+      <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
     </keep-alive>
     <keep-alive>
       <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
@@ -81,6 +81,7 @@ import RealtimeData from '@/components/RealtimeData'
 // import SetCarImage from '@/components/SetCarImage'
 import { mapActions, mapMutations, mapState } from 'vuex'
 import WebsocketState from './constants/WebsocketState'
+import ScreenType from './constants/ScreenType'
 
 export default {
   name: 'App',
@@ -116,6 +117,7 @@ export default {
   },
   async mounted () {
     await this.bindDb()
+    this.handleUrl()
     this.refreshTimes()
   },
   unmounted () {
@@ -123,7 +125,22 @@ export default {
   },
   methods: {
     ...mapActions(['bindDb', 'refreshTimes']),
-    ...mapMutations(['showScreen', 'setWebsocketState'])
+    ...mapMutations(['showScreen', 'setWebsocketState']),
+    handleUrl () {
+      if (this.queryParams.has('page')) {
+        const page = this.queryParams.get('page')
+        switch (page) {
+          case ScreenType.STATISTICS:
+            this.showScreen({ screen: ScreenType.STATISTICS })
+            break
+          case ScreenType.LAPTIME_BOARD:
+            this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
+            break
+          default:
+            console.error('Unkonwn page: ', page)
+        }
+      }
+    }
   }
 }
 </script>

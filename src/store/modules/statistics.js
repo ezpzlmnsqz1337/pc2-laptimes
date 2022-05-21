@@ -1,7 +1,7 @@
 import LaptimeBuilder from '@/builders/LaptimeBuilder'
 import StatisticsBuilder from '@/builders/StatisticsBuilder'
 import Distinct from '@/constants/Distinct'
-import ScreenType from '@/constants/ScreenType'
+import StatisticsScreenType from '@/constants/StatisticsScreenType'
 import WeatherType from '@/constants/WeatherType'
 
 const state = () => ({
@@ -11,7 +11,7 @@ const state = () => ({
   medals: [],
   trackCarBoardData: [],
   distinct: Distinct.NO,
-  activeScreen: ScreenType.MEDALS
+  activeScreen: StatisticsScreenType.MEDALS
 })
 
 // getters
@@ -19,6 +19,7 @@ const getters = {
   getFilter: (state) => () => {
     return {
       driverId: state.driverId,
+      position: state.position,
       distinct: state.distinct
     }
   },
@@ -68,7 +69,6 @@ const actions = {
           await dispatch('handleMedals', { laptimes: trackAndVariantAndCar })
           // only push laptime board when it matches the filter
           const matchFilter = await dispatch('handlePositionFilter', { laptimes: trackAndVariantAndCar })
-          console.log('MF: ', matchFilter)
           if (matchFilter) row.push(trackAndVariantAndCar)
         }
         // if any laptime board remain in this row after filtering, add it

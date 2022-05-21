@@ -58,7 +58,7 @@
 import Rank from '@/constants/Rank'
 import { mapGetters, mapMutations, mapState } from 'vuex'
 import tableMixin from '@/mixins/tableMixin'
-import ScreenType from '@/constants/ScreenType'
+import StatisticsScreenType from '@/constants/StatisticsScreenType'
 
 export default {
   name: 'Medals',
@@ -79,7 +79,7 @@ export default {
       this.cf()
       this.sf(filter)
       this.refresh()
-      this.showScreen({ screen: ScreenType.LEADERBOARDS })
+      this.showScreen({ screen: StatisticsScreenType.LEADERBOARDS })
     },
     clearFilter () {
       this.cf()

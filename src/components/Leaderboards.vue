@@ -198,10 +198,29 @@ export default {
   },
   computed: {
     ...mapState('statistics', ['distinct', 'driverId', 'position', 'trackCarBoardData']),
-    ...mapGetters(['getDriverById'])
+    ...mapGetters(['getDriverById', 'getDriverByName'])
+  },
+  mounted () {
+    this.handleUrl()
   },
   methods: {
     ...mapMutations('statistics', { sf: 'setFilter', cf: 'clearFilter' }),
+    handleUrl () {
+      const filter = {}
+      if (this.queryParams.has('driver')) {
+        const driver = this.getDriverByName(this.queryParams.get('driver'))
+        if (driver) filter.driverId = driver.uid
+      }
+      if (this.queryParams.has('position')) {
+        filter.position = parseInt(this.queryParams.get('position'))
+      }
+      if (this.queryParams.has('distinct')) {
+        filter.distinct = this.queryParams.get('distinct')
+      }
+      if (filter.driverId && filter.position && filter.distinct) {
+        this.setFilter(filter)
+      }
+    },
     setFilter (filter) {
       this.cf()
       this.sf(filter)

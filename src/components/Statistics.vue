@@ -3,28 +3,31 @@
     <div class="__menu">
       <Button
         :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.MEDALS}"
-        @click="showScreen({screen: ScreenType.MEDALS})"
+        :class="{__selected: activeScreen === StatisticsScreenType.MEDALS}"
+        @click="showScreen({screen: StatisticsScreenType.MEDALS})"
       >
         Medals
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.CHARTS}"
-        @click="showScreen({screen: ScreenType.CHARTS})"
+        :class="{__selected: activeScreen === StatisticsScreenType.CHARTS}"
+        @click="showScreen({screen: StatisticsScreenType.CHARTS})"
       >
         Charts
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.LEADERBOARDS}"
-        @click="showScreen({screen: ScreenType.LEADERBOARDS})"
+        :class="{__selected: activeScreen === StatisticsScreenType.LEADERBOARDS}"
+        @click="showScreen({screen: StatisticsScreenType.LEADERBOARDS})"
       >
         Leaderboards
       </Button>
     </div>
 
-    <div class="__controls">
+    <div
+      v-if="!refreshing"
+      class="__controls"
+    >
       <Button
         :type="ButtonType.SECONDARY"
         @click="refresh()"
@@ -32,6 +35,14 @@
         <div
           class="fa fa-redo"
         /><span>Refresh</span>
+      </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        @click="share()"
+      >
+        <div
+          class="fa fa-share"
+        /><span>Share</span>
       </Button>
     </div>
 
@@ -47,7 +58,7 @@
 
     <keep-alive>
       <StatisticsSection
-        v-if="!refreshing && activeScreen === ScreenType.MEDALS"
+        v-if="!refreshing && activeScreen === StatisticsScreenType.MEDALS"
         class="__generalStatisticsSection"
       >
         <Medals :refresh="refresh" />
@@ -56,7 +67,7 @@
 
     <keep-alive>
       <StatisticsSection
-        v-if="!refreshing && activeScreen === ScreenType.CHARTS"
+        v-if="!refreshing && activeScreen === StatisticsScreenType.CHARTS"
         class="__racesPerDaySection"
       >
         <h2 class="__center">
@@ -70,7 +81,7 @@
 
     <keep-alive>
       <StatisticsSection
-        v-if="!refreshing && activeScreen === ScreenType.LEADERBOARDS"
+        v-if="!refreshing && activeScreen === StatisticsScreenType.LEADERBOARDS"
         class="__trackCarMatrixSection"
       >
         <h2
@@ -88,11 +99,12 @@
 </template>
 
 <script>
-import { mapActions, mapMutations, mapState } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import StatisticsSection from '@/components/StatisticsSection'
 import RacesDaysBarChart from '@/components/RacesDaysBarChart'
 import Medals from '@/components/Medals'
 import Leaderboards from '@/components/Leaderboards'
+import StatisticsScreenType from '@/constants/StatisticsScreenType'
 
 export default {
   name: 'Statistics',
@@ -109,15 +121,49 @@ export default {
   },
   computed: {
     ...mapState(['cars', 'drivers', 'tracks']),
-    ...mapState('statistics', ['activeScreen', 'trackCarBoardData'])
+    ...mapState('statistics', ['activeScreen', 'trackCarBoardData']),
+    ...mapGetters('statistics', ['getFilter']),
+    ...mapGetters(['getDriverById'])
   },
   mounted () {
+    this.handleUrl()
     this.refresh()
   },
   methods: {
     ...mapActions(['getTimes']),
     ...mapMutations('statistics', ['showScreen']),
     ...mapActions('statistics', ['refreshData']),
+    handleUrl () {
+      if (this.queryParams.has('section')) {
+        const section = this.queryParams.get('section')
+        switch (section) {
+          case StatisticsScreenType.MEDALS:
+            this.showScreen({ screen: StatisticsScreenType.MEDALS })
+            break
+          case StatisticsScreenType.CHARTS:
+            this.showScreen({ screen: StatisticsScreenType.CHARTS })
+            break
+          case StatisticsScreenType.LEADERBOARDS:
+            this.showScreen({ screen: StatisticsScreenType.LEADERBOARDS })
+            break
+          default:
+            console.error('Unkonwn section: ', section)
+        }
+      }
+    },
+    async share () {
+      let url = `${window.location.origin}/?page=statistics`
+      url += `&section=${this.activeScreen}`
+
+      const { driverId, position, distinct } = this.getFilter()
+      if (driverId && position && distinct) {
+        const name = this.getDriverById(driverId).name
+        url += `&driver=${name}&position=${position}&distinct=${distinct}`
+      }
+
+      navigator.clipboard.writeText(url)
+      this.$toast.success('Link copied to clipboard.')
+    },
     async refresh () {
       if (this.refreshing) return
       this.refreshing = true
@@ -136,8 +182,8 @@ export default {
   padding-bottom: 6rem;
 }
 
-.__controls{
-  margin-top: 1rem;
+.__controls {
+  margin-top: 2rem;
   text-align: center;
 }
 
@@ -161,5 +207,15 @@ export default {
 .__loading {
   background-color: transparent !important;
   margin-top: 5rem;
+}
+
+@media only screen and (max-width: 700px) {
+.__controls {
+    margin-top: 1rem;
+  }
+
+  .__controls > button {
+    font-size: 0.6rem;
+  }
 }
 </style>
