@@ -131,7 +131,6 @@ export default {
         this.$rdb.removeListener(this.REALTIME_DATA_LISTENER)
       } else {
         this.REALTIME_DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
-        this.$rdb.addListener(this.onMessageCallback)
       }
       this.realtimeData = !this.realtimeData
     },

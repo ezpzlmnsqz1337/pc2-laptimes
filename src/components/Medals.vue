@@ -3,46 +3,14 @@
     <div
       class="__item"
     >
-      <h2>Total races</h2>
-      <table class="__totalRacesTable">
-        <tr><th>Driver</th><th>No. of races</th></tr>
-        <tr
-          v-show="!totalRaces.length"
-        >
-          <td
-            colspan="2"
-            class="__loading"
-          >
-            <PulseLoader
-              color="#188cff"
-              size="15px"
-            />
-          </td>
-        </tr>
-        <tr
-          v-for="tr in totalRaces"
-          :key="tr.driver"
-          class="__driver"
-        >
-          <td class="__name">
-            {{ tr.driver }}
-          </td><td class="__totalRaces">
-            {{ tr.races }}
-          </td>
-        </tr>
-      </table>
-    </div>
-    <div
-      class="__item"
-    >
       <h2>Medals</h2>
       <table class="__medalsTable">
-        <tr><th>Driver</th><th>1st</th><th>2nd</th><th>3rd</th><th>Points</th><th>Rank</th></tr>
+        <tr><th>Driver</th><th>No. of races</th><th>1st</th><th>2nd</th><th>3rd</th><th>Points</th><th>Rank</th></tr>
         <tr
           v-show="!medals.length"
         >
           <td
-            colspan="6"
+            colspan="7"
             class="__loading"
           >
             <PulseLoader
@@ -58,6 +26,9 @@
         >
           <td class="__name">
             {{ getDriver({driverId: m.driverId}) }}
+          </td>
+          <td class="__totalRaces">
+            {{ getDriverTotalRaces(m.driverId) }}
           </td>
           <td class="__first">
             <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: 1})">{{ m.first }}</span>
@@ -85,7 +56,7 @@
 
 <script>
 import Rank from '@/constants/Rank'
-import { mapMutations, mapState } from 'vuex'
+import { mapGetters, mapMutations, mapState } from 'vuex'
 import tableMixin from '@/mixins/tableMixin'
 import ScreenType from '@/constants/ScreenType'
 
@@ -99,7 +70,8 @@ export default {
     }
   },
   computed: {
-    ...mapState('statistics', ['medals', 'totalRaces'])
+    ...mapState('statistics', ['medals', 'totalRaces']),
+    ...mapGetters('statistics', ['getDriverTotalRaces'])
   },
   methods: {
     ...mapMutations('statistics', { sf: 'setFilter', cf: 'clearFilter', showScreen: 'showScreen' }),

@@ -21,6 +21,9 @@ const getters = {
       driverId: state.driverId,
       distinct: state.distinct
     }
+  },
+  getDriverTotalRaces: (state) => (driverId) => {
+    return state.totalRaces.find(x => x.driverId === driverId)?.races
   }
 }
 
@@ -41,7 +44,7 @@ const actions = {
     commit('resetState')
     const totalRaces = []
     drivers.forEach(async x => {
-      totalRaces.push({ driver: x.name, races: laptimes.filter(y => y.driverId === x.uid).length })
+      totalRaces.push({ driverId: x.uid, driver: x.name, races: laptimes.filter(y => y.driverId === x.uid).length })
       totalRaces.sort((a, b) => (b.races - a.races))
     })
     commit('setTotalRaces', { totalRaces })

@@ -125,6 +125,7 @@ const mutations = {
   },
   setValues (state, { data }) {
     Object.keys(data).forEach(x => {
+      // console.log(x)
       if (state[x] === undefined) return
       if (x === 'participants' && !data[x][0].fastestLapTime) return
       state[x] = data[x]

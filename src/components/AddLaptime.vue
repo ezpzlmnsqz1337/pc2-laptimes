@@ -408,6 +408,15 @@
           />
         </div>
 
+        <div class="__header">
+          Auto submit
+        </div>
+        <input
+          v-model="autoSubmit"
+          class="__autoSubmit"
+          type="checkbox"
+        >
+
         <div class="__header __sm">
           Game
         </div>
@@ -439,7 +448,7 @@
             block
             class="__submit"
             :disabled="!valid"
-            @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), game, notes})"
+            @click="submit()"
           >
             Submit
           </Button>
@@ -454,7 +463,7 @@
           block
           class="__submit"
           :disabled="!valid"
-          @click="submit({carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date: new Date().getTime(), game, notes})"
+          @click="submit()"
         >
           Submit
         </Button>
@@ -472,6 +481,7 @@ import ControlType from '@/constants/ControlType'
 import ScreenType from '@/constants/ScreenType'
 import StartType from '@/constants/StartType'
 import Game from '@/constants/Game'
+import RaceState from '@/constants/RaceState'
 
 export default {
   name: 'AddLaptime',
@@ -499,7 +509,9 @@ export default {
       newTrackVariantName: '',
       showNewCarModal: false,
       showNewTrackModal: false,
-      showNewTrackVariantModal: false
+      showNewTrackVariantModal: false,
+      autoSubmit: false,
+      lastRaceState: RaceState.MENU
     }
   },
   computed: {
@@ -521,6 +533,9 @@ export default {
       const d = new Date(this.participants[0].fastestLapTime * 1000)
       return this.$ltb.dateToLaptime(d)
     }
+  },
+  created () {
+    this.DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
   },
   methods: {
     ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'addNewTrack', 'addNewTrackVariant', 'refreshTimes', 'linkCarToGameId', 'linkTrackToGameId']),
@@ -563,9 +578,26 @@ export default {
       this.newDriverName = ''
       this.showNewDriverModal = false
     },
-    submit (laptime) {
+    submit () {
+      const laptime = {
+        carId: this.carId,
+        trackId: this.trackId,
+        trackVariant: this.trackVariant,
+        driverId: this.driverId,
+        laptime: this.laptime,
+        transmission: this.transmission,
+        weather: this.weather,
+        brakingLine: this.brakingLine,
+        controls: this.controls,
+        startType: this.startType,
+        date: new Date().getTime(),
+        game: this.game,
+        notes: this.notes
+      }
       this.addLaptime(laptime)
-      this.driverId = null
+      if (!this.autoSubmit) {
+        this.driverId = null
+      }
       this.showTimeInTable(laptime)
       this.$toast.success('Laptime added successfully!', {
         duration: 3000,
@@ -624,6 +656,31 @@ export default {
           li.selectionStart = li.value.length
           li.focus()
         }
+      }
+    },
+    onMessageCallback (msg) {
+      try {
+        let data = JSON.parse(msg.data)
+        if (data.packetType === undefined) return
+        data = data.data
+        if ('raceState' in data) {
+          if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
+          this.lastRaceState = data.raceState
+        }
+      } catch (e) {
+        console.log('Error: ', e.message, msg)
+      }
+    },
+    handleAutoSubmit (raceState) {
+      if (this.lastRaceState === RaceState.RACE_IS_ON && raceState === RaceState.RACE_FINISHED) {
+        this.showScreen({ screen: ScreenType.ADD_LAPTIME })
+        setTimeout(() => {
+          this.setLaptime(this.fastestLapTime)
+          this.setCarName(this.carName)
+          this.setTrackLocation(this.trackLocation)
+          this.setTrackVariation(this.trackVariation)
+          if (this.valid) this.submit()
+        }, 1000)
       }
     }
   }
@@ -820,6 +877,13 @@ textarea {
 
 .__lg > textarea {
   height: 7rem;
+}
+
+.__autoSubmit {
+  width: 1.7rem;
+  height: 1.7rem;
+  display: inline-block;
+  border-radius: 0.3rem;
 }
 
 </style>
