@@ -5,7 +5,8 @@
         v-if="isAdmin()"
         class="__connectionState"
       >
-        <span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span>
+        <div><span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span></div>
+        <div><span>Race state: </span><span :class="raceStateClass">{{ raceStateText }}</span></div>
       </div>
       <div class="__menu">
         <Button
@@ -82,6 +83,7 @@ import RealtimeData from '@/components/RealtimeData'
 import { mapActions, mapMutations, mapState } from 'vuex'
 import WebsocketState from './constants/WebsocketState'
 import ScreenType from './constants/ScreenType'
+import RaceState from './constants/RaceState'
 
 export default {
   name: 'App',
@@ -95,6 +97,7 @@ export default {
   },
   computed: {
     ...mapState(['activeScreen', 'websocketState']),
+    ...mapState('realtimeData', ['raceState']),
     websocketStateText () {
       return this.websocketState === WebsocketState.ESTABLISHED ? 'Connected' : 'Not connected'
     },
@@ -102,6 +105,28 @@ export default {
       return {
         __connected: this.websocketState === WebsocketState.ESTABLISHED,
         __notConnected: this.websocketState !== WebsocketState.ESTABLISHED
+      }
+    },
+    raceStateText () {
+      switch (this.raceState) {
+        case RaceState.MENU:
+          return 'In menu'
+        case RaceState.BEFORE_RACE_MENU:
+          return 'Waiting for race to start'
+        case RaceState.RACE_IS_ON:
+          return 'Race in progress'
+        case RaceState.RACE_FINISHED:
+          return 'Race finished'
+        default:
+          return ''
+      }
+    },
+    raceStateClass () {
+      return {
+        __red: this.raceState === RaceState.MENU,
+        __yellow: this.raceState === RaceState.BEFORE_RACE_MENU,
+        __green: this.raceState === RaceState.RACE_IS_ON,
+        __orange: this.raceState === RaceState.RACE_FINISHED
       }
     }
   },
@@ -247,6 +272,22 @@ a {
 
 .__connected {
   color: rgb(28, 197, 28);
+}
+
+.__red {
+  color: red;
+}
+
+.__yellow {
+  color: yellow;
+}
+
+.__green {
+  color: rgb(28, 197, 28);
+}
+
+.__orange {
+  color: orange;
 }
 
 /* custom scrollbar overrides */

@@ -106,7 +106,8 @@ const state = () => ({
   carClassName: null,
   trackLocation: null,
   trackVariation: null,
-  participants: []
+  participants: [],
+  raceState: null
 })
 
 // getters

@@ -127,7 +127,9 @@
     <div class="__heading">
       <h1>Add Laptime</h1>
     </div>
-    <div class="__timeWrapper">
+    <div
+      class="__timeWrapper"
+    >
       <div class="__firstPanel">
         <div
           v-if="fastestLapTime"
@@ -411,11 +413,16 @@
         <div class="__header">
           Auto submit
         </div>
-        <input
-          v-model="autoSubmit"
-          class="__autoSubmit"
-          type="checkbox"
+        <div
+          class="__inputRow __noColumn __autoSubmit"
+          :class="{__autoSubmitAnimation: autoSubmit}"
         >
+          <input
+            v-model="autoSubmit"
+            type="checkbox"
+          >
+          <span>{{ autoSubmit ? 'on' : 'off' }}</span>
+        </div>
 
         <div class="__header __sm">
           Game
@@ -441,7 +448,10 @@
           />
         </div>
 
-        <div class="__inputRow __sm">
+        <div
+          v-if="!autoSubmit"
+          class="__inputRow __sm"
+        >
           <Button
             :tabindex="14"
             :type="ButtonType.PRIMARY"
@@ -456,7 +466,10 @@
       </div>
     </div>
     <div class="__timeWrapper">
-      <div class="__inputRow __lg">
+      <div
+        v-if="!autoSubmit"
+        class="__inputRow __lg"
+      >
         <Button
           :tabindex="14"
           :type="ButtonType.PRIMARY"
@@ -516,7 +529,7 @@ export default {
   },
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
-    ...mapState('realtimeData', ['participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
+    ...mapState('realtimeData', ['raceState', 'participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
     ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants', 'getCarByGameId', 'getTrackByGameId', 'getTrackVariants']),
     laptime () {
       const [m, s, ms] = [this.minutes, this.seconds, this.milliseconds]
@@ -714,6 +727,12 @@ export default {
   display: none;
 }
 
+.__raceState {
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  padding: 0 0 0 1rem;
+}
+
 @media only screen and (max-width: 1280px) {
   .__timeWrapper {
     flex-direction: row;
@@ -824,6 +843,20 @@ export default {
   margin: 0 auto !important;
 }
 
+@keyframes blinking {
+  0% {
+    background-color: green;
+  }
+  75% {
+    background-color: blue;
+  }
+}
+
+.__autoSubmitAnimation {
+    background-color: green;
+  /* animation: blinking 1s linear infinite; */
+}
+
 .__selectLabel {
   text-align: left;
 }
@@ -880,10 +913,15 @@ textarea {
 }
 
 .__autoSubmit {
+  align-items: center;
+}
+
+.__autoSubmit input[type=checkbox] {
   width: 1.7rem;
   height: 1.7rem;
   display: inline-block;
   border-radius: 0.3rem;
+  margin: 0.5rem;
 }
 
 </style>
