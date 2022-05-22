@@ -1,12 +1,17 @@
 <template>
-  <div class="__wrapper">
+  <div
+    ref="wrapper"
+    class="__wrapper"
+  >
     <div class="__menuWrapper">
       <div
         v-if="isAdmin()"
         class="__connectionState"
       >
         <div><span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span></div>
-        <div><span>Race state: </span><span :class="raceStateClass">{{ raceStateText }}</span></div>
+        <div v-if="raceStateText">
+          <span>Race state: </span><span :class="raceStateClass">{{ raceStateText }}</span>
+        </div>
       </div>
       <div class="__menu">
         <Button
@@ -139,11 +144,20 @@ export default {
         this.setWebsocketState(this.$rdb.getWebsocketState())
       }, 2500)
     }
+    this.BACKGROUNDS = [
+      require('@/assets/images/project-cars-2-bg-1.jpg'),
+      require('@/assets/images/project-cars-2-bg-2.jpg'),
+      require('@/assets/images/project-cars-2-bg-3.jpg')
+    ]
+    this.CURRENT_BG_INDEX = 0
   },
   async mounted () {
     await this.bindDb()
     this.handleUrl()
     this.refreshTimes()
+    setInterval(() => {
+      this.cycleBackground()
+    }, 5000)
   },
   unmounted () {
     unsubscribeAll()
@@ -151,6 +165,11 @@ export default {
   methods: {
     ...mapActions(['bindDb', 'refreshTimes']),
     ...mapMutations(['showScreen', 'setWebsocketState']),
+    cycleBackground () {
+      const bgCount = this.BACKGROUNDS.length
+      this.$refs.wrapper.style.backgroundImage = `url(${this.BACKGROUNDS[this.CURRENT_BG_INDEX]})`
+      this.CURRENT_BG_INDEX = ++this.CURRENT_BG_INDEX % bgCount
+    },
     handleUrl () {
       if (this.queryParams.has('page')) {
         const page = this.queryParams.get('page')
@@ -300,6 +319,8 @@ a {
 }
 
 .__wrapper {
+  background-image: url('~@/assets/images/project-cars-2-bg-1.jpg');
+  background-blend-mode: overlay;
   background-color: var(--bg-dark3);
   height: 100vh;
   overflow-y: scroll;
@@ -315,8 +336,7 @@ a {
 }
 
 .__menuWrapper {
-  background-color: var(--bg-dark3);
-  border-bottom: 0.1rem solid var(--border-light1);
+  background-color: rgba(72, 72, 72, 0.7);
   top: 0;
   position: fixed;
   width: 100vw;
@@ -382,6 +402,10 @@ a {
 }
 
 @media only screen and (max-width: 700px) {
+  .__wrapper {
+    background-position: center center;
+  }
+
   .__laptimes {
     padding: 1rem;
   }

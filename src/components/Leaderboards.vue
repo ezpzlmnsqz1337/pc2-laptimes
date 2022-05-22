@@ -244,8 +244,7 @@ export default {
   width: 100vw;
   margin-left: -1rem;
   z-index: 999;
-  border-top: 0.1rem solid var(--border-light1);
-  background-color: var(--bg-dark3);
+  background-color: rgba(72, 72, 72, 0.7);
   display: flex;
   flex-direction: row;
   align-items: center;

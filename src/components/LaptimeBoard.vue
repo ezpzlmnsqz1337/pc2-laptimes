@@ -1,6 +1,5 @@
 <template>
   <div class="__laptimeBoard">
-    <h2>Laptime board</h2>
     <div class="__share">
       <Button
         :type="ButtonType.SECONDARY"
@@ -11,6 +10,7 @@
         /><span>Share</span>
       </Button>
     </div>
+    <h2>Laptime board</h2>
     <table>
       <tr class="__row __header">
         <th>Rank</th>
@@ -266,8 +266,16 @@ export default {
 }
 
 .__share {
-  right: 3rem;
-  top: 6.9rem;
+  right: 0;
+  top: 0;
+  position: relative;
+  text-align: right;
+  height: 0;
+}
+
+.__share button {
   position: absolute;
+  right: 0;
+  top: 0;
 }
 </style>
