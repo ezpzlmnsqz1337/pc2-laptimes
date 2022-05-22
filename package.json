@@ -6,7 +6,7 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy": "ssh pi@malina 'rm -rf /home/pi/workspace/laptimes/**' && scp -r ./dist/** pi@malina:/home/pi/workspace/laptimes/"
+    "deploy:malina": "yarn build && ssh pi@malina 'rm -rf /home/pi/workspace/laptimes/**' && scp -r ./dist/** pi@malina:/home/pi/workspace/laptimes/"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",

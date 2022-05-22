@@ -46,23 +46,24 @@
     <div class="__bottomContent">
       <div class="__telemetry">
         <div class="__brake">
+          <div class="__verticalDial">
+            <div
+              ref="brake"
+              class="__filler"
+            />
+          </div>
           <div>brake: {{ brake }}</div>
-          <div class="__verticalDial">
-            <div class="__filler" />
-          </div>
-        </div>
-        <div class="__throttle">
-          <div>throttle: {{ throttle }}</div>
-          <div class="__verticalDial">
-            <div class="__filler" />
-          </div>
         </div>
         <div class="__clutch">
-          <div>clutch: {{ clutch }}</div>
           <div class="__verticalDial">
-            <div class="__filler" />
+            <div
+              ref="clutch"
+              class="__filler"
+            />
           </div>
+          <div>clutch: {{ clutch }}</div>
         </div>
+
         <div class="__speedometer">
           <div class="__rpm">
             <div class="__rpmValue">
@@ -78,8 +79,18 @@
             </div>
           </div>
           <div class="__speed">
-            <div>{{ speed }} km/h</div>
+            <div>{{ parseInt(speed*(3600/1000)) }} km/h</div>
           </div>
+        </div>
+
+        <div class="__throttle">
+          <div class="__verticalDial">
+            <div
+              ref="throttle"
+              class="__filler"
+            />
+          </div>
+          <div>throttle: {{ throttle }}</div>
         </div>
       </div>
     </div>
@@ -108,6 +119,7 @@ export default {
       'speed',
       'rpm',
       'maxRpm',
+      'gearNumGears',
       // UDP1
       'carName',
       'carClassName',
@@ -139,13 +151,22 @@ export default {
         const data = JSON.parse(msg.data)
         if (data.packetType === undefined) return
         // console.log('Packet type: ', data)
-        if (this.lightsEnabled && data.packetType === PacketType.TELEMETRY) {
-          this.setLightsColor(data.data)
+        if (data.packetType === PacketType.TELEMETRY) {
+          this.setDials()
+          if (this.lightsEnabled) {
+            this.setLightsColor(data.data)
+          }
         }
         this.setValues(data)
       } catch (e) {
         console.log('Error: ', e.message, msg)
       }
+    },
+    setDials () {
+      this.$refs.throttle.style.maxHeight = `${(this.throttle / 255) * 100}%`
+      this.$refs.brake.style.maxHeight = `${(this.brake / 255) * 100}%`
+      this.$refs.clutch.style.maxHeight = `${(this.clutch / 255) * 100}%`
+      this.$refs.rpm.style.maxWidth = `${(this.rpm / this.maxRpm) * 100}%`
     },
     setLightsColor ({ throttle, rpm, maxRpm, brake }) {
       let color = '#00ff00'
@@ -187,6 +208,11 @@ export default {
   margin: 0 auto;
   padding: 1rem;
   display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(46, 46, 46, 0.809);
+  border-radius: 50% 50% 5rem 5rem;
+  border: 0.3rem solid rgba(0, 0, 0, 0.464);
 }
 
 .__controls > div {
@@ -196,7 +222,8 @@ export default {
 }
 
 .__speedometer {
-
+  font-size: 5rem;
+  text-align: center;
 }
 
 .__verticalDial {
@@ -207,6 +234,7 @@ export default {
   border-radius: 0.5rem;
   border: 0.1rem solid var(--border-dark1);
   background-color: var(--bg-light1);
+  display: inline-block;
 }
 
 .__verticalDial > .__filler{
@@ -232,6 +260,11 @@ export default {
   border-radius: 0.5rem;
   margin-top: 0.03rem;
   margin-left: 0.03rem;
+}
+
+.__brake, .__throttle, .__clutch {
+  text-align: center;
+  padding: 1rem;
 }
 
 .__brake > .__verticalDial > .__filler {
