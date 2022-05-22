@@ -1,6 +1,16 @@
 <template>
   <div class="__laptimeBoard">
     <h2>Laptime board</h2>
+    <div class="__share">
+      <Button
+        :type="ButtonType.SECONDARY"
+        @click="share()"
+      >
+        <div
+          class="fa fa-share"
+        /><span>Share</span>
+      </Button>
+    </div>
     <table>
       <tr class="__row __header">
         <th>Rank</th>
@@ -162,7 +172,9 @@ export default {
     }
   },
   mounted () {
-    this.setRandomFilter()
+    setTimeout(() => {
+      this.handleUrl()
+    }, 500)
   },
   methods: {
     ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
@@ -195,6 +207,33 @@ export default {
       this.cf()
       await this.refreshTimes()
       this.loading = false
+    },
+    async share () {
+      const url = `${window.location.origin}/?page=laptime_board`
+      const filter = {}
+      if (this.carId) filter.carId = this.carId
+      if (this.trackId) filter.trackId = this.trackId
+      if (this.trackVariant) filter.trackVariant = this.trackVariant
+      if (this.driverId) filter.driverId = this.driverId
+      if (this.transmission) filter.transmission = this.transmission
+      if (this.weather) filter.weather = this.weather
+      if (this.brakingLine) filter.line = this.brakingLine
+      if (this.controls) filter.controls = this.controls
+      if (this.startType) filter.startType = this.startType
+      if (this.game) filter.game = this.game
+      if (this.distinct) filter.distinct = this.distinct
+      const encoded = JSON.stringify(filter)
+
+      navigator.clipboard.writeText(`${url}&filter=` + encoded)
+      this.$toast.success('Link copied to clipboard.')
+    },
+    handleUrl () {
+      if (this.queryParams.has('filter')) {
+        const filter = JSON.parse(this.queryParams.get('filter'))
+        this.setFilter(filter)
+        return
+      }
+      this.setRandomFilter()
     }
   }
 }
@@ -224,5 +263,11 @@ export default {
   0% { box-shadow: inset 0 0 1.5rem 0.8rem var(--blink-color); }
   50% { box-shadow: inset 0 0 0 0 var(--blink-color); }
   100% { box-shadow: inset 0 0 1.5rem 0.8rem var(--blink-color); }
+}
+
+.__share {
+  right: 3rem;
+  top: 6.9rem;
+  position: absolute;
 }
 </style>

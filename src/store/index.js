@@ -52,7 +52,7 @@ export default createStore({
     },
     getTrackVariants: (state) => (trackId) => {
       if (!trackId) return []
-      return state.tracks.find(x => x.uid === trackId).variants
+      return state.tracks.find(x => x.uid === trackId)?.variants
     },
     getTimeById: (state) => (id) => {
       return state.times.find(x => x.uid === id)
