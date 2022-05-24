@@ -339,7 +339,7 @@ a {
   background-color: var(--bg-dark3);
   background-size: cover;
   width: 100%;
-  height: 100%;
+  height: 120%;
   position: absolute;
   top: 0;
   z-index: -999;

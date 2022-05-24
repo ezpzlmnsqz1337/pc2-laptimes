@@ -296,4 +296,10 @@ export default {
   left: 0;
   top: 0;
 }
+
+@media only screen and (max-width: 700px) {
+  .__tableControls button {
+    font-size: 0.6rem
+  }
+}
 </style>

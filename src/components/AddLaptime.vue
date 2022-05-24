@@ -410,10 +410,14 @@
           />
         </div>
 
-        <div class="__header">
+        <div
+          v-if="canAutoSubmit"
+          class="__header"
+        >
           Auto submit
         </div>
         <div
+          v-if="canAutoSubmit"
           class="__inputRow __noColumn __autoSubmit"
           :class="{__autoSubmitAnimation: autoSubmit}"
         >
@@ -495,6 +499,7 @@ import ScreenType from '@/constants/ScreenType'
 import StartType from '@/constants/StartType'
 import Game from '@/constants/Game'
 import RaceState from '@/constants/RaceState'
+import WebsocketState from '@/constants/WebsocketState'
 
 export default {
   name: 'AddLaptime',
@@ -528,7 +533,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['cars', 'tracks', 'drivers', 'times']),
+    ...mapState(['cars', 'tracks', 'drivers', 'times', 'websocketState']),
     ...mapState('realtimeData', ['raceState', 'participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
     ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants', 'getCarByGameId', 'getTrackByGameId', 'getTrackVariants']),
     laptime () {
@@ -545,6 +550,9 @@ export default {
 
       const d = new Date(this.participants[0].fastestLapTime * 1000)
       return this.$ltb.dateToLaptime(d)
+    },
+    canAutoSubmit () {
+      return this.websocketState === WebsocketState.ESTABLISHED && this.driverId
     }
   },
   created () {
