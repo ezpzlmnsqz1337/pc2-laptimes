@@ -164,6 +164,7 @@ export const carImages = [
   'porsche_911_gt1_98_livery_51-1.png',
   'porsche_918_livery_16-1.png',
   'porsche_935_77_livery_51-1.png',
+  'porsche_959_s.png',
   'porsche_935_80_livery_51-1.png',
   'porsche_936_livery_51-1.png',
   'porsche_962c_lh_livery_54-1.png',

@@ -1,151 +1,168 @@
 <template>
-  <div class="__filter">
-    <h2>Filter times</h2>
-    <div class="__inputRow">
-      <!-- object value -->
-      <v-select
-        :model-value="carId"
-        placeholder="Select car"
-        :options="cars"
-        :reduce="car => car.uid"
-        label="name"
-        :class="{__activeFilter: carId}"
-        @update:model-value="setFilter({carId: $event})"
-      />
-    </div>
-    <div class="__inputRow">
-      <v-select
-        :model-value="trackId"
-        placeholder="Select track"
-        :options="tracks"
-        :reduce="track => track.uid"
-        label="track"
-        :class="{__activeFilter: trackId}"
-        @update:model-value="setFilter({trackId: $event, trackVariant: null})"
-      />
-    </div>
+  <div
+    class="__filter"
+  >
     <div
-      v-if="trackId"
-      class="__inputRow"
+      v-show="showFilter"
+      class="__filterWrapper"
     >
-      <v-select
-        :model-value="trackVariant"
-        placeholder="Select track variant"
-        :options="getTrackVariants(trackId)"
-        :class="{__activeFilter: trackVariant}"
-        @update:model-value="setFilter({trackVariant: $event})"
-      />
-    </div>
-    <div
-      class="__inputRow"
-    >
-      <v-select
-        :model-value="driverId"
-        placeholder="Select driver"
-        :options="drivers"
-        :reduce="driver => driver.uid"
-        label="name"
-        :class="{__activeFilter: driverId}"
-        @update:model-value="setFilter({driverId: $event})"
-      />
-    </div>
-    <div class="__header">
-      Transmission
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="transmission"
-        :values="Object.values(TransmissionType)"
-        :value="transmission"
-        @changed="e => setFilter({transmission: e})"
-      />
-    </div>
+      <div class="__hideFilter">
+        <Button
+          :type="ButtonType.DANGER"
+          @click="toggleFilter()"
+        >
+          <div
+            class="fa fa-window-close"
+          /><span>Close</span>
+        </Button>
+      </div>
+      <h2>Filter times</h2>
+      <div class="__inputRow">
+        <!-- object value -->
+        <v-select
+          :model-value="carId"
+          placeholder="Select car"
+          :options="cars"
+          :reduce="car => car.uid"
+          label="name"
+          :class="{__activeFilter: carId}"
+          @update:model-value="setFilter({carId: $event})"
+        />
+      </div>
+      <div class="__inputRow">
+        <v-select
+          :model-value="trackId"
+          placeholder="Select track"
+          :options="tracks"
+          :reduce="track => track.uid"
+          label="track"
+          :class="{__activeFilter: trackId}"
+          @update:model-value="setFilter({trackId: $event, trackVariant: null})"
+        />
+      </div>
+      <div
+        v-if="trackId"
+        class="__inputRow"
+      >
+        <v-select
+          :model-value="trackVariant"
+          placeholder="Select track variant"
+          :options="getTrackVariants(trackId)"
+          :class="{__activeFilter: trackVariant}"
+          @update:model-value="setFilter({trackVariant: $event})"
+        />
+      </div>
+      <div
+        class="__inputRow"
+      >
+        <v-select
+          :model-value="driverId"
+          placeholder="Select driver"
+          :options="drivers"
+          :reduce="driver => driver.uid"
+          label="name"
+          :class="{__activeFilter: driverId}"
+          @update:model-value="setFilter({driverId: $event})"
+        />
+      </div>
+      <div class="__header">
+        Transmission
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="transmission"
+          :values="Object.values(TransmissionType)"
+          :value="transmission"
+          @changed="e => setFilter({transmission: e})"
+        />
+      </div>
 
-    <div class="__header">
-      Weather
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="weather"
-        :values="Object.values(WeatherType)"
-        :value="weather"
-        @changed="e => setFilter({weather: e})"
-      />
-    </div>
+      <div class="__header">
+        Weather
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="weather"
+          :values="Object.values(WeatherType)"
+          :value="weather"
+          @changed="e => setFilter({weather: e})"
+        />
+      </div>
 
-    <div class="__header">
-      Braking line
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="brakingLine"
-        :values="Object.values(BrakingLine)"
-        :value="brakingLine"
-        @changed="e => setFilter({brakingLine: e})"
-      />
-    </div>
+      <div class="__header">
+        Braking line
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="brakingLine"
+          :values="Object.values(BrakingLine)"
+          :value="brakingLine"
+          @changed="e => setFilter({brakingLine: e})"
+        />
+      </div>
 
-    <div class="__header">
-      Controls
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="controls"
-        :values="Object.values(ControlType)"
-        :value="controls"
-        @changed="e => setFilter({controls: e})"
-      />
-    </div>
+      <div class="__header">
+        Controls
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="controls"
+          :values="Object.values(ControlType)"
+          :value="controls"
+          @changed="e => setFilter({controls: e})"
+        />
+      </div>
 
-    <div class="__header">
-      Start type
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="startType"
-        :values="Object.values(StartType)"
-        :value="startType"
-        @changed="e => setFilter({startType: e})"
-      />
-    </div>
+      <div class="__header">
+        Start type
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="startType"
+          :values="Object.values(StartType)"
+          :value="startType"
+          @changed="e => setFilter({startType: e})"
+        />
+      </div>
 
-    <div class="__header">
-      Game
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="distinct"
-        :values="Object.values(Game)"
-        :value="game"
-        @changed="e => setFilter({game: e})"
-      />
-    </div>
+      <div class="__header">
+        Game
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="distinct"
+          :values="Object.values(Game)"
+          :value="game"
+          @changed="e => setFilter({game: e})"
+        />
+      </div>
 
-    <div class="__header">
-      Distinct
-    </div>
-    <div class="__inputRow __noColumn">
-      <RadioButtons
-        name="distinct"
-        :values="Object.values(Distinct)"
-        :value="distinct"
-        @changed="e => setFilter({distinct: e})"
-      />
-    </div>
+      <div class="__header">
+        Distinct
+      </div>
+      <div class="__inputRow __noColumn">
+        <RadioButtons
+          name="distinct"
+          :values="Object.values(Distinct)"
+          :value="distinct"
+          @changed="e => setFilter({distinct: e})"
+        />
+      </div>
 
-    <Button
-      :type="ButtonType.SECONDARY"
-      @click="setRandomFilter()"
-    >
-      <div class="fa fa-random" /><span>Random</span>
-    </Button>
-    <Button
-      :type="ButtonType.DANGER"
-      :disabled="!isFilterSet()"
-      @click="clearFilter()"
-    >
-      <div class="fa fa-ban" /><span>Clear filter</span>
-    </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        @click="setRandomFilter()"
+      >
+        <div class="fa fa-random" /><span>Random</span>
+      </Button>
+      <Button
+        :type="ButtonType.DANGER"
+        :disabled="!isFilterSet()"
+        @click="clearFilter()"
+      >
+        <div class="fa fa-ban" /><span>Clear filter</span>
+      </Button>
+    </div>
   </div>
 </template>
 
@@ -163,14 +180,14 @@ export default {
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
-    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'game', 'distinct']),
+    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'game', 'distinct', 'showFilter']),
     firstLaptime () {
       return this.times[0].laptime
     }
   },
   methods: {
     ...mapMutations(['setTimes']),
-    ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
+    ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter', toggleFilter: 'toggleFilter' }),
     ...mapActions(['refreshTimes', 'getTimes']),
     isFilterSet () {
       return this.carId || this.trackId || this.trackVariant || this.transmission ||
@@ -205,8 +222,16 @@ export default {
   border-radius: 0.3rem;
 }
 
-.__filter {
+.__filterWrapper {
   padding: 1rem;
+}
+
+.__hideFilter {
+  position: relative;
+  left: 0;
+  top: 0;
+  height: 0;
+  text-align: left;
 }
 
 .__inputRow {
@@ -224,9 +249,10 @@ export default {
 }
 
 @media only screen and (max-width: 700px) {
-  .__filter {
+  .__filterWrapper {
     padding: 0;
     width: 100%;
+    margin-bottom: 1rem;
   }
 }
 </style>

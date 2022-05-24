@@ -62,6 +62,10 @@ td div:hover {
   justify-content: center !important;
 }
 
+.__car > img{
+  width: 8rem;
+}
+
 .__driver span {
   border-radius: 0.3rem;
   padding: 0.2rem;
@@ -256,5 +260,9 @@ tr.__hasNotes {
 
   .__settings span{
     display: none;
+  }
+
+  .__car > img{
+    width: 4rem;
   }
 }

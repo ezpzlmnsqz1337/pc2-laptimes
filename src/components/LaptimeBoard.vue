@@ -1,7 +1,18 @@
 <template>
   <div class="__laptimeBoard">
-    <div class="__share">
+    <div class="__tableControls">
       <Button
+        v-if="!showFilter"
+        class="__showFilter"
+        :type="ButtonType.SECONDARY"
+        @click="toggleFilter()"
+      >
+        <div
+          class="fa fa-filter"
+        /><span>Filter</span>
+      </Button>
+      <Button
+        class="__share"
         :type="ButtonType.SECONDARY"
         @click="share()"
       >
@@ -75,6 +86,11 @@
           <span v-if="index > 0">{{ $ltb.getLaptimeDiff(firstLaptime, time.laptime) }}</span>
         </td>
         <td class="__car">
+          <img
+            v-if="getCarImage(time)"
+            :src="getCarImage(time)"
+            :alt="getCar(time)"
+          >
           <div @click="setFilter({carId: time.carId})">
             <EditableSelect
               :text="getCarById(time.carId).name"
@@ -166,7 +182,7 @@ export default {
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times', 'lastAddedLaptime']),
     ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants']),
-    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct']),
+    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct', 'showFilter']),
     firstLaptime () {
       return this.times[0].laptime
     }
@@ -177,7 +193,7 @@ export default {
     }, 500)
   },
   methods: {
-    ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter' }),
+    ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter', toggleFilter: 'toggleFilter' }),
     ...mapActions(['refreshTimes', 'getTimes']),
     ...mapActions({ ul: 'updateLaptime' }),
     async setRandomFilter () {
@@ -265,17 +281,19 @@ export default {
   100% { box-shadow: inset 0 0 1.5rem 0.8rem var(--blink-color); }
 }
 
-.__share {
-  right: 0;
-  top: 0;
+.__tableControls {
   position: relative;
-  text-align: right;
-  height: 0;
 }
 
-.__share button {
+.__tableControls .__share {
   position: absolute;
   right: 0;
+  top: 0;
+}
+
+.__tableControls .__showFilter {
+  position: absolute;
+  left: 0;
   top: 0;
 }
 </style>

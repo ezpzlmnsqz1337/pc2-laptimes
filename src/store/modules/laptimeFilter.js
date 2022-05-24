@@ -11,7 +11,8 @@ const state = () => ({
   controls: null,
   startType: null,
   game: null,
-  distinct: Distinct.YES
+  distinct: Distinct.YES,
+  showFilter: false
 })
 
 // getters
@@ -64,6 +65,9 @@ const mutations = {
     state.startType = null
     state.game = null
     state.distinct = Distinct.YES
+  },
+  toggleFilter (state) {
+    state.showFilter = !state.showFilter
   }
 }
 

@@ -209,6 +209,10 @@ export default {
   margin-top: 5rem;
 }
 
+.__trackCarMatrixSection {
+  padding-top: 1rem;
+}
+
 @media only screen and (max-width: 700px) {
 .__controls {
     margin-top: 1rem;

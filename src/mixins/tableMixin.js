@@ -27,6 +27,7 @@ export default {
     },
     getCarImage (time) {
       const car = this.getCarById(time.carId)
+      if (!car.imageUrl) return false
       return car ? `images/${car.imageUrl}` : 'Loading...'
     },
     getRowTitleText (laptime) {

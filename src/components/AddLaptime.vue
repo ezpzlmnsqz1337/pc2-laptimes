@@ -769,6 +769,7 @@ export default {
 .__laptimeInputs {
   border-radius: 0.3rem;
   display: flex;
+  width: 100%;
 }
 
 .__laptimeInputs .__minutes {

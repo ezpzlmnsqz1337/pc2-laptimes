@@ -1,8 +1,19 @@
 <template>
   <div
-    ref="wrapper"
     class="__wrapper"
   >
+    <div
+      ref="background1"
+      class="__background1"
+    />
+    <div
+      ref="background2"
+      class="__background2 __hidden"
+    />
+    <div
+      ref="background3"
+      class="__background3 __hidden"
+    />
     <div class="__menuWrapper">
       <div
         v-if="isAdmin()"
@@ -44,13 +55,13 @@
         >
           Realtime data
         </Button>
-      <!-- <Button
-        :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.SET_CAR_IMAGE}"
-        @click="showScreen({screen: ScreenType.SET_CAR_IMAGE})"
-      >
-        Set car image
-      </Button> -->
+        <!-- <Button
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeScreen === ScreenType.SET_CAR_IMAGE}"
+          @click="showScreen({screen: ScreenType.SET_CAR_IMAGE})"
+        >
+          Set car image
+        </Button> -->
       </div>
     </div>
     <keep-alive>
@@ -144,11 +155,6 @@ export default {
         this.setWebsocketState(this.$rdb.getWebsocketState())
       }, 2500)
     }
-    this.BACKGROUNDS = [
-      require('@/assets/images/project-cars-2-bg-1.jpg'),
-      require('@/assets/images/project-cars-2-bg-2.jpg'),
-      require('@/assets/images/project-cars-2-bg-3.jpg')
-    ]
     this.CURRENT_BG_INDEX = 0
   },
   async mounted () {
@@ -157,7 +163,7 @@ export default {
     this.refreshTimes()
     setInterval(() => {
       this.cycleBackground()
-    }, 5000)
+    }, 15000)
   },
   unmounted () {
     unsubscribeAll()
@@ -166,9 +172,10 @@ export default {
     ...mapActions(['bindDb', 'refreshTimes']),
     ...mapMutations(['showScreen', 'setWebsocketState']),
     cycleBackground () {
-      const bgCount = this.BACKGROUNDS.length
-      this.$refs.wrapper.style.backgroundImage = `url(${this.BACKGROUNDS[this.CURRENT_BG_INDEX]})`
+      const bgCount = 3
+      this.$refs[`background${this.CURRENT_BG_INDEX + 1}`].style.opacity = 0
       this.CURRENT_BG_INDEX = ++this.CURRENT_BG_INDEX % bgCount
+      this.$refs[`background${this.CURRENT_BG_INDEX + 1}`].style.opacity = 1
     },
     handleUrl () {
       if (this.queryParams.has('page')) {
@@ -181,7 +188,7 @@ export default {
             this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
             break
           default:
-            console.error('Unkonwn page: ', page)
+            console.error('Unknown page: ', page)
         }
       }
     }
@@ -319,15 +326,41 @@ a {
 }
 
 .__wrapper {
-  background-image: url('~@/assets/images/project-cars-2-bg-1.jpg');
-  background-blend-mode: overlay;
-  background-color: var(--bg-dark3);
   height: 100vh;
   overflow-y: scroll;
   padding-top: 5.5rem;
   /* Hide scrollbar for IE, Edge and Firefox */
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+.__background1, .__background2, .__background3 {
+  background-blend-mode: overlay;
+  background-color: var(--bg-dark3);
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  z-index: -999;
+  opacity: 1;
+  transition: opacity 1.5s ease-in;
+}
+
+.__background1 {
+  background-image: url('~@/assets/images/project-cars-2-bg-1.jpg');
+}
+
+.__background2 {
+  background-image: url('~@/assets/images/project-cars-2-bg-2.jpg');
+}
+
+.__background3 {
+  background-image: url('~@/assets/images/project-cars-2-bg-3.jpg');
+}
+
+.__hidden {
+  opacity: 0;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -402,8 +435,9 @@ a {
 }
 
 @media only screen and (max-width: 700px) {
-  .__wrapper {
+  .__background1, .__background2, .__background3 {
     background-position: center center;
+    background-size: cover;
   }
 
   .__laptimes {

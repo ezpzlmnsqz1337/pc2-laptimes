@@ -102,7 +102,7 @@
                 @click="$toast.info(time.notes || 'No comment')"
               >
                 <td class="__id">
-                  {{ indexTime + 1 }}
+                  {{ indexTime + 1 }}.
                 </td>
                 <td class="__driver">
                   <span>{{ getDriver(time) }}</span>
@@ -124,6 +124,7 @@
                 </td>
                 <td class="__carImage">
                   <img
+                    v-if="getCarImage(time)"
                     :src="getCarImage(time)"
                     :alt="getCar(time)"
                   >

@@ -191,6 +191,10 @@ export default {
     width: 100%;
   }
 
+  .__medalsTable .__rank img{
+    width: 3rem;
+  }
+
   .__totalRacesTable, .__medalsTable {
     font-size: 0.8rem !important;
   }
