@@ -64,12 +64,12 @@
           {{ index+1 }}.
         </td>
         <td class="__driver">
-          <div @click="setFilter({driverId: time.driverId})">
+          <div @click="doAction(setFilter, {driverId: time.driverId})">
             <EditableSelect
               label="name"
               :text="getDriver(time)"
               :options="drivers"
-              @value:update="updateLaptime({uid: time.uid, driverId: $event.uid})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, driverId: $event.uid})"
             />
           </div>
         </td>
@@ -91,74 +91,74 @@
             :src="getCarImage(time)"
             :alt="getCar(time)"
           >
-          <div @click="setFilter({carId: time.carId})">
+          <div @click="doAction(setFilter, {carId: time.carId})">
             <EditableSelect
               :text="getCarById(time.carId).name"
               :options="cars"
-              @value:update="updateLaptime({uid: time.uid, carId: $event.uid})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, carId: $event.uid})"
             />
           </div>
         </td>
         <td class="__track">
-          <div @click="setFilter({trackId: time.trackId})">
+          <div @click="doAction(setFilter, {trackId: time.trackId})">
             <EditableSelect
               label="track"
               :text="getTrackById(time.trackId).track"
               :options="tracks"
-              @value:update="updateLaptime({uid: time.uid, trackId: $event.uid})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, trackId: $event.uid})"
             />
           </div>
-          <div @click="setFilter({trackId: time.trackId, trackVariant: time.trackVariant})">
+          <div @click="doAction(setFilter, {trackId: time.trackId, trackVariant: time.trackVariant})">
             <EditableSelect
               :text="time.trackVariant"
               :options="getTrackVariants(trackId)"
-              @value:update="updateLaptime({uid: time.uid, trackVariant: $event})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, trackVariant: $event})"
             />
           </div>
         </td>
         <td class="__settings">
           <div
             :class="transmissionClass(time.transmission)"
-            @click="setFilter({transmission: time.transmission})"
+            @click="doAction(setFilter, {transmission: time.transmission})"
           >
             <EditableSelect
               :text="time.transmission"
               :icon="transmissionIcon(time.transmission)"
               :options="Object.values(TransmissionType).map(x => ({name: x}))"
-              @value:update="updateLaptime({uid: time.uid, transmission: $event.name})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, transmission: $event.name})"
             />
           </div>
           <div
             :class="weatherClass(time.weather)"
-            @click="setFilter({weather: time.weather})"
+            @click="doAction(setFilter, {weather: time.weather})"
           >
             <EditableSelect
               :text="time.weather"
               :icon="weatherIcon(time.weather)"
               :options="Object.values(WeatherType).map(x => ({name: x}))"
-              @value:update="updateLaptime({uid: time.uid, weather: $event.name})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, weather: $event.name})"
             />
           </div>
           <div
             :class="brakingLineClass(time.brakingLine)"
-            @click="setFilter({brakingLine: time.brakingLine})"
+            @click="doAction(setFilter, {brakingLine: time.brakingLine})"
           >
             <EditableSelect
               :text="time.brakingLine"
               :icon="time.brakingLine === BrakingLine.ON ? 'check-circle' : 'times-circle'"
               :options="Object.values(BrakingLine).map(x => ({name: x}))"
-              @value:update="updateLaptime({uid: time.uid, brakingLine: $event.name})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, brakingLine: $event.name})"
             />
           </div>
           <div
             :class="controlsClass(time.controls)"
-            @click="setFilter({controls: time.controls})"
+            @click="doAction(setFilter, {controls: time.controls})"
           >
             <EditableSelect
               :text="time.controls"
               :icon="time.controls"
               :options="Object.values(ControlType).map(x => ({name: x}))"
-              @value:update="updateLaptime({uid: time.uid, controls: $event.name})"
+              @value:update="doAction(updateLaptime, {uid: time.uid, controls: $event.name})"
             />
           </div>
         </td>
@@ -170,6 +170,8 @@
 <script>
 import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import tableMixin from '@/mixins/tableMixin'
+import { db } from '@/firebase'
+import { collection, onSnapshot, query } from '@firebase/firestore'
 
 export default {
   name: 'LaptimeBoard',
@@ -188,41 +190,31 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => {
-      this.handleUrl()
-    }, 500)
+    setTimeout(() => this.handleUrl(), 500)
+    this.watchForChanges()
   },
   methods: {
-    ...mapMutations('laptimeFilter', { sf: 'setFilter', cf: 'clearFilter', toggleFilter: 'toggleFilter' }),
-    ...mapActions(['refreshTimes', 'getTimes']),
-    ...mapActions({ ul: 'updateLaptime' }),
+    ...mapMutations('laptimeFilter', ['toggleFilter', 'setFilter']),
+    ...mapActions(['refreshTimes', 'getTimes', 'watchForChanges']),
+    ...mapActions(['updateLaptime']),
+    watchForChanges () {
+      const q = query(collection(db, 'times'))
+      onSnapshot(q, () => this.refreshTimes())
+    },
     async setRandomFilter () {
       this.loading = true
       const times = await this.getTimes({ queryLimit: 0 })
       // select random laptime
       const index = Math.round(Math.random() * times.length)
       const { trackId, trackVariant, carId, weather, game } = times[index]
-      this.setFilter({ trackId, trackVariant, carId, weather, game })
+      this.doAction(this.setFilter, { trackId, trackVariant, carId, weather, game })
       this.loading = false
     },
-    async updateLaptime (laptime) {
-      if (!laptime) return
+    async doAction (action, params) {
       this.loading = true
-      await this.ul(laptime)
+      await action(params)
       await this.refreshTimes()
-      this.loading = false
-    },
-    async setFilter (filter) {
       this.loading = true
-      this.sf(filter)
-      await this.refreshTimes()
-      this.loading = false
-    },
-    async clearFilter () {
-      this.loading = true
-      this.cf()
-      await this.refreshTimes()
-      this.loading = false
     },
     async share () {
       const url = `${window.location.origin}/?page=laptime_board`
@@ -246,7 +238,7 @@ export default {
     handleUrl () {
       if (this.queryParams.has('filter')) {
         const filter = JSON.parse(this.queryParams.get('filter'))
-        this.setFilter(filter)
+        this.doAction(this.setFilter, filter)
         return
       }
       this.setRandomFilter()
@@ -299,7 +291,7 @@ export default {
 
 @media only screen and (max-width: 700px) {
   .__tableControls button {
-    font-size: 0.6rem
+    font-size: 0.6rem;
   }
 }
 </style>

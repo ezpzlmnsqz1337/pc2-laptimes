@@ -28,6 +28,8 @@ import LaptimeBuilder from './builders/LaptimeBuilder'
 import StatisticsBuilder from './builders/StatisticsBuilder'
 import LightsBuilder from './builders/LightsBuilder'
 import PulseLoader from 'vue-spinner/src/PulseLoader'
+import './registerServiceWorker'
+import WebsocketState from './constants/WebsocketState'
 
 const app = createApp(App)
 app.config.globalProperties.ButtonType = ButtonType
@@ -37,6 +39,7 @@ app.config.globalProperties.BrakingLine = BrakingLine
 app.config.globalProperties.ControlType = ControlType
 app.config.globalProperties.StartType = StartType
 app.config.globalProperties.ScreenType = ScreenType
+app.config.globalProperties.WebsocketState = WebsocketState
 app.config.globalProperties.StatisticsScreenType = StatisticsScreenType
 app.config.globalProperties.Game = Game
 app.config.globalProperties.Distinct = Distinct
@@ -50,7 +53,7 @@ app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
 app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
 app.config.globalProperties.$lb = LightsBuilder.getInstance()
 app.config.globalProperties.$sb = StatisticsBuilder.getInstance()
-app.config.globalProperties.isAdmin = () => ['localhost:8080', 'malina:3000'].includes(window.location.host)
+app.config.globalProperties.isLocal = () => ['localhost:8080', 'malina:3000'].includes(window.location.host)
 
 app.use(store)
 app.use(Toaster)

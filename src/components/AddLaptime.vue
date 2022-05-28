@@ -559,7 +559,7 @@ export default {
     this.DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
   },
   methods: {
-    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'addNewTrack', 'addNewTrackVariant', 'refreshTimes', 'linkCarToGameId', 'linkTrackToGameId']),
+    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'addNewTrack', 'addNewTrackVariant', 'linkCarToGameId', 'linkTrackToGameId']),
     ...mapMutations(['showScreen']),
     ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
     canSetCar () {
@@ -629,7 +629,6 @@ export default {
     showTimeInTable ({ carId, trackId, trackVariant }) {
       this.clearFilter()
       this.setFilter({ carId, trackId, trackVariant })
-      this.refreshTimes()
       this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
     },
     setLaptime (laptime) {

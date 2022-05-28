@@ -55,8 +55,8 @@ button {
   --btn-text-light: var(--text-light1);
   --btn-default: #ffffff;
   --btn-default-hover: #e7e7e7;
-  --btn-primary: #195fbb;
-  --btn-primary-hover: #004890;
+  --btn-primary: #4081c2;
+  --btn-primary-hover: #3f71a3;
   --btn-secondary: #787879;
   --btn-secondary-hover: #5f5f5f;
   --btn-success: #2ab135;

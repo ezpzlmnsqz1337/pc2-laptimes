@@ -30,6 +30,11 @@ export default class RealtimeDataBuilder {
       if (!this.retryHandler) this.setupRetryHandler()
     }
 
+    disconnect () {
+      clearInterval(this.retryHandler)
+      this.ws.close()
+    }
+
     setupRetryHandler () {
       this.retryHandler = setInterval(() => {
         if (this.retries >= MAX_RETRY_ATTEMPTS) {

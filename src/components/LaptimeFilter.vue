@@ -254,5 +254,9 @@ export default {
     width: 100%;
     margin-bottom: 1rem;
   }
+
+  .__hideFilter button {
+    font-size: 0.6rem;
+  }
 }
 </style>

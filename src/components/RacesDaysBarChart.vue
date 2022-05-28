@@ -72,11 +72,19 @@ export default {
         scales: {
           x: {
             grid: { display: false },
-            stacked: true
+            stacked: true,
+            ticks: {
+              color: '#ffffff',
+              tickWidth: 30,
+              font: {
+                size: 18
+              }
+            }
           },
           y: {
             stacked: true,
             ticks: {
+              color: '#ffffff',
               tickWidth: 30,
               font: {
                 size: 18
@@ -87,6 +95,7 @@ export default {
         plugins: {
           legend: {
             labels: {
+              color: '#ffffff',
               font: {
                 size: 18
               },
@@ -109,8 +118,8 @@ export default {
           }
         }
       },
-      chartColors: ['#8928c9', '#d9ad96', '#a7fa55', '#2388eb', '#d67840', '#7cf7ca', '#1d6ebe',
-        '#e32d34', '#7027b0', '#000000', '#57aee6', '#ffffff', '#e0ad92']
+      chartColors: ['#d9ad96', '#8928c9', '#a7fa55', '#d67840', '#2388eb', '#1d6ebe', '#7cf7ca', '#7027b0',
+        '#e32d34', '#000000', '#57aee6', '#ffffff', '#e0ad92']
     }
   },
   computed: {

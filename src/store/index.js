@@ -126,7 +126,7 @@ export default createStore({
       await updateDoc(docRef, { imageUrl })
     },
     async updateLaptime ({ commit }, laptime) {
-      if (!laptime.uid) return
+      if (!laptime || !laptime.uid) return
       const docRef = doc(db, 'times', laptime.uid)
       console.log('Laptime: ', laptime, docRef)
       await setDoc(docRef, laptime, { merge: true })

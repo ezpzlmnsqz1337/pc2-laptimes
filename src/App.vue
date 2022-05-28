@@ -14,56 +14,7 @@
       ref="background3"
       class="__background3 __hidden"
     />
-    <div class="__menuWrapper">
-      <div
-        v-if="isAdmin()"
-        class="__connectionState"
-      >
-        <div><span>Websocket state: </span><span :class="websocketStateClass">{{ websocketStateText }}</span></div>
-        <div v-if="raceStateText">
-          <span>Race state: </span><span :class="raceStateClass">{{ raceStateText }}</span>
-        </div>
-      </div>
-      <div class="__menu">
-        <Button
-          v-if="isAdmin()"
-          :type="ButtonType.SECONDARY"
-          :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME}"
-          @click="showScreen({screen: ScreenType.ADD_LAPTIME})"
-        >
-          Add laptime
-        </Button>
-        <Button
-          :type="ButtonType.SECONDARY"
-          :class="{__selected: activeScreen === ScreenType.LAPTIME_BOARD}"
-          @click="showScreen({screen: ScreenType.LAPTIME_BOARD})"
-        >
-          Laptime board
-        </Button>
-        <Button
-          :type="ButtonType.SECONDARY"
-          :class="{__selected: activeScreen === ScreenType.STATISTICS}"
-          @click="showScreen({screen: ScreenType.STATISTICS})"
-        >
-          Statistics
-        </Button>
-        <Button
-          v-if="isAdmin()"
-          :type="ButtonType.SECONDARY"
-          :class="{__selected: activeScreen === ScreenType.REALTIME_DATA}"
-          @click="showScreen({screen: ScreenType.REALTIME_DATA})"
-        >
-          Realtime data
-        </Button>
-        <!-- <Button
-          :type="ButtonType.SECONDARY"
-          :class="{__selected: activeScreen === ScreenType.SET_CAR_IMAGE}"
-          @click="showScreen({screen: ScreenType.SET_CAR_IMAGE})"
-        >
-          Set car image
-        </Button> -->
-      </div>
-    </div>
+    <Menu />
     <keep-alive>
       <AddLaptime v-if="activeScreen === ScreenType.ADD_LAPTIME" />
     </keep-alive>
@@ -96,10 +47,9 @@ import LaptimeFilter from '@/components/LaptimeFilter'
 import Statistics from '@/components/Statistics'
 import RealtimeData from '@/components/RealtimeData'
 // import SetCarImage from '@/components/SetCarImage'
+import Menu from '@/components/Menu'
 import { mapActions, mapMutations, mapState } from 'vuex'
-import WebsocketState from './constants/WebsocketState'
 import ScreenType from './constants/ScreenType'
-import RaceState from './constants/RaceState'
 
 export default {
   name: 'App',
@@ -108,53 +58,14 @@ export default {
     LaptimeBoard,
     LaptimeFilter,
     Statistics,
-    RealtimeData
+    RealtimeData,
+    Menu
     // SetCarImage
   },
   computed: {
-    ...mapState(['activeScreen', 'websocketState']),
-    ...mapState('realtimeData', ['raceState']),
-    websocketStateText () {
-      return this.websocketState === WebsocketState.ESTABLISHED ? 'Connected' : 'Not connected'
-    },
-    websocketStateClass () {
-      return {
-        __connected: this.websocketState === WebsocketState.ESTABLISHED,
-        __notConnected: this.websocketState !== WebsocketState.ESTABLISHED
-      }
-    },
-    raceStateText () {
-      switch (this.raceState) {
-        case RaceState.MENU:
-          return 'In menu'
-        case RaceState.BEFORE_RACE_MENU:
-          return 'Waiting for race to start'
-        case RaceState.RACE_IS_ON:
-          return 'Race in progress'
-        case RaceState.RACE_FINISHED:
-          return 'Race finished'
-        default:
-          return ''
-      }
-    },
-    raceStateClass () {
-      return {
-        __red: this.raceState === RaceState.MENU,
-        __yellow: this.raceState === RaceState.BEFORE_RACE_MENU,
-        __green: this.raceState === RaceState.RACE_IS_ON,
-        __orange: this.raceState === RaceState.RACE_FINISHED
-      }
-    }
+    ...mapState(['activeScreen'])
   },
   created () {
-    // connect to the websocket server
-    if (this.isAdmin()) {
-      this.$rdb.connect('wallpc', 8765)
-      setInterval(() => {
-      // connect to ws for realtime data
-        this.setWebsocketState(this.$rdb.getWebsocketState())
-      }, 2500)
-    }
     this.CURRENT_BG_INDEX = 0
   },
   async mounted () {
@@ -170,7 +81,7 @@ export default {
   },
   methods: {
     ...mapActions(['bindDb', 'refreshTimes']),
-    ...mapMutations(['showScreen', 'setWebsocketState']),
+    ...mapMutations(['showScreen']),
     cycleBackground () {
       const bgCount = 3
       this.$refs[`background${this.CURRENT_BG_INDEX + 1}`].style.opacity = 0
@@ -287,19 +198,6 @@ a {
   padding: 0.5rem 1rem;
 }
 
-.__connectionState {
-  margin-top: 0.5rem;
-  text-align: center;
-}
-
-.__notConnected {
-  color: red;
-}
-
-.__connected {
-  color: rgb(28, 197, 28);
-}
-
 .__red {
   color: red;
 }
@@ -328,7 +226,6 @@ a {
 .__wrapper {
   height: 100vh;
   overflow-y: scroll;
-  padding-top: 5.5rem;
   /* Hide scrollbar for IE, Edge and Firefox */
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
@@ -366,24 +263,6 @@ a {
 /* Hide scrollbar for Chrome, Safari and Opera */
 .__wrapper::-webkit-scrollbar {
   display: none;
-}
-
-.__menuWrapper {
-  background-color: rgba(72, 72, 72, 0.7);
-  top: 0;
-  position: fixed;
-  width: 100vw;
-  padding-bottom: 1rem;
-  z-index: 999;
-}
-
-.__menu {
-  padding-top: 0.5rem;
-  text-align: center;
-}
-
-.__menu .__selected {
-  background-color: #242424 !important;
 }
 
 .__inputRow > input, .__inputRow > .v-select {

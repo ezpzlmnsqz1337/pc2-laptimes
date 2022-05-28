@@ -58,7 +58,7 @@ td div:hover {
   width: 100%;
 }
 
-.__car .__textContainer, .__track .__textContainer{
+.__car .__textContainer, .__track .__textContainer, .__driver .__textContainer {
   justify-content: center !important;
 }
 

@@ -182,6 +182,14 @@ export default {
   padding-bottom: 6rem;
 }
 
+.__menu {
+  text-align: center;
+}
+
+.__menu .__selected {
+  background-color: #242424 !important;
+}
+
 .__controls {
   margin-top: 2rem;
   text-align: center;
@@ -196,7 +204,7 @@ export default {
 }
 
 .__racesPerDaySection > .__chart {
-  background-color: var(--bg-light1);
+  background-color: rgba(72, 72, 72, 0.7);
   border-radius: 0.3rem;
 }
 

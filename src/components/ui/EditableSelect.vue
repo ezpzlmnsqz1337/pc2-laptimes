@@ -51,7 +51,7 @@ export default {
   },
   methods: {
     startEditing (e) {
-      if (!this.isAdmin() || !e.ctrlKey) return
+      if (!this.isLocal() || !e.ctrlKey) return
       this.edit = true
       this.$nextTick(() => this.$refs.select.$el.focus())
     },
