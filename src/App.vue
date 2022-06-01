@@ -111,7 +111,7 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 :root {
   --hover: #188cff;
-  --active: #205b95;
+  --active: #1d6ebe;
   --text-light1: #ffffff;
   --text-light2: gray;
   --text-dark1: #242424;
@@ -129,6 +129,10 @@ export default {
   --brake: #ff0000;
   --throttle: #00ff00;
   --clutch: #e4e43d;
+  --vdp-hover-bg-color: #188cff;
+  --vdp-selected-bg-color: #1d6ebe;
+  --vdp-bg-color: var(--bg-dark2);
+  --vdp-text-color: var(--text-dark1);
 }
 
 * {
@@ -150,7 +154,7 @@ h2 {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-light1);
-  font-size: 12px;
+  font-size: 0.7rem;
   margin-top: 0;
 }
 

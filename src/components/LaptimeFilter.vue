@@ -149,6 +149,32 @@
         />
       </div>
 
+      <div class="__header">
+        Date
+      </div>
+      <div class="__inputRow __noColumn">
+        <div>
+          <DatePicker
+            class="__datepicker"
+            input-format="dd.MM.yyyy"
+            :disabled-dates="{predicate: disabledDates}"
+            :model-value="date"
+            @update:model-value="setFilter({date: $event})"
+          />
+        </div>
+
+        <Button
+          :type="ButtonType.DANGER"
+          :disabled="date === null"
+          @click="setFilter({date: null})"
+        >
+          <div
+            class="fa fa-ban"
+            style="margin-right: 0"
+          />
+        </Button>
+      </div>
+
       <Button
         :type="ButtonType.SECONDARY"
         @click="setRandomFilter()"
@@ -174,16 +200,26 @@ export default {
   name: 'LaptimeFilter',
   data () {
     return {
-      randomizing: false
+      randomizing: false,
+      allTimes: []
     }
   },
   computed: {
     ...mapState(['cars', 'tracks', 'drivers', 'times']),
     ...mapGetters(['getCarById', 'getTrackById', 'getDriverById', 'getTrackVariants']),
-    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'game', 'distinct', 'showFilter']),
+    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'game', 'date', 'distinct', 'showFilter']),
+    raceDates () {
+      return this.allTimes.map(x => x.dateString)
+    },
     firstLaptime () {
       return this.times[0].laptime
     }
+  },
+  async mounted () {
+    if (screen.availWidth >= 700) {
+      this.toggleFilter()
+    }
+    this.allTimes = await this.getTimes({ queryLimit: 0 })
   },
   methods: {
     ...mapMutations(['setTimes']),
@@ -191,18 +227,20 @@ export default {
     ...mapActions(['refreshTimes', 'getTimes']),
     isFilterSet () {
       return this.carId || this.trackId || this.trackVariant || this.transmission ||
-              this.weather || this.brakingLine || this.controls || this.startType || this.game || this.distinct === Distinct.NO
+              this.weather || this.brakingLine || this.controls || this.startType || this.game || this.date || this.distinct === Distinct.NO
     },
     async setRandomFilter () {
       if (this.randomizing) return
       this.randomizing = true
       this.setTimes([])
-      const times = await this.getTimes({ queryLimit: 0 })
       // select random laptime
-      const index = Math.round(Math.random() * times.length)
-      const { trackId, trackVariant, carId, weather } = times[index]
+      const index = Math.round(Math.random() * this.allTimes.length)
+      const { trackId, trackVariant, carId, weather } = this.allTimes[index]
       this.setFilter({ trackId, trackVariant, carId, weather })
       this.randomizing = false
+    },
+    disabledDates (date) {
+      return !this.raceDates.includes(date.toLocaleDateString('en-GB'))
     },
     async setFilter (filter) {
       this.sf(filter)
@@ -236,6 +274,7 @@ export default {
 
 .__inputRow {
   margin-bottom: 0.7rem;
+  align-items: center;
 }
 
 .__activeFilter :deep(.vs__dropdown-toggle) {
@@ -246,6 +285,17 @@ export default {
 .__activeFilter :deep(span.vs__selected) {
   color: #4081C2;
   font-weight: bold;
+}
+
+:deep(.__datepicker) {
+  text-align: center;
+  font-size: 1rem;
+  padding: 0.3rem;
+}
+
+:deep(.v3dp__popout){
+  font-size: 1rem;
+  bottom: 1rem;
 }
 
 @media only screen and (max-width: 700px) {

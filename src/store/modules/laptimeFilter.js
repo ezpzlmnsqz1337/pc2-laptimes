@@ -11,6 +11,7 @@ const state = () => ({
   controls: null,
   startType: null,
   game: null,
+  date: null,
   distinct: Distinct.YES,
   showFilter: false
 })
@@ -29,6 +30,7 @@ const getters = {
       controls: state.controls,
       startType: state.startType,
       game: state.game,
+      date: state.date,
       distinct: state.distinct
     }
   }
@@ -40,7 +42,7 @@ const actions = {
 
 // mutations
 const mutations = {
-  setFilter (state, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, game, distinct }) {
+  setFilter (state, { carId, trackId, trackVariant, driverId, transmission, weather, brakingLine, controls, startType, game, date, distinct }) {
     if (carId !== undefined) state.carId = carId
     if (trackId !== undefined) state.trackId = trackId
     if (trackVariant !== undefined) state.trackVariant = trackVariant
@@ -51,6 +53,7 @@ const mutations = {
     if (controls !== undefined) state.controls = controls
     if (startType !== undefined) state.startType = startType
     if (game !== undefined) state.game = game
+    if (date !== undefined) state.date = date
     if (distinct !== undefined) state.distinct = distinct
   },
   clearFilter (state) {
@@ -64,6 +67,7 @@ const mutations = {
     state.controls = null
     state.startType = null
     state.game = null
+    state.date = null
     state.distinct = Distinct.YES
   },
   toggleFilter (state) {

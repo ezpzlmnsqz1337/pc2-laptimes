@@ -654,7 +654,7 @@ export default {
       this.trackId = track.uid
     },
     setTrackVariation (trackVariation) {
-      const variant = this.getTrackVariants(this.trackId).find(x => x.includes(trackVariation))
+      const variant = this.getTrackVariants(this.trackId).find(x => x.includes(trackVariation.replace('_', ' ')))
       if (!variant) {
         this.$toast.error('Unable to set track variant. Track variant does not exist.')
         return

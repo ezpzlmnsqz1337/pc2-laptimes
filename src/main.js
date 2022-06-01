@@ -18,6 +18,7 @@ import Distinct from '@/constants/Distinct'
 import Modal from '@/components/ui/Modal'
 import { debounce } from 'debounce'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
+import Datepicker from 'vue3-datepicker'
 import 'material-icons/iconfont/material-icons.css'
 import vSelect from 'vue-select'
 import 'vue-select/dist/vue-select.css'
@@ -64,4 +65,5 @@ app.component('EditableSelect', EditableSelect)
 app.component('RadioButtons', RadioButtons)
 app.component('VSelect', vSelect)
 app.component('PulseLoader', PulseLoader)
+app.component('DatePicker', Datepicker)
 app.mount('#app')

@@ -103,7 +103,7 @@ export default createStore({
       await setDoc(docRef, driver)
     },
     async addLaptime ({ commit }, { carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, game, notes }) {
-      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, game, notes }
+      const time = { uid: uuidv4(), carId, trackId, trackVariant, driverId, laptime, transmission, weather, brakingLine, controls, startType, date, dateString: new Date(date).toLocaleDateString('en-GB'), game, notes }
       const docRef = doc(db, 'times', time.uid)
       commit('setLastAddedLaptime', { laptime: time })
       await setDoc(docRef, time)
@@ -150,7 +150,7 @@ export default createStore({
       if (brakingLine) constraints.push(where('brakingLine', '==', brakingLine))
       if (controls) constraints.push(where('controls', '==', controls))
       if (startType) constraints.push(where('startType', '==', startType))
-      if (date) constraints.push(where('date', '==', date))
+      if (date) constraints.push(where('dateString', '==', new Date(date).toLocaleDateString('en-GB')))
       if (game) constraints.push(where('game', '==', game))
       constraints.push(orderBy('laptime'))
       if (queryLimit > 0) constraints.push(limit(queryLimit))
