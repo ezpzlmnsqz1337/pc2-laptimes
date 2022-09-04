@@ -546,9 +546,10 @@ export default {
       return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
     },
     fastestLapTime () {
-      if (this.participants.length === 0 || !this.participants[0].fastestLapTime) return false
+      const participantId = this.$rdb.getHostname() === 'wallpc' ? 0 : 1
+      if (this.participants.length === 0 || !this.participants[participantId]?.fastestLapTime) return false
 
-      const d = new Date(this.participants[0].fastestLapTime * 1000)
+      const d = new Date(this.participants[participantId].fastestLapTime * 1000)
       return this.$ltb.dateToLaptime(d)
     },
     canAutoSubmit () {

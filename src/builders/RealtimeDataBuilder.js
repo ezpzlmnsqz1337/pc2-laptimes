@@ -67,4 +67,8 @@ export default class RealtimeDataBuilder {
     getWebsocketState () {
       return this.ws ? this.ws.readyState : WebsocketState.NOT_YET_ESTABLISHED
     }
+
+    getHostname () {
+      return this.hostname
+    }
 }
