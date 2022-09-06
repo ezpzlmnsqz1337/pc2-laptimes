@@ -28,15 +28,16 @@
   </transition>
 </template>
 
-<script>
+<script lang="ts">
+import { Options, Vue } from 'vue-class-component'
 
-export default {
-  name: 'Modal',
+@Options({
   emits: ['close']
-}
+})
+export default class Modal extends Vue {}
 </script>
 
-<style>
+<style lang="scss">
 .__modalMask {
   position: fixed;
   z-index: 9998;

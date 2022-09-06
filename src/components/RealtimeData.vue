@@ -97,105 +97,137 @@
   </div>
 </template>
 
-<script>
-import { mapMutations, mapState } from 'vuex'
-import PacketType from '@/constants/PacketType'
+<script lang="ts">
+import { PacketType } from '@/constants/PacketType'
+import { Vue } from 'vue-class-component'
 
-export default {
-  name: 'RealtimeData',
-  data () {
-    return {
-      realtimeData: true,
-      lightsEnabled: false,
-      lightsOpacity: 1
+export default class RealtimeData extends Vue {
+  protected realtimeDataListener = this.$rdb.addListener(this.onMessageCallback)
+  protected lightsUrl = 'http://malina:4500'
+  protected lightsId = 'C82B96407FD3'
+
+  realtimeData = true
+  lightsEnabled = false
+  lightsOpacity = 1
+
+  $refs!: {
+    throttle: HTMLDivElement,
+    brake: HTMLDivElement,
+    clutch: HTMLDivElement,
+    rpm: HTMLDivElement
+  }
+
+  get brake () {
+    return this.$realtimeDataStore.brake
+  }
+
+  get throttle () {
+    return this.$realtimeDataStore.throttle
+  }
+
+  get clutch () {
+    return this.$realtimeDataStore.clutch
+  }
+
+  get speed () {
+    return this.$realtimeDataStore.speed
+  }
+
+  get rpm () {
+    return this.$realtimeDataStore.rpm
+  }
+
+  get maxRpm () {
+    return this.$realtimeDataStore.maxRpm
+  }
+
+  get gearNumGears () {
+    return this.$realtimeDataStore.gearNumGears
+  }
+
+  get carName () {
+    return this.$realtimeDataStore.carName
+  }
+
+  get carClassName () {
+    return this.$realtimeDataStore.carClassName
+  }
+
+  get trackLocation () {
+    return this.$realtimeDataStore.trackLocation
+  }
+
+  get trackVariation () {
+    return this.$realtimeDataStore.trackVariation
+  }
+
+  toggleLights () {
+    this.lightsEnabled = !this.lightsEnabled
+    this.$lb.setLightsPower(this.lightsUrl, this.lightsId, this.lightsEnabled)
+  }
+
+  toggleRealtimeData () {
+    if (this.realtimeData) {
+      this.$rdb.removeListener(this.realtimeDataListener)
+    } else {
+      this.realtimeDataListener = this.$rdb.addListener(this.onMessageCallback)
     }
-  },
-  computed: {
-    ...mapState('realtimeData', [
-      // Data
-      'brake',
-      'throttle',
-      'clutch',
-      'speed',
-      'rpm',
-      'maxRpm',
-      'gearNumGears',
-      // UDP1
-      'carName',
-      'carClassName',
-      'trackLocation',
-      'trackVariation'
-    ])
-  },
-  created () {
-    this.REALTIME_DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
-    this.lightsUrl = 'http://malina:4500'
-    this.lightsId = 'C82B96407FD3'
-  },
-  methods: {
-    ...mapMutations('realtimeData', ['setValueByKey', 'setValues']),
-    toggleLights () {
-      this.lightsEnabled = !this.lightsEnabled
-      this.$lb.setLightsPower(this.lightsUrl, this.lightsId, this.lightsEnabled)
-    },
-    toggleRealtimeData () {
-      if (this.realtimeData) {
-        this.$rdb.removeListener(this.REALTIME_DATA_LISTENER)
-      } else {
-        this.REALTIME_DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
-      }
-      this.realtimeData = !this.realtimeData
-    },
-    onMessageCallback (msg) {
-      try {
-        const data = JSON.parse(msg.data)
-        if (data.packetType === undefined) return
-        // console.log('Packet type: ', data)
-        if (data.packetType === PacketType.TELEMETRY) {
-          this.setDials()
-          if (this.lightsEnabled) {
-            this.setLightsColor(data.data)
-          }
+    this.realtimeData = !this.realtimeData
+  }
+
+  onMessageCallback (message: MessageEvent<any>) {
+    try {
+      const data = JSON.parse(message.data)
+      if (data.packetType === undefined) return
+      // console.log('Packet type: ', data)
+      if (data.packetType === PacketType.TELEMETRY) {
+        this.setDials()
+        if (this.lightsEnabled) {
+          const { throttle, rpm, maxRpm, brake } = data
+          this.setLightsColor(throttle, rpm, maxRpm, brake)
         }
-        this.setValues(data)
-      } catch (e) {
-        console.log('Error: ', e.message, msg)
       }
-    },
-    setDials () {
-      this.$refs.throttle.style.maxHeight = `${(this.throttle / 255) * 100}%`
-      this.$refs.brake.style.maxHeight = `${(this.brake / 255) * 100}%`
-      this.$refs.clutch.style.maxHeight = `${(this.clutch / 255) * 100}%`
-      this.$refs.rpm.style.maxWidth = `${(this.rpm / this.maxRpm) * 100}%`
-    },
-    setLightsColor ({ throttle, rpm, maxRpm, brake }) {
-      let color = '#00ff00'
-      let brightness = rpm / maxRpm * 100
-      // if braking, red color, brightness is intensity of braking
-      if (brake > 0) {
-        color = '#ff0000'
-        brightness = brake / 255 * 100 // 255 is max brake
-      }
-      // if braking and throttle, yellow color, brightness is combination
-      if (brake > 0 && throttle > 0) {
-        color = '#ffff00'
-        brightness = brake / 500 * 100 // 500 is max brake + max throttle
-      }
-      // if no throttle, nor brake, yellow, brightness is rpm/maxRpm percent
-      if (throttle === 0 && brake === 0) {
-        color = '#ffff00'
-      }
-      this.$lb.setLightsColor(this.lightsUrl, this.lightsId, color, brightness * this.lightsOpacity)
-    },
-    displayTime (seconds) {
-      const d = new Date(seconds * 1000)
-      return this.$ltb.dateToLaptime(d)
+      this.$realtimeDataStore.setValues(data)
+    } catch (e: unknown) {
+      console.log('Error: ', (e as SyntaxError).message, message)
     }
+  }
+
+  setDials () {
+    this.$refs.throttle.style.maxHeight = `${(this.throttle / 255) * 100}%`
+    this.$refs.brake.style.maxHeight = `${(this.brake / 255) * 100}%`
+    this.$refs.clutch.style.maxHeight = `${(this.clutch / 255) * 100}%`
+    this.$refs.rpm.style.maxWidth = `${(this.rpm / this.maxRpm) * 100}%`
+  }
+
+  setLightsColor (throttle: number, rpm: number, maxRpm: number, brake: number) {
+    let color = '#00ff00'
+    let brightness = rpm / maxRpm * 100
+    // if braking, red color, brightness is intensity of braking
+    if (brake > 0) {
+      color = '#ff0000'
+      brightness = brake / 255 * 100 // 255 is max brake
+    }
+    // if braking and throttle, yellow color, brightness is combination
+    if (brake > 0 && throttle > 0) {
+      color = '#ffff00'
+      brightness = brake / 500 * 100 // 500 is max brake + max throttle
+    }
+    // if no throttle, nor brake, yellow, brightness is rpm/maxRpm percent
+    if (throttle === 0 && brake === 0) {
+      color = '#ffff00'
+    }
+    this.$lb.setLightsColor(this.lightsUrl, this.lightsId, color, brightness * this.lightsOpacity)
+  }
+
+  displayTime (seconds: number) {
+    const d = new Date(seconds * 1000)
+    return this.$ltb.dateToLaptime(d)
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .__topContent {
   padding: 1rem;
   display: flex;
@@ -235,13 +267,13 @@ export default {
   border: 0.1rem solid var(--border-dark1);
   background-color: var(--bg-light1);
   display: inline-block;
-}
 
-.__verticalDial > .__filler{
-  position: relative;
-  width: 1.3rem;
-  height: 100%;
-  border-radius: 0.5rem;
+  > .__filler{
+    position: relative;
+    width: 1.3rem;
+    height: 100%;
+    border-radius: 0.5rem;
+  }
 }
 
 .__horizontalDial {
@@ -251,15 +283,15 @@ export default {
   border-radius: 0.5rem;
   border: 0.1rem solid var(--border-dark1);
   background-color: var(--bg-light1);
-}
 
-.__horizontalDial > .__filler{
-  position: relative;
-  width: 100%;
-  height: 1.3rem;
-  border-radius: 0.5rem;
-  margin-top: 0.03rem;
-  margin-left: 0.03rem;
+  > .__filler {
+    position: relative;
+    width: 100%;
+    height: 1.3rem;
+    border-radius: 0.5rem;
+    margin-top: 0.03rem;
+    margin-left: 0.03rem;
+  }
 }
 
 .__brake, .__throttle, .__clutch {
@@ -283,16 +315,18 @@ export default {
   background-color: var(--throttle);
 }
 
-.__rpm > .__horizontalDial{
-  width: 30rem;
-  height: 4rem;
-}
+.__rpm {
+  > .__horizontalDial {
+    width: 30rem;
+    height: 4rem;
 
-.__rpm > .__horizontalDial > .__filler {
-  height: 3.8rem;
-  max-width: 29.75rem;
-  width: 100%;
-  background-color: #1a27db;
+    > .__filler {
+      height: 3.8rem;
+      max-width: 29.75rem;
+      width: 100%;
+      background-color: #1a27db;
+    }
+  }
 }
 
 .__rpmValue {

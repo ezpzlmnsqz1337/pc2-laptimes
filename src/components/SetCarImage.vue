@@ -12,17 +12,18 @@
   </div>
 </template>
 
-<script>
-import { mapState } from 'vuex'
-import SetCarImageRow from '@/components/SetCarImageRow'
+<script lang="ts">
+import SetCarImageRow from '@/components/SetCarImageRow.vue'
+import { Options, Vue } from 'vue-class-component'
 
-export default {
-  name: 'SetCarImage',
+@Options({
   components: {
     SetCarImageRow
-  },
-  computed: {
-    ...mapState(['cars'])
+  }
+})
+export default class SetCarImage extends Vue {
+  get cars () {
+    return this.$dataStore.cars
   }
 }
 </script>

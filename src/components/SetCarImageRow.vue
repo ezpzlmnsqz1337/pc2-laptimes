@@ -13,49 +13,40 @@
       />
     </div>
     <div>
-      <Button @click="setCarImage({carId: car.uid, imageUrl})">
+      <Button @click="setCarImage(car.uid, imageUrl)">
         Link
       </Button>
     </div>
   </div>
 </template>
 
-<script>
-import { mapActions, mapState } from 'vuex'
+<script lang="ts">
 import { carImages } from '@/assets/db/images'
+import { prop, Vue } from 'vue-class-component'
 
-export default {
-  name: 'SetCarImage',
-  props: {
-    car: {
-      type: Object,
-      default: null
-    }
-  },
-  data () {
-    return {
-      images: carImages,
-      imageUrl: ''
-    }
-  },
-  computed: {
-    ...mapState(['cars'])
-  },
-  methods: {
-    ...mapActions(['setCarImage'])
+class SetCarImageRowProps {
+  car = prop<object>({ default: null });
+}
+
+export default class SetCarImageRow extends Vue.with(SetCarImageRowProps) {
+  images = carImages
+  imageUrl = ''
+
+  setCarImage (carId: string, imageUrl: string) {
+    this.$dataStore.setCarImage(carId, imageUrl)
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .__row {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-end;
-}
 
-.__row .__imageUrl {
-  width: 30rem;
+  .__imageUrl {
+    width: 30rem;
+  }
 }
 </style>

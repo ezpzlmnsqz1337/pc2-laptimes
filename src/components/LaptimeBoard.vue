@@ -167,87 +167,82 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import tableMixin from '@/mixins/tableMixin'
+<script lang="ts">
+import TableMixin from '@/mixins/tableMixin'
 import { db } from '@/firebase'
 import { collection, onSnapshot, query } from '@firebase/firestore'
+import { mixins } from 'vue-class-component'
 
-export default {
-  name: 'LaptimeBoard',
-  mixins: [tableMixin],
-  data () {
-    return {
-      loading: true
-    }
-  },
-  computed: {
-    ...mapState(['cars', 'tracks', 'drivers', 'times', 'lastAddedLaptime']),
-    ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants']),
-    ...mapState('laptimeFilter', ['carId', 'trackId', 'trackVariant', 'driverId', 'transmission', 'weather', 'brakingLine', 'controls', 'startType', 'distinct', 'showFilter']),
-    firstLaptime () {
-      return this.times[0].laptime
-    }
-  },
+export default class LaptimeBoard extends mixins(TableMixin) {
+  loading = true
+
+  get times () {
+    return this.$dataStore.times
+  }
+
+  get firstLaptime () {
+    return this.times[0].laptime
+  }
+
   mounted () {
     setTimeout(() => this.handleUrl(), 500)
     this.watchForChanges()
-  },
-  methods: {
-    ...mapMutations('laptimeFilter', ['toggleFilter', 'setFilter']),
-    ...mapActions(['refreshTimes', 'getTimes', 'watchForChanges']),
-    ...mapActions(['updateLaptime']),
-    watchForChanges () {
-      const q = query(collection(db, 'times'))
-      onSnapshot(q, () => this.refreshTimes())
-    },
-    async setRandomFilter () {
-      this.loading = true
-      const times = await this.getTimes({ queryLimit: 0 })
-      // select random laptime
-      const index = Math.round(Math.random() * times.length)
-      const { trackId, trackVariant, carId, weather, game } = times[index]
-      this.doAction(this.setFilter, { trackId, trackVariant, carId, weather, game })
-      this.loading = false
-    },
-    async doAction (action, params) {
-      this.loading = true
-      await action(params)
-      await this.refreshTimes()
-      this.loading = true
-    },
-    async share () {
-      const url = `${window.location.origin}/?page=laptime_board`
-      const filter = {}
-      if (this.carId) filter.carId = this.carId
-      if (this.trackId) filter.trackId = this.trackId
-      if (this.trackVariant) filter.trackVariant = this.trackVariant
-      if (this.driverId) filter.driverId = this.driverId
-      if (this.transmission) filter.transmission = this.transmission
-      if (this.weather) filter.weather = this.weather
-      if (this.brakingLine) filter.line = this.brakingLine
-      if (this.controls) filter.controls = this.controls
-      if (this.startType) filter.startType = this.startType
-      if (this.game) filter.game = this.game
-      if (this.distinct) filter.distinct = this.distinct
-      const encoded = JSON.stringify(filter)
+  }
 
-      navigator.clipboard.writeText(`${url}&filter=` + encoded)
-      this.$toast.success('Link copied to clipboard.')
-    },
-    handleUrl () {
-      if (this.queryParams.has('filter')) {
-        const filter = JSON.parse(this.queryParams.get('filter'))
-        this.doAction(this.setFilter, filter)
-        return
-      }
-      this.setRandomFilter()
+  watchForChanges () {
+    const q = query(collection(db, 'times'))
+    onSnapshot(q, () => this.refreshTimes())
+  }
+
+  async setRandomFilter () {
+    this.loading = true
+    const times = await this.getTimes(0)
+    // select random laptime
+    const index = Math.round(Math.random() * times.length)
+    const { trackId, trackVariant, carId, weather, game } = times[index]
+    this.doAction(this.setFilter, { trackId, trackVariant, carId, weather, game })
+    this.loading = false
+  }
+
+  async doAction (action: Function, params: any) {
+    this.loading = true
+    await action(params)
+    await this.refreshTimes()
+    this.loading = true
+  }
+
+  async share () {
+    const url = `${window.location.origin}/?page=laptime_board`
+    const filter: any = {}
+    if (this.carId) filter.carId = this.carId
+    if (this.trackId) filter.trackId = this.trackId
+    if (this.trackVariant) filter.trackVariant = this.trackVariant
+    if (this.driverId) filter.driverId = this.driverId
+    if (this.transmission) filter.transmission = this.transmission
+    if (this.weather) filter.weather = this.weather
+    if (this.brakingLine) filter.brakingLine = this.brakingLine
+    if (this.controls) filter.controls = this.controls
+    if (this.startType) filter.startType = this.startType
+    if (this.game) filter.game = this.game
+    if (this.distinct) filter.distinct = this.distinct
+    const encoded = JSON.stringify(filter)
+
+    navigator.clipboard.writeText(`${url}&filter=` + encoded)
+    this.$toast.success('Link copied to clipboard.')
+  }
+
+  handleUrl () {
+    if (this.queryParams.has('filter')) {
+      const filter = JSON.parse(this.queryParams.get('filter'))
+      this.doAction(this.setFilter, filter)
+      return
     }
+    this.setRandomFilter()
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 @import '../assets/css/table.css';
 
 .__laptimeBoard {
@@ -275,18 +270,17 @@ export default {
 
 .__tableControls {
   position: relative;
-}
 
-.__tableControls .__share {
-  position: absolute;
-  right: 0;
-  top: 0;
-}
-
-.__tableControls .__showFilter {
-  position: absolute;
-  left: 0;
-  top: 0;
+  .__share {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .__showFilter {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
 }
 
 @media only screen and (max-width: 700px) {

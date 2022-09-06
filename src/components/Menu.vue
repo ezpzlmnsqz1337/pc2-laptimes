@@ -59,21 +59,21 @@
         v-if="isLocal()"
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME}"
-        @click="showScreen({screen: ScreenType.ADD_LAPTIME})"
+        @click="showScreen(ScreenType.ADD_LAPTIME)"
       >
         Add laptime
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === ScreenType.LAPTIME_BOARD}"
-        @click="showScreen({screen: ScreenType.LAPTIME_BOARD})"
+        @click="showScreen(ScreenType.LAPTIME_BOARD)"
       >
         Laptime board
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === ScreenType.STATISTICS}"
-        @click="showScreen({screen: ScreenType.STATISTICS})"
+        @click="showScreen(ScreenType.STATISTICS)"
       >
         Statistics
       </Button>
@@ -81,14 +81,14 @@
         v-if="isLocal()"
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === ScreenType.REALTIME_DATA}"
-        @click="showScreen({screen: ScreenType.REALTIME_DATA})"
+        @click="showScreen(ScreenType.REALTIME_DATA)"
       >
         Realtime data
       </Button>
       <!-- <Button
           :type="ButtonType.SECONDARY"
           :class="{__selected: activeScreen === ScreenType.SET_CAR_IMAGE}"
-          @click="showScreen({screen: ScreenType.SET_CAR_IMAGE})"
+          @click="showScreen(ScreenType.SET_CAR_IMAGE)"
         >
           Set car image
         </Button> -->
@@ -96,81 +96,79 @@
   </div>
 </template>
 
-<script>
-import WebsocketState from '@/constants/WebsocketState'
-import { mapMutations, mapState } from 'vuex'
-import RaceState from '@/constants/RaceState'
+<script lang="ts">
+import { WebsocketState } from '@/constants/WebsocketState'
+import { RaceState } from '@/constants/RaceState'
+import { Vue } from 'vue-class-component'
 
-export default {
-  name: 'Menu',
-  data () {
+export default class Menu extends Vue {
+  connecting = false
+  host = 'wallpc'
+  wsHosts = ['wallpc', 'deskpc']
+
+  get websocketStateText () {
+    return this.$dataStore.websocketState === WebsocketState.ESTABLISHED ? 'Connected' : 'Not connected'
+  }
+
+  get websocketStateClass () {
     return {
-      connecting: false,
-      host: 'wallpc',
-      wsHosts: ['wallpc', 'deskpc']
+      __connected: this.$dataStore.websocketState === WebsocketState.ESTABLISHED,
+      __notConnected: this.$dataStore.websocketState !== WebsocketState.ESTABLISHED
     }
-  },
-  computed: {
-    ...mapState(['websocketState', 'activeScreen']),
-    ...mapState('realtimeData', ['raceState']),
-    websocketStateText () {
-      return this.websocketState === WebsocketState.ESTABLISHED ? 'Connected' : 'Not connected'
-    },
-    websocketStateClass () {
-      return {
-        __connected: this.websocketState === WebsocketState.ESTABLISHED,
-        __notConnected: this.websocketState !== WebsocketState.ESTABLISHED
-      }
-    },
-    raceStateText () {
-      switch (this.raceState) {
-        case RaceState.MENU:
-          return 'In menu'
-        case RaceState.BEFORE_RACE_MENU:
-          return 'Waiting for race to start'
-        case RaceState.RACE_IS_ON:
-          return 'Race in progress'
-        case RaceState.RACE_FINISHED:
-          return 'Race finished'
-        default:
-          return ''
-      }
-    },
-    raceStateClass () {
-      return {
-        __red: this.raceState === RaceState.MENU,
-        __yellow: this.raceState === RaceState.BEFORE_RACE_MENU,
-        __green: this.raceState === RaceState.RACE_IS_ON,
-        __orange: this.raceState === RaceState.RACE_FINISHED
-      }
-    }
-  },
-  methods: {
-    ...mapMutations(['showScreen', 'setWebsocketState']),
-    connect () {
-      if (!this.host) return
-      this.connecting = true
+  }
 
-      if (this.isLocal()) {
-        this.$rdb.connect(this.host, 8765)
-        setInterval(() => {
-          const wsState = this.$rdb.getWebsocketState()
-          if (wsState !== WebsocketState.ESTABLISHED) {
-            this.connecting = false
-          }
-          this.setWebsocketState(wsState)
-        }, 2500)
-      }
-    },
-    disconnect () {
-      this.$rdb.disconnect()
-      this.setWebsocketState(WebsocketState.CLOSED_OR_COULD_NOT_OPEN)
+  get raceState () {
+    return this.$realtimeDataStore.raceState
+  }
+
+  getRaceStateText () {
+    switch (this.raceState) {
+      case RaceState.MENU:
+        return 'In menu'
+      case RaceState.BEFORE_RACE_MENU:
+        return 'Waiting for race to start'
+      case RaceState.RACE_IS_ON:
+        return 'Race in progress'
+      case RaceState.RACE_FINISHED:
+        return 'Race finished'
+      default:
+        return ''
     }
+  }
+
+  getRaceStateClass () {
+    return {
+      __red: this.raceState === RaceState.MENU,
+      __yellow: this.raceState === RaceState.BEFORE_RACE_MENU,
+      __green: this.raceState === RaceState.RACE_IS_ON,
+      __orange: this.raceState === RaceState.RACE_FINISHED
+    }
+  }
+
+  connect () {
+    if (!this.host) return
+    this.connecting = true
+
+    if (this.isLocal()) {
+      this.$rdb.connect(this.host, 8765)
+      setInterval(() => {
+        const wsState = this.$rdb.getWebsocketState()
+        if (wsState !== WebsocketState.ESTABLISHED) {
+          this.connecting = false
+        }
+        this.$dataStore.setWebsocketState(wsState)
+      }, 2500)
+    }
+  }
+
+  disconnect () {
+    this.$rdb.disconnect()
+    this.$dataStore.setWebsocketState(WebsocketState.CLOSED_OR_COULD_NOT_OPEN)
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .__menuWrapper {
   background-color: rgba(72, 72, 72, 0.7);
   top: 0;
@@ -183,10 +181,10 @@ export default {
 
 .__menu {
   padding-top: 0.2rem;
-}
 
-.__menu .__selected {
-  background-color: #242424 !important;
+  .__selected {
+    background-color: #242424 !important;
+  }
 }
 
 .__info {
@@ -209,10 +207,10 @@ export default {
 .__connect {
   display: flex;
   justify-content: center;
-}
 
-.__connect .__select{
-  min-width: 10rem;
+  .__select{
+    min-width: 10rem;
+  }
 }
 
 .__disconnect button{

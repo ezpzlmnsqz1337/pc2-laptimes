@@ -205,7 +205,7 @@
           <Button
             v-if="carId && !canSetCar() && !carAlreadyLinked()"
             :type="ButtonType.DANGER"
-            @click="linkCarToGameId({carId: carId, gameId: carName})"
+            @click="linkCarToGameId(carId, carName)"
           >
             Link
           </Button>
@@ -243,7 +243,7 @@
           <Button
             v-if="trackId && !canSetTrack() && !trackAlreadyLinked()"
             :type="ButtonType.DANGER"
-            @click="linkTrackToGameId({trackId: trackId, gameId: trackLocation})"
+            @click="linkTrackToGameId(trackId, trackLocation)"
           >
             Link
           </Button>
@@ -489,226 +489,260 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import TransmissionType from '@/constants/TransmissionType'
-import WeatherType from '@/constants/WeatherType'
-import BrakingLine from '@/constants/BrakingLine'
-import ControlType from '@/constants/ControlType'
-import ScreenType from '@/constants/ScreenType'
-import StartType from '@/constants/StartType'
-import Game from '@/constants/Game'
-import RaceState from '@/constants/RaceState'
-import WebsocketState from '@/constants/WebsocketState'
+<script lang="ts">
+import { TransmissionType } from '@/constants/TransmissionType'
+import { WeatherType } from '@/constants/WeatherType'
+import { BrakingLine } from '@/constants/BrakingLine'
+import { ControlType } from '@/constants/ControlType'
+import { ScreenType } from '@/constants/ScreenType'
+import { StartType } from '@/constants/StartType'
+import { Game } from '@/constants/Game'
+import { RaceState } from '@/constants/RaceState'
+import { WebsocketState } from '@/constants/WebsocketState'
+import { Vue } from 'vue-class-component'
+import { Laptime } from '@/builders/LaptimeBuilder'
+import { LaptimeFilter } from '../store/laptimeFilterStore'
 
-export default {
-  name: 'AddLaptime',
-  data () {
-    return {
-      carId: null,
-      trackId: null,
-      trackVariant: null,
-      driverId: null,
-      minutes: '',
-      seconds: '',
-      milliseconds: '',
-      laptimeError: false,
-      transmission: TransmissionType.SEQUENTIAL,
-      weather: WeatherType.SUN,
-      brakingLine: BrakingLine.OFF,
-      controls: ControlType.STEERING_WHEEL,
-      startType: StartType.RUNNING,
-      game: Game.PC2,
-      notes: '',
-      newDriverName: '',
-      showNewDriverModal: false,
-      newCarName: '',
-      newTrackName: '',
-      newTrackVariantName: '',
-      showNewCarModal: false,
-      showNewTrackModal: false,
-      showNewTrackVariantModal: false,
-      autoSubmit: false,
-      lastRaceState: RaceState.MENU
+export default class AddLaptime extends Vue {
+  protected dataListener = this.$rdb.addListener(this.onMessageCallback)
+
+  carId: string | null = null
+  trackId: string | null = null
+  trackVariant: string | null = null
+  driverId: string | null = null
+  minutes = ''
+  seconds = ''
+  milliseconds = ''
+  laptimeError = false
+  transmission = TransmissionType.SEQUENTIAL
+  weather = WeatherType.SUN
+  brakingLine = BrakingLine.OFF
+  controls = ControlType.STEERING_WHEEL
+  startType = StartType.RUNNING
+  game = Game.PC2
+  notes = ''
+  newDriverName = ''
+  showNewDriverModal = false
+  newCarName = ''
+  newTrackName = ''
+  newTrackVariantName = ''
+  showNewCarModal = false
+  showNewTrackModal = false
+  showNewTrackVariantModal = false
+  autoSubmit = false
+  lastRaceState = RaceState.MENU
+
+  $refs!: {
+    leftInput: HTMLInputElement,
+    rightInput: HTMLInputElement
+  }
+
+  get trackLocation () {
+    return this.$realtimeDataStore.trackLocation
+  }
+
+  get trackVariation () {
+    return this.$realtimeDataStore.trackVariation
+  }
+
+  get participants () {
+    return this.$realtimeDataStore.participants
+  }
+
+  get websocketState () {
+    return this.$dataStore.websocketState
+  }
+
+  get carName () {
+    return this.$realtimeDataStore.carName
+  }
+
+  get laptime () {
+    const [m, s, ms] = [this.minutes, this.seconds, this.milliseconds]
+    if (!m || !s || !ms) return
+
+    return this.$ltb.isLaptimeValid(m, s, ms) ? this.$ltb.laptimeFromComponents(m, s, ms) : undefined
+  }
+
+  get valid () {
+    return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
+  }
+
+  get fastestLapTime () {
+    const participantId = this.$rdb.getHostname() === 'wallpc' ? 0 : 1
+    if (this.participants.length === 0 || !this.participants[participantId]?.fastestLapTime) return '00:00:000'
+
+    const d = new Date(this.participants[participantId].fastestLapTime * 1000)
+    return this.$ltb.dateToLaptime(d)
+  }
+
+  get canAutoSubmit () {
+    return this.websocketState === WebsocketState.ESTABLISHED && this.driverId
+  }
+
+  get canSetCar () {
+    return Boolean(this.$dataStore.getCarByGameId(this.carName))
+  }
+
+  get carAlreadyLinked () {
+    const car = this.$dataStore.getCarById(this.carId!)
+    return car && car.gameId
+  }
+
+  get canSetTrack () {
+    return Boolean(this.$dataStore.getTrackByGameId(this.trackLocation))
+  }
+
+  get trackAlreadyLinked () {
+    const track = this.$dataStore.getTrackById(this.trackId!)
+    return track && track.gameId
+  }
+
+  validateLaptimeFormat () {
+    this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d{2}.\d{3}$/) === null
+  }
+
+  addCar () {
+    this.$dataStore.addNewCar(this.newCarName)
+    this.newCarName = ''
+    this.showNewCarModal = false
+  }
+
+  addTrack () {
+    this.$dataStore.addNewTrack(this.newTrackName)
+    this.newTrackName = ''
+    this.showNewTrackModal = false
+  }
+
+  addTrackVariant () {
+    this.$dataStore.addNewTrackVariant(this.trackId!, this.newTrackVariantName)
+    this.newTrackVariantName = ''
+    this.showNewTrackVariantModal = false
+  }
+
+  addDriver () {
+    this.$dataStore.addNewDriver(this.newDriverName)
+    this.newDriverName = ''
+    this.showNewDriverModal = false
+  }
+
+  submit () {
+    const laptime: Laptime = {
+      uid: '',
+      carId: this.carId!,
+      trackId: this.trackId!,
+      trackVariant: this.trackVariant!,
+      driverId: this.driverId!,
+      laptime: this.laptime!,
+      transmission: this.transmission,
+      weather: this.weather,
+      brakingLine: this.brakingLine,
+      controls: this.controls,
+      startType: this.startType,
+      date: new Date().getTime(),
+      game: this.game,
+      notes: this.notes
     }
-  },
-  computed: {
-    ...mapState(['cars', 'tracks', 'drivers', 'times', 'websocketState']),
-    ...mapState('realtimeData', ['raceState', 'participants', 'carName', 'carClassName', 'trackLocation', 'trackVariation']),
-    ...mapGetters(['getCarById', 'getTrackById', 'getTrackVariants', 'getCarByGameId', 'getTrackByGameId', 'getTrackVariants']),
-    laptime () {
-      const [m, s, ms] = [this.minutes, this.seconds, this.milliseconds]
-      if (!m || !s || !ms) return false
-
-      return this.$ltb.isLaptimeValid(m, s, ms) ? this.$ltb.laptimeFromComponents(m, s, ms) : false
-    },
-    valid () {
-      return this.carId && this.trackId && this.trackVariant && this.driverId && this.laptime && !this.laptimeError && this.transmission && this.weather && this.brakingLine
-    },
-    fastestLapTime () {
-      const participantId = this.$rdb.getHostname() === 'wallpc' ? 0 : 1
-      if (this.participants.length === 0 || !this.participants[participantId]?.fastestLapTime) return false
-
-      const d = new Date(this.participants[participantId].fastestLapTime * 1000)
-      return this.$ltb.dateToLaptime(d)
-    },
-    canAutoSubmit () {
-      return this.websocketState === WebsocketState.ESTABLISHED && this.driverId
+    this.$dataStore.addLaptime(laptime)
+    if (!this.autoSubmit) {
+      this.driverId = null
     }
-  },
-  created () {
-    this.DATA_LISTENER = this.$rdb.addListener(this.onMessageCallback)
-  },
-  methods: {
-    ...mapActions(['addNewDriver', 'addLaptime', 'addNewCar', 'addNewTrack', 'addNewTrackVariant', 'linkCarToGameId', 'linkTrackToGameId']),
-    ...mapMutations(['showScreen']),
-    ...mapMutations('laptimeFilter', ['setFilter', 'clearFilter']),
-    canSetCar () {
-      return Boolean(this.getCarByGameId(this.carName))
-    },
-    carAlreadyLinked () {
-      const car = this.getCarById(this.carId)
-      return car && car.gameId
-    },
-    canSetTrack () {
-      return Boolean(this.getTrackByGameId(this.trackLocation))
-    },
-    trackAlreadyLinked () {
-      const track = this.getTrackById(this.trackId)
-      return track && track.gameId
-    },
-    validateLaptimeFormat () {
-      this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d{2}.\d{3}$/) === null
-    },
-    addCar () {
-      this.addNewCar({ name: this.newCarName })
-      this.newCarName = ''
-      this.showNewCarModal = false
-    },
-    addTrack () {
-      this.addNewTrack({ track: this.newTrackName })
-      this.newTrackName = ''
-      this.showNewTrackModal = false
-    },
-    addTrackVariant () {
-      this.addNewTrackVariant({ trackId: this.trackId, variant: this.newTrackVariantName })
-      this.newTrackVariantName = ''
-      this.showNewTrackVariantModal = false
-    },
-    addDriver () {
-      this.addNewDriver({ name: this.newDriverName })
-      this.newDriverName = ''
-      this.showNewDriverModal = false
-    },
-    submit () {
-      const laptime = {
-        carId: this.carId,
-        trackId: this.trackId,
-        trackVariant: this.trackVariant,
-        driverId: this.driverId,
-        laptime: this.laptime,
-        transmission: this.transmission,
-        weather: this.weather,
-        brakingLine: this.brakingLine,
-        controls: this.controls,
-        startType: this.startType,
-        date: new Date().getTime(),
-        game: this.game,
-        notes: this.notes
+    this.showTimeInTable(laptime)
+    this.$toast.success('Laptime added successfully!', {
+      duration: 3000,
+      maxToasts: 1,
+      queue: false
+    })
+  }
+
+  showTimeInTable ({ carId, trackId, trackVariant }: Laptime) {
+    this.$laptimeFilterStore.clearFilter()
+    this.$laptimeFilterStore.setFilter({ carId, trackId, trackVariant } as LaptimeFilter)
+    this.$dataStore.showScreen(ScreenType.LAPTIME_BOARD)
+  }
+
+  setLaptime (laptime: string) {
+    const d = this.$ltb.laptimeToDate(laptime)
+    this.minutes = `${d?.getMinutes()}`
+    this.seconds = `${d?.getSeconds()}`.padStart(2, '0')
+    this.milliseconds = `${d?.getMilliseconds()}`.padStart(3, '0')
+  }
+
+  setCarName (carName: string) {
+    const car = this.$dataStore.getCarByGameId(carName)
+    if (!car) {
+      this.$toast.error('Unable to set car. Car does not exist.')
+      return
+    }
+    this.carId = car.uid
+  }
+
+  setTrackLocation (trackLocation: string) {
+    const track = this.$dataStore.getTrackByGameId(trackLocation)
+    if (!track) {
+      this.$toast.error('Unable to set track. Track does not exist.')
+      return
+    }
+    this.trackId = track.uid
+  }
+
+  setTrackVariation (trackVariation: string) {
+    const variant = this.$dataStore.getTrackVariants(this.trackId!)?.find(x => x.includes(trackVariation.replace('_', ' ')))
+    if (!variant) {
+      this.$toast.error('Unable to set track variant. Track variant does not exist.')
+      return
+    }
+    this.trackVariant = variant
+  }
+
+  onLaptimeInputKeyDown (e: any, leftInput: string, rightInput: string) {
+    if (e.key === 'ArrowRight') {
+      if (!rightInput) return
+      const ri = (this.$refs as any)[rightInput]
+      if (e.target.selectionStart === e.target.value.length) {
+        ri.selectionStart = 0
+        ri.focus()
       }
-      this.addLaptime(laptime)
-      if (!this.autoSubmit) {
-        this.driverId = null
+    } else if (e.key === 'ArrowLeft') {
+      if (!leftInput) return
+      const li = (this.$refs as any)[leftInput]
+      if (e.target.selectionStart === 0) {
+        li.selectionStart = li.value.length
+        li.focus()
       }
-      this.showTimeInTable(laptime)
-      this.$toast.success('Laptime added successfully!', {
-        duration: 3000,
-        maxToasts: 1,
-        queue: false
-      })
-    },
-    showTimeInTable ({ carId, trackId, trackVariant }) {
-      this.clearFilter()
-      this.setFilter({ carId, trackId, trackVariant })
-      this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
-    },
-    setLaptime (laptime) {
-      const d = this.$ltb.laptimeToDate(laptime)
-      this.minutes = `${d.getMinutes()}`
-      this.seconds = `${d.getSeconds()}`.padStart(2, '0')
-      this.milliseconds = `${d.getMilliseconds()}`.padStart(3, '0')
-    },
-    setCarName (carName) {
-      const car = this.getCarByGameId(carName)
-      if (!car) {
-        this.$toast.error('Unable to set car. Car does not exist.')
-        return
+    }
+  }
+
+  onMessageCallback (msg: MessageEvent<any>) {
+    try {
+      let data = JSON.parse(msg.data)
+      if (data.packetType === undefined) return
+      data = data.data
+      if ('raceState' in data) {
+        if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
+        this.lastRaceState = data.raceState
       }
-      this.carId = car.uid
-    },
-    setTrackLocation (trackLocation) {
-      const track = this.getTrackByGameId(trackLocation)
-      if (!track) {
-        this.$toast.error('Unable to set track. Track does not exist.')
-        return
-      }
-      this.trackId = track.uid
-    },
-    setTrackVariation (trackVariation) {
-      const variant = this.getTrackVariants(this.trackId).find(x => x.includes(trackVariation.replace('_', ' ')))
-      if (!variant) {
-        this.$toast.error('Unable to set track variant. Track variant does not exist.')
-        return
-      }
-      this.trackVariant = variant
-    },
-    onLaptimeInputKeyDown (e, leftInput, rightInput) {
-      if (e.key === 'ArrowRight') {
-        if (!rightInput) return
-        const ri = this.$refs[rightInput]
-        if (e.target.selectionStart === e.target.value.length) {
-          ri.selectionStart = 0
-          ri.focus()
-        }
-      } else if (e.key === 'ArrowLeft') {
-        if (!leftInput) return
-        const li = this.$refs[leftInput]
-        if (e.target.selectionStart === 0) {
-          li.selectionStart = li.value.length
-          li.focus()
-        }
-      }
-    },
-    onMessageCallback (msg) {
-      try {
-        let data = JSON.parse(msg.data)
-        if (data.packetType === undefined) return
-        data = data.data
-        if ('raceState' in data) {
-          if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
-          this.lastRaceState = data.raceState
-        }
-      } catch (e) {
-        console.log('Error: ', e.message, msg)
-      }
-    },
-    handleAutoSubmit (raceState) {
-      if (this.lastRaceState === RaceState.RACE_IS_ON && raceState === RaceState.RACE_FINISHED) {
-        this.showScreen({ screen: ScreenType.ADD_LAPTIME })
-        setTimeout(() => {
-          this.setLaptime(this.fastestLapTime)
-          this.setCarName(this.carName)
-          this.setTrackLocation(this.trackLocation)
-          this.setTrackVariation(this.trackVariation)
-          if (this.valid) this.submit()
-        }, 1000)
-      }
+    } catch (e: unknown) {
+      console.log('Error: ', (e as SyntaxError).message, msg)
+    }
+  }
+
+  handleAutoSubmit (raceState: RaceState) {
+    if (this.lastRaceState === RaceState.RACE_IS_ON && raceState === RaceState.RACE_FINISHED) {
+      this.$dataStore.showScreen(ScreenType.ADD_LAPTIME)
+      setTimeout(() => {
+        this.setLaptime(this.fastestLapTime)
+        this.setCarName(this.carName)
+        this.setTrackLocation(this.trackLocation)
+        this.setTrackVariation(this.trackVariation)
+        if (this.valid) this.submit()
+      }, 1000)
     }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .__heading {
   text-align: center;
 }
@@ -777,73 +811,74 @@ export default {
 .__laptimeInputs {
   border-radius: 0.3rem;
   display: flex;
-  width: 100%;
-}
+    width: 100%;
 
-.__laptimeInputs .__minutes {
-  width: 100%;
-  text-align: right;
-  border-right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  padding-right: 0.3rem;
-}
+  .__minutes {
+    width: 100%;
+    text-align: right;
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-right: 0.3rem;
+  }
 
-.__laptimeInputs .__seconds {
-  width: 3.1rem;
-  border-right: 0;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-  border-left: 0;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  text-align: center;
-  padding-left: 0.3rem;
-  padding-right: 0.3rem;
-}
+  .__seconds {
+    width: 3.1rem;
+    border-right: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    text-align: center;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+  }
 
-.__laptimeInputs .__milliseconds {
-  width: 100%;
-  border-left: 0;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  padding-left: 0.3rem;
-}
+  .__milliseconds {
+    width: 100%;
+    border-left: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding-left: 0.3rem;
+  }
 
-.__laptimeInputs .__colon, .__laptimeInputs .__dot {
-  background-color: white;
-  color: var(--text-dark1);
-  font-size: 2rem;
-  padding-top: 0.45rem;
-  border-top: 0.1rem solid black;
-  border-bottom: 0.1rem solid black;
-}
+  .__colon, .__dot {
+    background-color: white;
+    color: var(--text-dark1);
+    font-size: 2rem;
+    padding-top: 0.45rem;
+    border-top: 0.1rem solid black;
+    border-bottom: 0.1rem solid black;
+  }
 
-.__laptimeInputs input {
-  font-size: 2rem;
-}
+  input {
+    font-size: 2rem;
 
-.__laptimeInputs input:focus {
-  outline: 0;
-}
+    &:focus {
+      outline: 0;
+    }
+  }
 
-.__laptimeInputs.__error .__minutes {
-  border: 0.15rem solid red;
-  color: red;
-  border-right: none;
-}
+  &.__error {
+    .__minutes {
+      border: 0.15rem solid red;
+      color: red;
+      border-right: none;
+    }
+    .__seconds,  .__colon,  .__dot {
+      border: 0.15rem solid red;
+      color: red;
+      border-right: none;
+      border-left: none;
+    }
 
-.__laptimeInputs.__error .__seconds, .__laptimeInputs.__error .__colon, .__laptimeInputs.__error .__dot {
-  border: 0.15rem solid red;
-  color: red;
-  border-right: none;
-  border-left: none;
-}
-
-.__laptimeInputs.__error .__milliseconds {
-  border: 0.15rem solid red;
-  color: red;
-  border-left: none;
+    .__milliseconds {
+      border: 0.15rem solid red;
+      color: red;
+      border-left: none;
+    }
+  }
 }
 
 .__submit {
@@ -890,14 +925,16 @@ export default {
   font-size: 1.1rem;
 }
 
-.__selected :deep(.vs__dropdown-toggle) {
-  border: 0.1rem solid #4081C2;
-  box-shadow: 0px 0px 5px 2px #4081C2;
-}
+.__selected {
+  :deep(.vs__dropdown-toggle) {
+    border: 0.1rem solid #4081C2;
+    box-shadow: 0px 0px 5px 2px #4081C2;
+  }
 
-.__selected :deep(span.vs__selected) {
-  color: #4081C2;
-  font-weight: bold;
+  :deep(span.vs__selected) {
+    color: #4081C2;
+    font-weight: bold;
+  }
 }
 
 .__gameInfoColumn {
@@ -923,14 +960,14 @@ textarea {
 
 .__autoSubmit {
   align-items: center;
-}
 
-.__autoSubmit input[type=checkbox] {
-  width: 1.7rem;
-  height: 1.7rem;
-  display: inline-block;
-  border-radius: 0.3rem;
-  margin: 0.5rem;
+  input[type=checkbox] {
+    width: 1.7rem;
+    height: 1.7rem;
+    display: inline-block;
+    border-radius: 0.3rem;
+    margin: 0.5rem;
+  }
 }
 
 </style>

@@ -4,21 +4,21 @@
       <Button
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === StatisticsScreenType.MEDALS}"
-        @click="showScreen({screen: StatisticsScreenType.MEDALS})"
+        @click="showScreen(StatisticsScreenType.MEDALS)"
       >
         Medals
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === StatisticsScreenType.CHARTS}"
-        @click="showScreen({screen: StatisticsScreenType.CHARTS})"
+        @click="showScreen(StatisticsScreenType.CHARTS)"
       >
         Charts
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === StatisticsScreenType.LEADERBOARDS}"
-        @click="showScreen({screen: StatisticsScreenType.LEADERBOARDS})"
+        @click="showScreen(StatisticsScreenType.LEADERBOARDS)"
       >
         Leaderboards
       </Button>
@@ -98,85 +98,74 @@
   </div>
 </template>
 
-<script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import StatisticsSection from '@/components/StatisticsSection'
-import RacesDaysBarChart from '@/components/RacesDaysBarChart'
-import Medals from '@/components/Medals'
-import Leaderboards from '@/components/Leaderboards'
-import StatisticsScreenType from '@/constants/StatisticsScreenType'
+<script lang="ts">
+import StatisticsSection from '@/components/StatisticsSection.vue'
+import RacesDaysBarChart from '@/components/RacesDaysBarChart.vue'
+import Medals from '@/components/MedalsComponent.vue'
+import Leaderboards from '@/components/Leaderboards.vue'
+import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
+import { Options, Vue } from 'vue-class-component'
 
-export default {
-  name: 'Statistics',
+@Options({
   components: {
     StatisticsSection,
     Medals,
     RacesDaysBarChart,
     Leaderboards
-  },
-  data () {
-    return {
-      refreshing: false
-    }
-  },
-  computed: {
-    ...mapState(['cars', 'drivers', 'tracks']),
-    ...mapState('statistics', ['activeScreen', 'trackCarBoardData']),
-    ...mapGetters('statistics', ['getFilter']),
-    ...mapGetters(['getDriverById'])
-  },
+  }
+})
+export default class Statistics extends Vue {
+  refreshing = false
   mounted () {
     this.handleUrl()
     this.refresh()
-  },
-  methods: {
-    ...mapActions(['getTimes']),
-    ...mapMutations('statistics', ['showScreen']),
-    ...mapActions('statistics', ['refreshData']),
-    handleUrl () {
-      if (this.queryParams.has('section')) {
-        const section = this.queryParams.get('section')
-        switch (section) {
-          case StatisticsScreenType.MEDALS:
-            this.showScreen({ screen: StatisticsScreenType.MEDALS })
-            break
-          case StatisticsScreenType.CHARTS:
-            this.showScreen({ screen: StatisticsScreenType.CHARTS })
-            break
-          case StatisticsScreenType.LEADERBOARDS:
-            this.showScreen({ screen: StatisticsScreenType.LEADERBOARDS })
-            break
-          default:
-            console.error('Unkonwn section: ', section)
-        }
+  }
+
+  handleUrl () {
+    if (this.queryParams.has('section')) {
+      const section = this.queryParams.get('section')
+      switch (section) {
+        case StatisticsScreenType.MEDALS:
+          this.$statisticsStore.showScreen(StatisticsScreenType.MEDALS)
+          break
+        case StatisticsScreenType.CHARTS:
+          this.$statisticsStore.showScreen(StatisticsScreenType.CHARTS)
+          break
+        case StatisticsScreenType.LEADERBOARDS:
+          this.$statisticsStore.showScreen(StatisticsScreenType.LEADERBOARDS)
+          break
+        default:
+          console.error('Unknown section: ', section)
       }
-    },
-    async share () {
-      let url = `${window.location.origin}/?page=statistics`
-      url += `&section=${this.activeScreen}`
-
-      const { driverId, position, distinct } = this.getFilter()
-      if (driverId && position && distinct) {
-        const name = this.getDriverById(driverId).name
-        url += `&driver=${name}&position=${position}&distinct=${distinct}`
-      }
-
-      navigator.clipboard.writeText(url)
-      this.$toast.success('Link copied to clipboard.')
-    },
-    async refresh () {
-      if (this.refreshing) return
-      this.refreshing = true
-      const laptimes = await this.getTimes({ queryLimit: 0 })
-      await this.refreshData({ laptimes, tracks: this.tracks, cars: this.cars, drivers: this.drivers })
-
-      this.refreshing = false
     }
+  }
+
+  async share () {
+    let url = `${window.location.origin}/?page=statistics`
+    url += `&section=${this.$dataStore.activeScreen}`
+
+    const { driverId, position, distinct } = this.$statisticsStore.getFilter()
+    if (driverId && position && distinct) {
+      const name = this.$dataStore.getDriverById(driverId)?.name
+      url += `&driver=${name}&position=${position}&distinct=${distinct}`
+    }
+
+    navigator.clipboard.writeText(url)
+    this.$toast.success('Link copied to clipboard.')
+  }
+
+  async refresh () {
+    if (this.refreshing) return
+    this.refreshing = true
+    const laptimes = await this.$dataStore.getTimes(0)
+    await this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers, this.$dataStore.tracks, this.$dataStore.cars)
+
+    this.refreshing = false
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .__statistics {
   padding: 1rem;
   padding-bottom: 6rem;
@@ -184,9 +173,7 @@ export default {
 
 .__menu {
   text-align: center;
-}
-
-.__menu .__selected {
+  .__selected {
   background-color: #242424 !important;
 }
 
@@ -201,9 +188,8 @@ export default {
 
 .__racesPerDaySection {
   padding: 1rem;
-}
 
-.__racesPerDaySection > .__chart {
+  > .__chart {
   background-color: rgba(72, 72, 72, 0.7);
   border-radius: 0.3rem;
 }
@@ -222,12 +208,12 @@ export default {
 }
 
 @media only screen and (max-width: 700px) {
-.__controls {
+  .__controls {
     margin-top: 1rem;
-  }
 
-  .__controls > button {
-    font-size: 0.6rem;
+      > button {
+      font-size: 0.6rem;
+    }
   }
 }
 </style>

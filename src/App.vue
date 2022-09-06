@@ -23,7 +23,7 @@
       class="__laptimes"
     >
       <keep-alive>
-        <LaptimeFilter v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
+        <LaptimeFilterComponent v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
       </keep-alive>
       <keep-alive>
         <LaptimeBoard v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
@@ -39,75 +39,73 @@
   </div>
 </template>
 
-<script>
-import { unsubscribeAll } from '@/vuex-firestore-binding'
-import AddLaptime from '@/components/AddLaptime'
-import LaptimeBoard from '@/components/LaptimeBoard'
-import LaptimeFilter from '@/components/LaptimeFilter'
-import Statistics from '@/components/Statistics'
-import RealtimeData from '@/components/RealtimeData'
+<script lang="ts">
+import AddLaptime from '@/components/AddLaptime.vue'
+import LaptimeBoard from '@/components/LaptimeBoard.vue'
+import LaptimeFilterComponent from '@/components/LaptimeFilterComponent.vue'
 // import SetCarImage from '@/components/SetCarImage'
-import Menu from '@/components/Menu'
-import { mapActions, mapMutations, mapState } from 'vuex'
-import ScreenType from './constants/ScreenType'
+import Menu from '@/components/Menu.vue'
+import RealtimeData from '@/components/RealtimeData.vue'
+import Statistics from '@/components/Statistics.vue'
+import { unsubscribeAll } from '@/vuex-firestore-binding'
+import { Options, Vue } from 'vue-class-component'
+import { ScreenType } from './constants/ScreenType'
 
-export default {
-  name: 'App',
+@Options({
   components: {
     AddLaptime,
     LaptimeBoard,
-    LaptimeFilter,
+    LaptimeFilterComponent,
     Statistics,
     RealtimeData,
     Menu
     // SetCarImage
-  },
-  computed: {
-    ...mapState(['activeScreen'])
-  },
-  created () {
-    this.CURRENT_BG_INDEX = 0
-  },
+  }
+})
+export default class App extends Vue {
+  protected currentBgIndex = 0
+
+  $refs!: any
+
   async mounted () {
-    await this.bindDb()
-    this.handleUrl()
-    this.refreshTimes()
-    setInterval(() => {
-      this.cycleBackground()
-    }, 15000)
-  },
+    // await this.$dataStore.bindDb()
+    // this.handleUrl()
+    // this.$dataStore.refreshTimes()
+    // setInterval(() => {
+    //   this.cycleBackground()
+    // }, 15000)
+  }
+
   unmounted () {
     unsubscribeAll()
-  },
-  methods: {
-    ...mapActions(['bindDb', 'refreshTimes']),
-    ...mapMutations(['showScreen']),
-    cycleBackground () {
-      const bgCount = 3
-      this.$refs[`background${this.CURRENT_BG_INDEX + 1}`].style.opacity = 0
-      this.CURRENT_BG_INDEX = ++this.CURRENT_BG_INDEX % bgCount
-      this.$refs[`background${this.CURRENT_BG_INDEX + 1}`].style.opacity = 1
-    },
-    handleUrl () {
-      if (this.queryParams.has('page')) {
-        const page = this.queryParams.get('page')
-        switch (page) {
-          case ScreenType.STATISTICS:
-            this.showScreen({ screen: ScreenType.STATISTICS })
-            break
-          case ScreenType.LAPTIME_BOARD:
-            this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
-            break
-          default:
-            console.error('Unknown page: ', page)
-        }
+  }
+
+  cycleBackground () {
+    const bgCount = 3
+    this.$refs[`background${this.currentBgIndex + 1}`].style.opacity = 0
+    this.currentBgIndex = ++this.currentBgIndex % bgCount
+    this.$refs[`background${this.currentBgIndex + 1}`].style.opacity = 1
+  }
+
+  handleUrl () {
+    if (this.queryParams.has('page')) {
+      const page = this.queryParams.get('page')
+      switch (page) {
+        case ScreenType.STATISTICS:
+          this.$dataStore.showScreen(ScreenType.STATISTICS)
+          break
+        case ScreenType.LAPTIME_BOARD:
+          this.$dataStore.showScreen(ScreenType.LAPTIME_BOARD)
+          break
+        default:
+          console.error('Unknown page: ', page)
       }
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss">
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 :root {
   --hover: #188cff;

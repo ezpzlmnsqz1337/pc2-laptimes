@@ -9,46 +9,35 @@
   </button>
 </template>
 
-<script>
-import ButtonType from '@/constants/ButtonType'
+<script lang="ts">
+import { ButtonType } from '@/constants/ButtonType'
+import { Options, Vue, prop } from 'vue-class-component'
 
-export default {
-  name: 'Button',
-  props: {
-    type: {
-      type: String,
-      default: ButtonType.DEFAULT
-    },
-    title: {
-      type: String,
-      default: ''
-    },
-    block: {
-      type: Boolean,
-      default: false
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['click'],
-  methods: {
-    btnClass: function () {
-      return {
-        __primary: this.type === ButtonType.PRIMARY,
-        __secondary: this.type === ButtonType.SECONDARY,
-        __success: this.type === ButtonType.SUCCESS,
-        __danger: this.type === ButtonType.DANGER,
-        __warning: this.type === ButtonType.WARNING,
-        __block: this.block
-      }
+class ButtonProps {
+  type = prop<ButtonType>({ default: ButtonType.DEFAULT })
+  title = prop<string>({ default: '' })
+  block = prop<boolean>({ default: false })
+  disabled = prop<boolean>({ default: false })
+}
+
+Options({
+  emits: ['click']
+})
+export default class Button extends Vue.with(ButtonProps) {
+  btnClass () {
+    return {
+      __primary: this.type === ButtonType.PRIMARY,
+      __secondary: this.type === ButtonType.SECONDARY,
+      __success: this.type === ButtonType.SUCCESS,
+      __danger: this.type === ButtonType.DANGER,
+      __warning: this.type === ButtonType.WARNING,
+      __block: this.block
     }
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 button {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   --btn-text-dark: var(--text-dark1);
@@ -77,75 +66,75 @@ button {
   margin: 0.1rem;
   padding: 0.5rem 0.8rem;
   border-radius: 0.3rem;
-}
 
-button:deep .fa {
-  margin-right: 0.3rem;
-}
+  &:deep(.fa) {
+    margin-right: 0.3rem;
+  }
 
-button:disabled, button:disabled:hover {
-  cursor: not-allowed;
-  background-color: var(--btn-disabled) !important;
-  color: var(--btn-disabled-text) !important;
-}
+  &:disabled, &:disabled:hover {
+    cursor: not-allowed;
+    background-color: var(--btn-disabled) !important;
+    color: var(--btn-disabled-text) !important;
+  }
 
-button:hover {
-  background-color: var(--btn-default-hover);
-  color: var(--btn-text-dark);
-  cursor: pointer;
-}
+  &:hover {
+    background-color: var(--btn-default-hover);
+    color: var(--btn-text-dark);
+    cursor: pointer;
+  }
 
-button.__primary {
-  background-color: var(--btn-primary);
-  color: var(--btn-text-light);
-}
+  &.__primary {
+    background-color: var(--btn-primary);
+    color: var(--btn-text-light);
+  }
 
-button.__primary:hover {
-  background-color: var(--btn-primary-hover);
-  color: var(--btn-text-light);
-}
+  &.__primary:hover {
+    background-color: var(--btn-primary-hover);
+    color: var(--btn-text-light);
+  }
 
-button.__secondary {
-  background-color: var(--btn-secondary);
-  color: var(--btn-text-light);
-}
+  &.__secondary {
+    background-color: var(--btn-secondary);
+    color: var(--btn-text-light);
+  }
 
-button.__secondary:hover {
-  background-color: var(--btn-secondary-hover);
-  color: var(--btn-text-light);
-}
+  &.__secondary:hover {
+    background-color: var(--btn-secondary-hover);
+    color: var(--btn-text-light);
+  }
 
-button.__success {
-  background-color: var(--btn-success);
-  color: var(--btn-text-light);
-}
+  &.__success {
+    background-color: var(--btn-success);
+    color: var(--btn-text-light);
+  }
 
-button.__success:hover{
-  background-color: var(--btn-success-hover);
-  color: var(--btn-text-light);
-}
+  &.__success:hover{
+    background-color: var(--btn-success-hover);
+    color: var(--btn-text-light);
+  }
 
-button.__danger {
-  background-color: var(--btn-danger);
-  color: var(--btn-text-light);
-}
+  &.__danger {
+    background-color: var(--btn-danger);
+    color: var(--btn-text-light);
+  }
 
-button.__danger:hover {
-  background-color: var(--btn-danger-hover);
-  color: var(--btn-text-light);
-}
+  &.__danger:hover {
+    background-color: var(--btn-danger-hover);
+    color: var(--btn-text-light);
+  }
 
-button.__warning {
-  background-color: var(--btn-warning);
-  color: var(--btn-text-dark);
-}
+  &.__warning {
+    background-color: var(--btn-warning);
+    color: var(--btn-text-dark);
+  }
 
-button.__warning:hover {
-  background-color: var(--btn-warning-hover);
-  color: var(--btn-text-light);
-}
+  &.__warning:hover {
+    background-color: var(--btn-warning-hover);
+    color: var(--btn-text-light);
+  }
 
-button.__block {
-  display: block;
+  &.__block {
+    display: block;
+  }
 }
 </style>

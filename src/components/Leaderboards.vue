@@ -176,66 +176,63 @@
   </div>
 </template>
 
-<script>
-import { mapGetters, mapMutations, mapState } from 'vuex'
-import tableMixin from '@/mixins/tableMixin'
+<script lang="ts">
+import { Distinct } from '@/constants/Distinct'
+// import TableMixin from '@/mixins/TableMixin.vue'
+import { StatisticsFilter } from '@/store/statisticsStore'
+import { Options, prop, Vue } from 'vue-class-component'
+import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
-import { Carousel, Slide, Pagination, Navigation } from 'vue3-carousel'
 
-export default {
-  name: 'Leaderboards',
+class LeaderboardsProps {
+  refresh = prop<Function>({ default: () => {} })
+}
+
+@Options({
   components: {
     Carousel,
     Slide,
     Pagination,
     Navigation
-  },
-  mixins: [tableMixin],
-  props: {
-    refresh: {
-      type: Function,
-      default: () => {}
-    }
-  },
-  computed: {
-    ...mapState('statistics', ['distinct', 'driverId', 'position', 'trackCarBoardData']),
-    ...mapGetters(['getDriverById', 'getDriverByName'])
-  },
+  }
+})
+// table mixin
+export default class Leaderboards extends Vue.with(LeaderboardsProps) {
   mounted () {
     this.handleUrl()
-  },
-  methods: {
-    ...mapMutations('statistics', { sf: 'setFilter', cf: 'clearFilter' }),
-    handleUrl () {
-      const filter = {}
-      if (this.queryParams.has('driver')) {
-        const driver = this.getDriverByName(this.queryParams.get('driver'))
-        if (driver) filter.driverId = driver.uid
-      }
-      if (this.queryParams.has('position')) {
-        filter.position = parseInt(this.queryParams.get('position'))
-      }
-      if (this.queryParams.has('distinct')) {
-        filter.distinct = this.queryParams.get('distinct')
-      }
-      if (filter.driverId && filter.position && filter.distinct) {
-        this.setFilter(filter)
-      }
-    },
-    setFilter (filter) {
-      this.cf()
-      this.sf(filter)
-      this.refresh()
-    },
-    clearFilter () {
-      this.cf()
-      this.refresh()
+  }
+
+  handleUrl () {
+    const filter = {} as StatisticsFilter
+    if (this.queryParams.has('driver')) {
+      const driver = this.$dataStore.getDriverByName(this.queryParams.get('driver')!)
+      if (driver) filter.driverId = driver.uid
     }
+    if (this.queryParams.has('position')) {
+      filter.position = parseInt(this.queryParams.get('position')!)
+    }
+    if (this.queryParams.has('distinct')) {
+      filter.distinct = this.queryParams.get('distinct') === Distinct.YES ? Distinct.YES : Distinct.NO
+    }
+    if (filter.driverId && filter.position && filter.distinct) {
+      this.setFilter(filter)
+    }
+  }
+
+  setFilter (filter: StatisticsFilter) {
+    this.$statisticsStore.clearFilter()
+    this.$statisticsStore.setFilter(filter)
+    this.refresh()
+  }
+
+  clearFilter () {
+    this.$statisticsStore.clearFilter()
+    this.refresh()
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 @import '../assets/css/table.css';
 @import '../assets/css/carousel.css';
 
@@ -250,17 +247,16 @@ export default {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-}
+  .__item {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    text-align: center;
+  }
 
-.__filter .__item {
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  text-align: center;
-}
-
-.__filter .__header {
-  margin-bottom: 0.3rem;
+  .__header {
+    margin-bottom: 0.3rem;
+  }
 }
 
 .__trackCarMatrix {
@@ -268,16 +264,16 @@ export default {
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
-}
 
-.__trackCarMatrix .__item {
-  padding-left: 10vw;
-  padding-right: 10vw;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  .__item {
+    padding-left: 10vw;
+    padding-right: 10vw;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .__carImage > img{
