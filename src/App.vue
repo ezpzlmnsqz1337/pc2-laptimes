@@ -40,13 +40,13 @@
 </template>
 
 <script lang="ts">
-import AddLaptime from '@/components/AddLaptime.vue'
-import LaptimeBoard from '@/components/LaptimeBoard.vue'
-import LaptimeFilterComponent from '@/components/LaptimeFilterComponent.vue'
+import AddLaptime from '@/pages/AddLaptime.vue'
+import LaptimeBoard from '@/pages/LaptimeBoard.vue'
+import LaptimeFilterComponent from '@/components/laptime-filter/LaptimeFilterComponent.vue'
 // import SetCarImage from '@/components/SetCarImage'
 import Menu from '@/components/Menu.vue'
-import RealtimeData from '@/components/RealtimeData.vue'
-import Statistics from '@/components/Statistics.vue'
+import RealtimeData from '@/pages/RealtimeData.vue'
+import Statistics from '@/pages/Statistics.vue'
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from './constants/ScreenType'

@@ -178,9 +178,9 @@
 
 <script lang="ts">
 import { Distinct } from '@/constants/Distinct'
-// import TableMixin from '@/mixins/TableMixin.vue'
+import TableMixin from '@/mixins/TableMixin.vue'
 import { StatisticsFilter } from '@/store/statisticsStore'
-import { Options, prop, Vue } from 'vue-class-component'
+import { Options, prop } from 'vue-class-component'
 import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
 
@@ -196,8 +196,7 @@ class LeaderboardsProps {
     Navigation
   }
 })
-// table mixin
-export default class Leaderboards extends Vue.with(LeaderboardsProps) {
+export default class Leaderboards extends TableMixin.with(LeaderboardsProps) {
   mounted () {
     this.handleUrl()
   }
@@ -247,6 +246,7 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
   flex-direction: row;
   align-items: center;
   justify-content: center;
+
   .__item {
     display: flex;
     flex-direction: column;

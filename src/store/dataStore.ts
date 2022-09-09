@@ -2,8 +2,14 @@ import { Car } from '@/assets/db/cars'
 import { Track } from '@/assets/db/tracks'
 import LaptimeBuilder, { Laptime } from '@/builders/LaptimeBuilder'
 import { Driver } from '@/builders/StatisticsBuilder'
+import { BrakingLine } from '@/constants/BrakingLine'
+import { ControlType } from '@/constants/ControlType'
 import { Distinct } from '@/constants/Distinct'
+import { Game } from '@/constants/Game'
 import { ScreenType } from '@/constants/ScreenType'
+import { StartType } from '@/constants/StartType'
+import { TransmissionType } from '@/constants/TransmissionType'
+import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
 import { db } from '@/firebase'
 import { arrayUnion, collection, doc, DocumentData, getDocs, limit, orderBy, query, QueryConstraint, QueryDocumentSnapshot, setDoc, updateDoc, where } from 'firebase/firestore'
@@ -11,6 +17,23 @@ import { v4 as uuidv4 } from 'uuid'
 import { LaptimeFilter, laptimeFilterStore } from './laptimeFilterStore'
 
 const debug = process.env.NODE_ENV !== 'production'
+
+export interface LaptimeUpdate {
+  uid: string
+  carId?: string
+  trackId?: string
+  trackVariant?: string
+  driverId?: string
+  transmission?: TransmissionType
+  weather?: WeatherType
+  brakingLine?: BrakingLine
+  controls?: ControlType
+  startType?: StartType
+  laptime?: string
+  game?: Game
+  date?: number
+  notes?: string
+}
 
 export interface DataStore {
   websocketState: WebsocketState
@@ -40,7 +63,7 @@ export interface DataStore {
   linkCarToGameId (carId: string, gameId: string) :void
   linkTrackToGameId (trackId: string, gameId: string) :void
   setCarImage (carId: string, imageUrl: string) :void
-  updateLaptime (laptime: Laptime) :void
+  updateLaptime (laptime: LaptimeUpdate) :void
   getTimesForDriver (driverId: string) : Promise<Laptime[]>
   getTimes (queryLimit: number, filter?: LaptimeFilter) : Promise<Laptime[]>
   getTracksTimes (tracks: Track[]) : Promise<Laptime[]>
@@ -140,7 +163,7 @@ export const dataStore: DataStore = {
     const docRef = doc(db, 'cars', carId)
     await updateDoc(docRef, { imageUrl })
   },
-  async updateLaptime (laptime: Laptime) {
+  async updateLaptime (laptime: LaptimeUpdate) {
     if (!laptime || !laptime.uid) return
     const docRef = doc(db, 'times', laptime.uid)
     console.log('Laptime: ', laptime, docRef)

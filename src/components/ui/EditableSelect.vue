@@ -31,6 +31,7 @@ class EditableSelectProps {
   icon = prop<string>({ default: '' })
   options = prop<any[]>({ default: [] })
   label = prop<string>({ default: 'name' })
+  editable = prop<boolean>({ default: false })
 }
 
 @Options({
@@ -44,6 +45,7 @@ export default class EditableSelect extends Vue.with(EditableSelectProps) {
   }
 
   startEditing (e: KeyboardEvent) {
+    if (!this.editable) return
     if (!this.isLocal() || !e.ctrlKey) return
     this.edit = true
     this.$nextTick(() => (this.$refs.select.$el as HTMLSelectElement).focus())

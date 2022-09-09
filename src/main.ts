@@ -73,7 +73,9 @@ app.config.globalProperties.isLocal = () => ['localhost:8080', 'malina:3000'].in
 app.use(storePlugin)
 app.use(Toaster)
 app.use(PerfectScrollbar)
+// eslint-disable-next-line vue/multi-word-component-names
 app.component('Button', Button)
+// eslint-disable-next-line vue/multi-word-component-names
 app.component('Modal', Modal)
 app.component('EditableSelect', EditableSelect)
 app.component('RadioButtons', RadioButtons)

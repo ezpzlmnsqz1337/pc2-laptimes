@@ -58,15 +58,15 @@
 import { Medals } from '@/builders/StatisticsBuilder'
 import { Rank } from '@/constants/Rank'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
-import tableMixin from '@/mixins/tableMixin'
+import TableMixin from '@/mixins/TableMixin.vue'
 import { StatisticsFilter, TotalDriverRaces } from '@/store/statisticsStore'
-import { prop, mixins } from 'vue-class-component'
+import { prop } from 'vue-class-component'
 
 class MedalsProps {
   refresh = prop<Function>({ default: () => {} })
 }
 
-export default class MedalsComponent extends mixins(tableMixin).with(MedalsProps) {
+export default class MedalsComponent extends TableMixin.with(MedalsProps) {
   setFilter (filter: StatisticsFilter) {
     this.$statisticsStore.clearFilter()
     this.$statisticsStore.setFilter(filter)

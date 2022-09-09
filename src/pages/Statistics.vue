@@ -174,7 +174,8 @@ export default class Statistics extends Vue {
 .__menu {
   text-align: center;
   .__selected {
-  background-color: #242424 !important;
+    background-color: #242424 !important;
+  }
 }
 
 .__controls {
@@ -190,8 +191,9 @@ export default class Statistics extends Vue {
   padding: 1rem;
 
   > .__chart {
-  background-color: rgba(72, 72, 72, 0.7);
-  border-radius: 0.3rem;
+    background-color: rgba(72, 72, 72, 0.7);
+    border-radius: 0.3rem;
+  }
 }
 
 .__center {

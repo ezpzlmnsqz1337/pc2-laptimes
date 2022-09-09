@@ -1,0 +1,74 @@
+<template>
+  <div @click="handleClickEvent($event)">
+    <EditableSelect
+      :editable="editable"
+      label="track"
+      :text="getTrack(time)"
+      :options="tracks"
+      @value:update="handleUpdateEvent('trackId', $event.uid)"
+    />
+  </div>
+  <div @click="handleClickEvent($event)">
+    <EditableSelect
+      :editable="editable"
+      :text="time.trackVariant"
+      :options="getTrackVariants(trackId)"
+      @value:update="handleUpdateEvent('trackVariant', $event)"
+    />
+  </div>
+</template>
+
+<script lang="ts">
+import { Laptime } from '@/builders/LaptimeBuilder'
+import { Options, prop, Vue } from 'vue-class-component'
+
+type UpdateEventKey = 'trackId' | 'trackVariant'
+
+export interface TrackComponentClickEvent {
+  trackId: string
+  trackVariant?: string
+}
+
+export interface TrackComponentUpdateEvent {
+  key: UpdateEventKey
+  value: string
+}
+
+export class TrackProps {
+  time = prop<Laptime>({ required: true })
+  editable = prop<boolean>({ default: false })
+}
+
+@Options({
+  emits: ['click', 'value:update']
+})
+export default class TrackComponent extends Vue.with(TrackProps) {
+  handleClickEvent (e: MouseEvent) {
+    if (!e.ctrlKey) {
+      this.$emit('click', { trackId: this.time.trackId, trackVariant: this.time.trackVariant })
+    }
+  }
+
+  handleUpdateEvent (key: UpdateEventKey, value: string) {
+    this.$emit('value:update', { key, value })
+  }
+
+  get tracks () {
+    return this.$dataStore.tracks
+  }
+
+  getTrack (time: Laptime) {
+    const track = this.$dataStore.getTrackById(time.trackId)
+    return track ? `${track.track} - ${time.trackVariant}` : 'Loading...'
+  }
+
+  getTrackName (time: Laptime) {
+    const track = this.$dataStore.getTrackById(time.trackId)
+    return track ? track.track : 'Loading...'
+  }
+}
+</script>
+
+<style scoped lang="scss">
+
+</style>
