@@ -77,10 +77,13 @@ export interface DataStore {
   addDriver (name: string) :void
   addLaptime (laptime: Laptime) :void
 
+  linkCarToGameId (carId: string, gameId: string) :void
+  linkTrackToGameId (trackId: string, gameId: string) :void
+  updateLaptime (laptime: LaptimeUpdate) :void
+
   showScreen (screen: ScreenType):void
   setLastAddedLaptime (laptime: Laptime) :void
   setWebsocketState (websocketState: WebsocketState) :void
-  updateLaptime (laptime: LaptimeUpdate) :void
   bindDb () : void
 }
 
@@ -157,6 +160,18 @@ export const dataStore: DataStore = {
     const docRef = doc(db, 'times', laptime.uid)
     console.log('Laptime: ', laptime, docRef)
     await setDoc(docRef, laptime, { merge: true })
+  },
+  async linkCarToGameId (carId: string, gameId: string) {
+    if (!carId || !gameId) return
+    const docRef = doc(db, 'cars', carId)
+    console.log('Link: ', carId, docRef)
+    await updateDoc(docRef, { gameId })
+  },
+  async linkTrackToGameId (trackId: string, gameId: string) {
+    if (!trackId || !gameId) return
+    const docRef = doc(db, 'tracks', trackId)
+    console.log('Link: ', trackId, docRef)
+    await updateDoc(docRef, { gameId })
   },
   getTimesForDriver (driverId: string) {
     if (!driverId) return []

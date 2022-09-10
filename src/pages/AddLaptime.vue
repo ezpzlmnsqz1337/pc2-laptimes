@@ -88,14 +88,14 @@
         >
           <div>In game car name: {{ carName }}</div>
           <Button
-            v-if="canSetCar()"
+            v-if="canSetCar"
             :type="ButtonType.SECONDARY"
             @click="setCarName(carName)"
           >
             Set
           </Button>
           <Button
-            v-if="carId && !canSetCar() && !carAlreadyLinked()"
+            v-if="carId && !canSetCar && !carAlreadyLinked"
             :type="ButtonType.DANGER"
             @click="linkCarToGameId(carId, carName)"
           >
@@ -126,14 +126,14 @@
         >
           <div>In game track location: {{ trackLocation }}</div>
           <Button
-            v-if="canSetTrack()"
+            v-if="canSetTrack"
             :type="ButtonType.SECONDARY"
             @click="setTrackLocation(trackLocation)"
           >
             Set
           </Button>
           <Button
-            v-if="trackId && !canSetTrack() && !trackAlreadyLinked()"
+            v-if="trackId && !canSetTrack && !trackAlreadyLinked"
             :type="ButtonType.DANGER"
             @click="linkTrackToGameId(trackId, trackLocation)"
           >
@@ -484,9 +484,10 @@ export default class AddLaptime extends Vue {
 
   get fastestLapTime () {
     const participantId = this.$rdb.getHostname() === 'wallpc' ? 0 : 1
-    if (this.participants.length === 0 || !this.participants[participantId]?.fastestLapTime) return '00:00:000'
+    if (this.participants.length === 0 || !this.participants[participantId]?.fastestLapTime) return
 
     const d = new Date(this.participants[participantId].fastestLapTime * 1000)
+    console.log(d)
     return this.$ltb.dateToLaptime(d)
   }
 
@@ -510,6 +511,46 @@ export default class AddLaptime extends Vue {
   get trackAlreadyLinked () {
     const track = this.$dataStore.getTrackById(this.trackId!)
     return track && track.gameId
+  }
+
+  onLaptimeInputKeyDown (e: any, leftInput: string, rightInput: string) {
+    if (e.key === 'ArrowRight') {
+      if (!rightInput) return
+      const ri = (this.$refs as any)[rightInput]
+      if (e.target.selectionStart === e.target.value.length) {
+        ri.selectionStart = 0
+        ri.focus()
+      }
+    } else if (e.key === 'ArrowLeft') {
+      if (!leftInput) return
+      const li = (this.$refs as any)[leftInput]
+      if (e.target.selectionStart === 0) {
+        li.selectionStart = li.value.length
+        li.focus()
+      }
+    }
+  }
+
+  onMessageCallback (msg: MessageEvent<any>) {
+    try {
+      let data = JSON.parse(msg.data)
+      if (data.packetType === undefined) return
+      data = data.data
+      if ('raceState' in data) {
+        if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
+        this.lastRaceState = data.raceState
+      }
+    } catch (e: unknown) {
+      console.log('Error: ', (e as SyntaxError).message, msg)
+    }
+  }
+
+  linkCarToGameId (carId: string, gameId: string) {
+    this.$dataStore.linkCarToGameId(carId, gameId)
+  }
+
+  linkTrackToGameId (trackId: string, gameId: string) {
+    this.$dataStore.linkTrackToGameId(trackId, gameId)
   }
 
   validateLaptimeFormat () {
@@ -590,43 +631,11 @@ export default class AddLaptime extends Vue {
     this.trackVariant = variant
   }
 
-  onLaptimeInputKeyDown (e: any, leftInput: string, rightInput: string) {
-    if (e.key === 'ArrowRight') {
-      if (!rightInput) return
-      const ri = (this.$refs as any)[rightInput]
-      if (e.target.selectionStart === e.target.value.length) {
-        ri.selectionStart = 0
-        ri.focus()
-      }
-    } else if (e.key === 'ArrowLeft') {
-      if (!leftInput) return
-      const li = (this.$refs as any)[leftInput]
-      if (e.target.selectionStart === 0) {
-        li.selectionStart = li.value.length
-        li.focus()
-      }
-    }
-  }
-
-  onMessageCallback (msg: MessageEvent<any>) {
-    try {
-      let data = JSON.parse(msg.data)
-      if (data.packetType === undefined) return
-      data = data.data
-      if ('raceState' in data) {
-        if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
-        this.lastRaceState = data.raceState
-      }
-    } catch (e: unknown) {
-      console.log('Error: ', (e as SyntaxError).message, msg)
-    }
-  }
-
   handleAutoSubmit (raceState: RaceState) {
     if (this.lastRaceState === RaceState.RACE_IS_ON && raceState === RaceState.RACE_FINISHED) {
       this.$dataStore.showScreen(ScreenType.ADD_LAPTIME)
       setTimeout(() => {
-        this.setLaptime(this.fastestLapTime)
+        this.setLaptime(this.fastestLapTime!)
         this.setCarName(this.carName)
         this.setTrackLocation(this.trackLocation)
         this.setTrackVariation(this.trackVariation)

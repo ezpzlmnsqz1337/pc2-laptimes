@@ -92,6 +92,13 @@
         >
           Set car image
         </Button> -->
+      <Button
+        :type="ButtonType.DANGER"
+        :class="{__selected: activeScreen === ScreenType.WEBSOCKET_TESTING}"
+        @click="showScreen(ScreenType.WEBSOCKET_TESTING)"
+      >
+        Websocket testing
+      </Button>
     </div>
   </div>
 </template>
@@ -130,11 +137,7 @@ export default class Menu extends Vue {
     return this.$realtimeDataStore.raceState
   }
 
-  showScreen (screen: ScreenType) {
-    this.$dataStore.showScreen(screen)
-  }
-
-  getRaceStateText () {
+  get raceStateText () {
     switch (this.raceState) {
       case RaceState.MENU:
         return 'In menu'
@@ -149,13 +152,17 @@ export default class Menu extends Vue {
     }
   }
 
-  getRaceStateClass () {
+  get raceStateClass () {
     return {
       __red: this.raceState === RaceState.MENU,
       __yellow: this.raceState === RaceState.BEFORE_RACE_MENU,
       __green: this.raceState === RaceState.RACE_IS_ON,
       __orange: this.raceState === RaceState.RACE_FINISHED
     }
+  }
+
+  showScreen (screen: ScreenType) {
+    this.$dataStore.showScreen(screen)
   }
 
   connect () {
