@@ -9,7 +9,7 @@
       <div class="__hideFilter">
         <Button
           :type="ButtonType.DANGER"
-          @click="toggleFilter()"
+          @click="$emit('filter:close')"
         >
           <div
             class="fa fa-window-close"
@@ -20,35 +20,35 @@
       <div class="__inputRow">
         <!-- object value -->
         <v-select
-          :model-value="carId"
+          :model-value="filter.carId"
           placeholder="Select car"
           :options="cars"
           :reduce="car => car.uid"
           label="name"
-          :class="{__activeFilter: carId}"
+          :class="{__activeFilter: filter.carId}"
           @update:model-value="setFilter({carId: $event})"
         />
       </div>
       <div class="__inputRow">
         <v-select
-          :model-value="trackId"
+          :model-value="filter.trackId"
           placeholder="Select track"
           :options="tracks"
           :reduce="track => track.uid"
           label="track"
-          :class="{__activeFilter: trackId}"
+          :class="{__activeFilter: filter.trackId}"
           @update:model-value="setFilter({trackId: $event, trackVariant: null})"
         />
       </div>
       <div
-        v-if="trackId"
+        v-if="filter.trackId"
         class="__inputRow"
       >
         <v-select
-          :model-value="trackVariant"
+          :model-value="filter.trackVariant"
           placeholder="Select track variant"
-          :options="getTrackVariants(trackId)"
-          :class="{__activeFilter: trackVariant}"
+          :options="getTrackVariants(filter.trackId)"
+          :class="{__activeFilter: filter.trackVariant}"
           @update:model-value="setFilter({trackVariant: $event})"
         />
       </div>
@@ -56,12 +56,12 @@
         class="__inputRow"
       >
         <v-select
-          :model-value="driverId"
+          :model-value="filter.driverId"
           placeholder="Select driver"
           :options="drivers"
           :reduce="driver => driver.uid"
           label="name"
-          :class="{__activeFilter: driverId}"
+          :class="{__activeFilter: filter.driverId}"
           @update:model-value="setFilter({driverId: $event})"
         />
       </div>
@@ -72,8 +72,8 @@
         <RadioButtons
           name="transmission"
           :values="Object.values(TransmissionType)"
-          :value="transmission"
-          @changed="e => setFilter({transmission: e})"
+          :value="filter.transmission"
+          @changed="setFilter({transmission: $event})"
         />
       </div>
 
@@ -84,8 +84,8 @@
         <RadioButtons
           name="weather"
           :values="Object.values(WeatherType)"
-          :value="weather"
-          @changed="e => setFilter({weather: e})"
+          :value="filter.weather"
+          @changed="setFilter({weather: $event})"
         />
       </div>
 
@@ -96,8 +96,8 @@
         <RadioButtons
           name="brakingLine"
           :values="Object.values(BrakingLine)"
-          :value="brakingLine"
-          @changed="e => setFilter({brakingLine: e})"
+          :value="filter.brakingLine"
+          @changed="setFilter({brakingLine: $event})"
         />
       </div>
 
@@ -108,8 +108,8 @@
         <RadioButtons
           name="controls"
           :values="Object.values(ControlType)"
-          :value="controls"
-          @changed="e => setFilter({controls: e})"
+          :value="filter.controls"
+          @changed="setFilter({controls: $event})"
         />
       </div>
 
@@ -120,8 +120,8 @@
         <RadioButtons
           name="startType"
           :values="Object.values(StartType)"
-          :value="startType"
-          @changed="e => setFilter({startType: e})"
+          :value="filter.startType"
+          @changed="setFilter({startType: $event})"
         />
       </div>
 
@@ -132,8 +132,8 @@
         <RadioButtons
           name="distinct"
           :values="Object.values(Game)"
-          :value="game"
-          @changed="e => setFilter({game: e})"
+          :value="filter.game"
+          @changed="setFilter({game: $event})"
         />
       </div>
 
@@ -144,8 +144,8 @@
         <RadioButtons
           name="distinct"
           :values="Object.values(Distinct)"
-          :value="distinct"
-          @changed="e => setFilter({distinct: e})"
+          :value="filter.distinct"
+          @changed="setFilter({distinct: $event})"
         />
       </div>
 
@@ -158,14 +158,14 @@
             class="__datepicker"
             input-format="dd.MM.yyyy"
             :disabled-dates="{predicate: disabledDates}"
-            :model-value="date"
+            :model-value="filter.date"
             @update:model-value="setFilter({date: $event})"
           />
         </div>
 
         <Button
           :type="ButtonType.DANGER"
-          :disabled="date === null"
+          :disabled="filter.date === null"
           @click="setFilter({date: null})"
         >
           <div
@@ -194,73 +194,114 @@
 
 <script lang="ts">
 import { Laptime } from '@/builders/LaptimeBuilder'
-import { LaptimeFilter } from '@/store/laptimeFilterStore'
-import { Vue } from 'vue-class-component'
+import { BrakingLine } from '@/constants/BrakingLine'
+import { ControlType } from '@/constants/ControlType'
+import { Distinct } from '@/constants/Distinct'
+import { Game } from '@/constants/Game'
+import { StartType } from '@/constants/StartType'
+import { TransmissionType } from '@/constants/TransmissionType'
+import { WeatherType } from '@/constants/WeatherType'
+import { LaptimeFilter } from '@/store/dataStore'
+import { Options, prop, Vue } from 'vue-class-component'
 
 interface LaptimeDb extends Laptime {
   dateString: string
 }
 
-export default class LaptimeFilterComponent extends Vue {
-  randomizing = false
-  allTimes: LaptimeDb[] = []
+class LaptimeFilterComponentProps {
+  showFilter = prop<boolean>({ default: true })
+}
 
-  get times () {
-    return this.$dataStore.times
+@Options({
+  emits: ['filter:changed', 'filter:close']
+})
+export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterComponentProps) {
+  randomizing = false
+
+  filter: LaptimeFilter = {
+    carId: null,
+    trackId: null,
+    trackVariant: null,
+    driverId: null,
+    transmission: TransmissionType.ANY,
+    weather: WeatherType.ANY,
+    brakingLine: BrakingLine.ANY,
+    controls: ControlType.ANY,
+    startType: StartType.ANY,
+    game: Game.ANY,
+    date: null,
+    distinct: Distinct.YES
+  }
+
+  get cars () {
+    return this.$dataStore.cars
+  }
+
+  get tracks () {
+    return this.$dataStore.tracks
+  }
+
+  get drivers () {
+    return this.$dataStore.drivers
+  }
+
+  get allTimes () {
+    return this.$dataStore.times as LaptimeDb[]
   }
 
   get raceDates () {
     return this.allTimes.map(x => x.dateString)
   }
 
-  get firstLaptime () {
-    return this.times[0].laptime
-  }
-
-  async mounted () {
-    if (screen.availWidth >= 700) {
-      this.$laptimeFilterStore.toggleFilter()
-    }
-    this.allTimes = (await this.$dataStore.getTimes(0)) as LaptimeDb[]
+  getTrackVariants (trackId: string) {
+    return this.$dataStore.getTrackVariants(trackId)
   }
 
   isFilterSet () {
-    this.$laptimeFilterStore.isFilterSet()
+    return Boolean(this.filter.carId || this.filter.trackId || this.filter.trackVariant || this.filter.transmission ||
+            this.filter.weather || this.filter.brakingLine || this.filter.controls || this.filter.startType || this.filter.game || this.filter.date || this.filter.distinct === Distinct.NO)
   }
 
-  async setRandomFilter () {
+  setRandomFilter () {
     if (this.randomizing) return
     this.randomizing = true
-    this.$dataStore.setTimes([])
     // select random laptime
     const index = Math.round(Math.random() * this.allTimes.length)
-    const { trackId, trackVariant, carId, weather } = this.allTimes[index]
-    this.setFilter({ trackId, trackVariant, carId, weather })
-    this.randomizing = false
+
+    setTimeout(() => {
+      const { trackId, trackVariant, carId, weather } = this.allTimes[index]
+      this.setFilter({ trackId, trackVariant, carId, weather })
+      this.randomizing = false
+    }, 500)
   }
 
   disabledDates (date: Date) {
     return !this.raceDates.includes(date.toLocaleDateString('en-GB'))
   }
 
-  async setFilter (filter: LaptimeFilter) {
-    this.$laptimeFilterStore.setFilter(filter)
-    this.$dataStore.refreshTimes()
+  setFilter (filter: LaptimeFilter) {
+    this.filter = { ...this.filter, ...filter }
+    this.$emit('filter:changed', this.filter)
   }
 
-  async clearFilter () {
-    this.$laptimeFilterStore.clearFilter()
-    this.$dataStore.refreshTimes()
+  clearFilter () {
+    this.filter.carId = null
+    this.filter.trackId = null
+    this.filter.trackVariant = null
+    this.filter.driverId = null
+    this.filter.transmission = TransmissionType.ANY
+    this.filter.weather = WeatherType.ANY
+    this.filter.brakingLine = BrakingLine.ANY
+    this.filter.controls = ControlType.ANY
+    this.filter.startType = StartType.ANY
+    this.filter.game = Game.ANY
+    this.filter.date = null
+    this.filter.distinct = Distinct.YES
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.__laptimeBoard {
-  padding: 1rem;
-  border-radius: 0.3rem;
-}
-
 .__filterWrapper {
   padding: 1rem;
 }

@@ -178,9 +178,8 @@
 
 <script lang="ts">
 import { Distinct } from '@/constants/Distinct'
-import TableMixin from '@/mixins/TableMixin.vue'
 import { StatisticsFilter } from '@/store/statisticsStore'
-import { Options, prop } from 'vue-class-component'
+import { Options, prop, Vue } from 'vue-class-component'
 import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
 
@@ -196,7 +195,7 @@ class LeaderboardsProps {
     Navigation
   }
 })
-export default class Leaderboards extends TableMixin.with(LeaderboardsProps) {
+export default class Leaderboards extends Vue.with(LeaderboardsProps) {
   mounted () {
     this.handleUrl()
   }
@@ -232,8 +231,8 @@ export default class Leaderboards extends TableMixin.with(LeaderboardsProps) {
 </script>
 
 <style lang="scss" scoped>
-@import '../assets/css/table.css';
-@import '../assets/css/carousel.css';
+@import '../../assets/css/table.css';
+@import '../../assets/css/carousel.css';
 
 .__filter {
   position: fixed;

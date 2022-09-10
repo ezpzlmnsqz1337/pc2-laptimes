@@ -501,7 +501,6 @@ import { RaceState } from '@/constants/RaceState'
 import { WebsocketState } from '@/constants/WebsocketState'
 import { Vue } from 'vue-class-component'
 import { Laptime } from '@/builders/LaptimeBuilder'
-import { LaptimeFilter } from '../store/laptimeFilterStore'
 
 export default class AddLaptime extends Vue {
   protected dataListener = this.$rdb.addListener(this.onMessageCallback)
@@ -603,25 +602,25 @@ export default class AddLaptime extends Vue {
   }
 
   addCar () {
-    this.$dataStore.addNewCar(this.newCarName)
+    this.$dataStore.addCar(this.newCarName)
     this.newCarName = ''
     this.showNewCarModal = false
   }
 
   addTrack () {
-    this.$dataStore.addNewTrack(this.newTrackName)
+    this.$dataStore.addTrack(this.newTrackName)
     this.newTrackName = ''
     this.showNewTrackModal = false
   }
 
   addTrackVariant () {
-    this.$dataStore.addNewTrackVariant(this.trackId!, this.newTrackVariantName)
+    this.$dataStore.addTrackVariant(this.trackId!, this.newTrackVariantName)
     this.newTrackVariantName = ''
     this.showNewTrackVariantModal = false
   }
 
   addDriver () {
-    this.$dataStore.addNewDriver(this.newDriverName)
+    this.$dataStore.addDriver(this.newDriverName)
     this.newDriverName = ''
     this.showNewDriverModal = false
   }
@@ -656,8 +655,8 @@ export default class AddLaptime extends Vue {
   }
 
   showTimeInTable ({ carId, trackId, trackVariant }: Laptime) {
-    this.$laptimeFilterStore.clearFilter()
-    this.$laptimeFilterStore.setFilter({ carId, trackId, trackVariant } as LaptimeFilter)
+    // this.$laptimeFilterStore.clearFilter()
+    // this.$laptimeFilterStore.setFilter({ carId, trackId, trackVariant } as LaptimeFilter)
     this.$dataStore.showScreen(ScreenType.LAPTIME_BOARD)
   }
 

@@ -100,25 +100,38 @@
 import { WebsocketState } from '@/constants/WebsocketState'
 import { RaceState } from '@/constants/RaceState'
 import { Vue } from 'vue-class-component'
+import { ScreenType } from '@/constants/ScreenType'
 
 export default class Menu extends Vue {
   connecting = false
   host = 'wallpc'
   wsHosts = ['wallpc', 'deskpc']
 
+  get activeScreen () {
+    return this.$dataStore.activeScreen
+  }
+
+  get websocketState () {
+    return this.$dataStore.websocketState
+  }
+
   get websocketStateText () {
-    return this.$dataStore.websocketState === WebsocketState.ESTABLISHED ? 'Connected' : 'Not connected'
+    return this.websocketState === WebsocketState.ESTABLISHED ? 'Connected' : 'Not connected'
   }
 
   get websocketStateClass () {
     return {
-      __connected: this.$dataStore.websocketState === WebsocketState.ESTABLISHED,
-      __notConnected: this.$dataStore.websocketState !== WebsocketState.ESTABLISHED
+      __connected: this.websocketState === WebsocketState.ESTABLISHED,
+      __notConnected: this.websocketState !== WebsocketState.ESTABLISHED
     }
   }
 
   get raceState () {
     return this.$realtimeDataStore.raceState
+  }
+
+  showScreen (screen: ScreenType) {
+    this.$dataStore.showScreen(screen)
   }
 
   getRaceStateText () {

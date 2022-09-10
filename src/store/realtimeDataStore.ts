@@ -1,4 +1,5 @@
 export interface Tyre {
+  name: string | null
   tyreFlags: any | null,
   terrain: any | null,
   tyreY: any | null,
@@ -28,6 +29,7 @@ export interface Tyre {
 
 function createTire (name: string): Tyre {
   return {
+    name,
     tyreFlags: null,
     terrain: null,
     tyreY: null,

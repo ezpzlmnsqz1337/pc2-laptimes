@@ -3,6 +3,7 @@
     v-for="(s, index) in settings"
     :key="index"
     :type="s"
+    :value="time[s]"
     :editable="editable"
     @click="handleClickEvent($event)"
     @value:update="handleUpdateEvent($event)"
@@ -22,17 +23,18 @@ export class RaceSettingsProps {
 @Options({
   components: {
     RaceSettingsBadge
-  }
+  },
+  emits: ['click', 'value:update']
 })
 export default class RaceSettings extends Vue.with(RaceSettingsProps) {
   settings = ['transmission', 'weather', 'brakingLine', 'controls']
 
   handleClickEvent (e: RaceSettingsBadgeClickEvent) {
-    this.$laptimeFilterStore.setFilter({ [e.type]: e.value })
+    this.$emit('click', e)
   }
 
   handleUpdateEvent (e: RaceSettingsBadgeUpdateEvent) {
-    this.$dataStore.updateLaptime({ uid: this.time.uid, [e.type]: e.value })
+    this.$emit('value:update', { uid: this.time.uid, [e.type]: e.value })
   }
 }
 

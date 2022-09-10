@@ -15,49 +15,39 @@
       class="__background3 __hidden"
     />
     <Menu />
-    <keep-alive>
+    <!-- <keep-alive>
       <AddLaptime v-if="activeScreen === ScreenType.ADD_LAPTIME" />
-    </keep-alive>
-    <div
-      v-show="activeScreen === ScreenType.LAPTIME_BOARD"
-      class="__laptimes"
-    >
-      <keep-alive>
-        <LaptimeFilterComponent v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
-      </keep-alive>
-      <keep-alive>
-        <LaptimeBoard v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
-      </keep-alive>
-    </div>
+    </keep-alive> -->
     <keep-alive>
+      <BrowseTimes v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
+    </keep-alive>
+    <!-- <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
-    </keep-alive>
-    <keep-alive>
+    </keep-alive> -->
+    <!-- <keep-alive>
       <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
-    </keep-alive>
+    </keep-alive> -->
     <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
   </div>
 </template>
 
 <script lang="ts">
-import AddLaptime from '@/pages/AddLaptime.vue'
-import LaptimeBoard from '@/pages/LaptimeBoard.vue'
-import LaptimeFilterComponent from '@/components/laptime-filter/LaptimeFilterComponent.vue'
+// import AddLaptime from '@/pages/AddLaptime.vue'
+import BrowseTimes from '@/pages/BrowseTimes.vue'
 // import SetCarImage from '@/components/SetCarImage'
 import Menu from '@/components/Menu.vue'
-import RealtimeData from '@/pages/RealtimeData.vue'
-import Statistics from '@/pages/Statistics.vue'
+// import RealtimeData from '@/pages/RealtimeData.vue'
+// import Statistics from '@/pages/Statistics.vue'
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from './constants/ScreenType'
 
 @Options({
   components: {
-    AddLaptime,
-    LaptimeBoard,
-    LaptimeFilterComponent,
-    Statistics,
-    RealtimeData,
+    // AddLaptime,
+    BrowseTimes,
+    // Statistics,
+    // RealtimeData,
     Menu
     // SetCarImage
   }
@@ -68,15 +58,19 @@ export default class App extends Vue {
   $refs!: any
 
   async mounted () {
-    // await this.$dataStore.bindDb()
-    // this.handleUrl()
+    this.$dataStore.bindDb()
+    this.handleUrl()
     // this.$dataStore.refreshTimes()
-    // setInterval(() => {
-    //   this.cycleBackground()
-    // }, 15000)
+    setInterval(() => {
+      this.cycleBackground()
+    }, 15000)
   }
 
-  unmounted () {
+  get activeScreen () {
+    return this.$dataStore.activeScreen
+  }
+
+  beforeUnmount () {
     unsubscribeAll()
   }
 

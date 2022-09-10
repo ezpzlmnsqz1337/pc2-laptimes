@@ -12,7 +12,7 @@
     <EditableSelect
       :editable="editable"
       :text="time.trackVariant"
-      :options="getTrackVariants(trackId)"
+      :options="getTrackVariants(time.trackId)"
       @value:update="handleUpdateEvent('trackVariant', $event)"
     />
   </div>
@@ -65,6 +65,10 @@ export default class TrackComponent extends Vue.with(TrackProps) {
   getTrackName (time: Laptime) {
     const track = this.$dataStore.getTrackById(time.trackId)
     return track ? track.track : 'Loading...'
+  }
+
+  getTrackVariants (trackId: string) {
+    return this.$dataStore.getTrackVariants(trackId)
   }
 }
 </script>

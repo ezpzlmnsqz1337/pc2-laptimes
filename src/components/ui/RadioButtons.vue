@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-import { Options, prop, Vue } from 'vue-class-component'
+import { prop, Vue } from 'vue-class-component'
 
 class RadioButtonsProps {
   noAny = prop<boolean>({ default: false })
@@ -38,9 +38,6 @@ class RadioButtonsProps {
   values = prop<any[]>({ default: [] })
 }
 
-@Options({
-  emits: ['changed']
-})
 export default class RadioButtons extends Vue.with(RadioButtonsProps) {
   selected: string | null = null
 

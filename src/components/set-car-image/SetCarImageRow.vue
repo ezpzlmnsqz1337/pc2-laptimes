@@ -33,7 +33,7 @@ export default class SetCarImageRow extends Vue.with(SetCarImageRowProps) {
   imageUrl = ''
 
   setCarImage (carId: string, imageUrl: string) {
-    this.$dataStore.setCarImage(carId, imageUrl)
+    this.$utilsStore.setCarImage(carId, imageUrl)
   }
 }
 </script>

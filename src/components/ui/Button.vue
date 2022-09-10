@@ -3,7 +3,6 @@
     :class="btnClass()"
     :title="title"
     :disabled="disabled"
-    @click.stop="$emit('click')"
   >
     <slot />
   </button>
@@ -11,7 +10,7 @@
 
 <script lang="ts">
 import { ButtonType } from '@/constants/ButtonType'
-import { Options, Vue, prop } from 'vue-class-component'
+import { Vue, prop } from 'vue-class-component'
 
 class ButtonProps {
   type = prop<ButtonType>({ default: ButtonType.DEFAULT })
@@ -20,9 +19,6 @@ class ButtonProps {
   disabled = prop<boolean>({ default: false })
 }
 
-Options({
-  emits: ['click']
-})
 export default class Button extends Vue.with(ButtonProps) {
   btnClass () {
     return {

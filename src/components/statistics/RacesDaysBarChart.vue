@@ -150,7 +150,7 @@ export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) 
     this.chartData.labels.splice(0)
     this.chartData.datasets.splice(0)
 
-    const laptimes = (await this.$dataStore.getTimes(0)).sort((a, b) => b.date - a.date)
+    const laptimes = this.$dataStore.getTimes().sort((a, b) => b.date - a.date)
     const noOfRaces = this.countNumberOfRaces(laptimes)
 
     this.generateChartData(noOfRaces)

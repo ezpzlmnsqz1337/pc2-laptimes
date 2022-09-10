@@ -140,7 +140,7 @@ export default class Statistics extends Vue {
     }
   }
 
-  async share () {
+  share () {
     let url = `${window.location.origin}/?page=statistics`
     url += `&section=${this.$dataStore.activeScreen}`
 
@@ -154,11 +154,12 @@ export default class Statistics extends Vue {
     this.$toast.success('Link copied to clipboard.')
   }
 
-  async refresh () {
+  refresh () {
     if (this.refreshing) return
+
     this.refreshing = true
-    const laptimes = await this.$dataStore.getTimes(0)
-    await this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers, this.$dataStore.tracks, this.$dataStore.cars)
+    const laptimes = this.$dataStore.getTimes()
+    this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers, this.$dataStore.tracks, this.$dataStore.cars)
 
     this.refreshing = false
   }

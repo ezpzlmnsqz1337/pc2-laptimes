@@ -4,10 +4,10 @@
     v-if="showDiff"
     class="__losing __losing_sm"
   >
-    {{ $ltb.getLaptimeDiff(firstLaptime, time.laptime) }}
+    {{ $ltb.getLaptimeDiff(firstPlace.laptime, time.laptime) }}
   </div>
   <div class="__losing __losing_lg">
-    <span v-if="showDiff">{{ $ltb.getLaptimeDiff(firstLaptime, time.laptime) }}</span>
+    <span v-if="showDiff">{{ $ltb.getLaptimeDiff(firstPlace.laptime, time.laptime) }}</span>
   </div>
 </template>
 
