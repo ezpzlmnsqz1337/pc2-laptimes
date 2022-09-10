@@ -12,8 +12,9 @@
 
 <script lang="ts">
 import { Laptime } from '@/builders/LaptimeBuilder'
+import { LaptimeFilter } from '@/store/dataStore'
 import { Options, prop, Vue } from 'vue-class-component'
-import RaceSettingsBadge, { RaceSettingsBadgeClickEvent, RaceSettingsBadgeUpdateEvent } from '../race-settings/RaceSettingsBadge.vue'
+import RaceSettingsBadge from '../race-settings/RaceSettingsBadge.vue'
 
 export class RaceSettingsProps {
   time = prop<Laptime>({ required: true })
@@ -29,12 +30,12 @@ export class RaceSettingsProps {
 export default class RaceSettings extends Vue.with(RaceSettingsProps) {
   settings = ['transmission', 'weather', 'brakingLine', 'controls']
 
-  handleClickEvent (e: RaceSettingsBadgeClickEvent) {
+  handleClickEvent (e: LaptimeFilter) {
     this.$emit('click', e)
   }
 
-  handleUpdateEvent (e: RaceSettingsBadgeUpdateEvent) {
-    this.$emit('value:update', { uid: this.time.uid, [e.type]: e.value })
+  handleUpdateEvent (e: Laptime) {
+    this.$emit('value:update', { ...e, uid: this.time.uid })
   }
 }
 

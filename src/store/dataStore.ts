@@ -168,7 +168,7 @@ export const dataStore: DataStore = {
     tracks.forEach(x => {
       const trackTimes = this.times
         .filter(x => x.trackId === x.uid)
-        .sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
+        .sort((a, b) => ltb.compareLaptimes(b.laptime, a.laptime))
 
       result[x.uid] = this.getDistinctTimes(trackTimes)
     })
@@ -177,18 +177,27 @@ export const dataStore: DataStore = {
   getTimes (filter?: LaptimeFilter) {
     if (!filter) return this.times
 
+    const ltb = LaptimeBuilder.getInstance()
+
     const filterKeys = Object.keys(filter).filter(x => x !== 'distinct')
 
     const times = this.times.filter((time: any) => {
       for (const key of filterKeys) {
-        const filterValue = (filter as any)[key]
+        let filterValue = (filter as any)[key]
         if (!filterValue) continue
-        if (time[key] !== filterValue) {
+
+        let timeValue = time[key]
+
+        if (key === 'date') {
+          timeValue = time.dateString
+          filterValue = new Date(filterValue).toLocaleDateString('en-GB')
+        }
+        if (timeValue !== filterValue) {
           return false
         }
       }
       return true
-    })
+    }).sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
 
     return filter.distinct === Distinct.YES ? this.getDistinctTimes(times) : times
   },

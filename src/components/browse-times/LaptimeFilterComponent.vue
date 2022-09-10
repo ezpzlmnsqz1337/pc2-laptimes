@@ -285,18 +285,20 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   }
 
   clearFilter () {
-    this.filter.carId = null
-    this.filter.trackId = null
-    this.filter.trackVariant = null
-    this.filter.driverId = null
-    this.filter.transmission = TransmissionType.ANY
-    this.filter.weather = WeatherType.ANY
-    this.filter.brakingLine = BrakingLine.ANY
-    this.filter.controls = ControlType.ANY
-    this.filter.startType = StartType.ANY
-    this.filter.game = Game.ANY
-    this.filter.date = null
-    this.filter.distinct = Distinct.YES
+    this.setFilter({
+      carId: null,
+      trackId: null,
+      trackVariant: null,
+      driverId: null,
+      transmission: TransmissionType.ANY,
+      weather: WeatherType.ANY,
+      brakingLine: BrakingLine.ANY,
+      controls: ControlType.ANY,
+      startType: StartType.ANY,
+      game: Game.ANY,
+      date: null,
+      distinct: Distinct.YES
+    })
   }
 }
 </script>

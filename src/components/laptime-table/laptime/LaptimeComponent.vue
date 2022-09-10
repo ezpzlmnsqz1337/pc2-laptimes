@@ -1,13 +1,12 @@
 <template>
-  <div>{{ time.laptime }}</div>
-  <div
-    v-if="showDiff"
-    class="__losing __losing_sm"
-  >
-    {{ $ltb.getLaptimeDiff(firstPlace.laptime, time.laptime) }}
-  </div>
-  <div class="__losing __losing_lg">
-    <span v-if="showDiff">{{ $ltb.getLaptimeDiff(firstPlace.laptime, time.laptime) }}</span>
+  <div class="__laptimeComponent">
+    <div>{{ time.laptime }}</div>
+    <div
+      v-if="showDiff"
+      class="__losing"
+    >
+      <span>{{ $ltb.getLaptimeDiff(firstPlace.laptime, time.laptime) }}</span>
+    </div>
   </div>
 </template>
 
@@ -49,5 +48,17 @@ export default class LaptimeComponent extends Vue.with(LaptimeProps) {
 </script>
 
 <style scoped lang="scss">
+.__laptimeComponent {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 0 1rem;
+}
 
+@media only screen and (max-width: 1300px) {
+  .__laptimeComponent {
+    flex-direction: column;
+  }
+}
 </style>

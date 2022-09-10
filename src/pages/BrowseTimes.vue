@@ -37,7 +37,6 @@ import TableControls from '@/components/laptime-table/TableControls.vue'
 })
 export default class BrowseTimes extends Vue {
   showFilter = true
-  loading = true
 
   $refs!: {
     table: LaptimeTable,
@@ -56,7 +55,7 @@ export default class BrowseTimes extends Vue {
     if (screen.availWidth >= 700) {
       this.toggleFilter()
     }
-    this.$refs.table.filter = this.$refs.filter
+    this.$refs.table.filterRef = this.$refs.filter
     setTimeout(() => this.handleUrl(), 500)
   }
 

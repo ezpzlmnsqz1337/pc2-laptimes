@@ -10,12 +10,6 @@
       <th v-if="displayColumn('laptime')">
         Laptime
       </th>
-      <th
-        v-if="displayColumn('laptime')"
-        class="__losing_lg"
-      >
-        Losing
-      </th>
       <th v-if="displayColumn('car')">
         Car
       </th>
@@ -152,7 +146,10 @@ export class LaptimeTableProps {
 export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   loading = true
   times: Laptime[] = []
-  filter!: LaptimeFilterComponent
+  maxRows = 50
+
+  filterRef!: LaptimeFilterComponent
+
   debouncedLoadData = _debounce(this._loadData, 300, true)
 
   getRowClass (laptime: Laptime) {
@@ -174,23 +171,24 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
     return this.displayColumns.includes(column)
   }
 
-  addFilter (filter: { type: string, value: string }) {
-    const laptimeFilter = { [filter.type]: filter.value } as LaptimeFilter
-    if (this.filter) {
-      this.filter.setFilter(laptimeFilter)
+  addFilter (filter: LaptimeFilter) {
+    if (this.filterRef) {
+      this.filterRef.setFilter(filter)
     } else {
-      this.loadData(laptimeFilter)
+      this.loadData(filter)
     }
   }
 
   loadData (filter: LaptimeFilter) {
-    console.log('L: ', this.times.length)
-    this.times = this.debouncedLoadData(filter)
+    this.debouncedLoadData(filter)
   }
 
   private _loadData (filter: LaptimeFilter) {
-    console.table(filter)
-    return this.$dataStore.getTimes(filter)
+    this.loading = true
+    this.$nextTick(() => {
+      this.times = this.$dataStore.getTimes(filter).slice(-this.maxRows)
+      this.loading = false
+    })
   }
 
   updateLaptime (e: any, time: Laptime) {

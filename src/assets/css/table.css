@@ -104,14 +104,6 @@ tr.__hasNotes {
   background-image: repeating-linear-gradient(135deg, rgba(188, 189, 205, 0.2) 0, rgba(188, 189, 205, 0.3) 1px, rgba(230, 230, 247, 0) 50%, rgba(230, 230, 247, 0) 30%);
 }
 
-.__losing_lg {
-  display: table-cell;
-}
-
-.__losing_sm {
-  display: none;
-}
-
 .__losing {
   white-space: nowrap;
   color: #c20000;
@@ -187,18 +179,6 @@ tr.__hasNotes {
   margin-bottom: 0.3rem;
   font-size: 0.7rem;
   min-width: 6rem;
-}
-
-@media only screen and (max-width: 1300px) {
-  .__losing_lg {
-    display: none;
-  }
-
-  .__losing_sm {
-    display: block;
-    white-space: nowrap;
-  }
-
 }
 
 @media only screen and (max-width: 1024px) {

@@ -1,13 +1,13 @@
 <template>
   <div
     :class="getClass(type)"
-    @click="$emit('click', {type, value})"
+    @click="$emit('click', {[type]: value})"
   >
     <EditableSelect
       :text="value"
       :icon="getIcon(type)"
       :options="Object.values(type).map(x => ({name: x}))"
-      @value:update="$emit('value:update', {type, value: $event.name})"
+      @value:update="$emit('value:update', {[type]: $event.name})"
     />
   </div>
 </template>
@@ -26,16 +26,6 @@ enum BadgeType {
   WEATHER = 'weather'
 }
 type BadgeValue = TransmissionType | BrakingLine | ControlType | WeatherType
-
-export interface RaceSettingsBadgeClickEvent {
-  type: BadgeType,
-  value: BadgeValue
-}
-
-export interface RaceSettingsBadgeUpdateEvent {
-  type: BadgeType,
-  value: BadgeValue
-}
 
 export class RaceSettingsBadgeProps {
   type = prop<BadgeType>({ required: true })
@@ -140,7 +130,7 @@ export default class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) 
       case ControlType.GAMEPAD:
         return 'gamepad'
       case ControlType.STEERING_WHEEL:
-        return 'steering-wheel'
+        return 'steering_wheel'
     }
   }
 }
