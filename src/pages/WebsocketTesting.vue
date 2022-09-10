@@ -46,6 +46,7 @@
 </template>
 
 <script lang="ts">
+import { PacketType } from '@/constants/PacketType'
 import { RaceState } from '@/constants/RaceState'
 import { Vue } from 'vue-class-component'
 
@@ -65,6 +66,8 @@ export default class WebsocketTesting extends Vue {
   }
 
   sendRaceState (raceState: RaceState) {
+    const data = { packetType: PacketType.RACE_DATA, data: { raceState } }
+    this.$rdb.listeners.forEach(x => x(data))
     this.$realtimeDataStore.setValues({ raceState })
   }
 }

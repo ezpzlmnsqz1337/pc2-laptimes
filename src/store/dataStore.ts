@@ -158,19 +158,16 @@ export const dataStore: DataStore = {
   async updateLaptime (laptime: LaptimeUpdate) {
     if (!laptime || !laptime.uid) return
     const docRef = doc(db, 'times', laptime.uid)
-    console.log('Laptime: ', laptime, docRef)
     await setDoc(docRef, laptime, { merge: true })
   },
   async linkCarToGameId (carId: string, gameId: string) {
     if (!carId || !gameId) return
     const docRef = doc(db, 'cars', carId)
-    console.log('Link: ', carId, docRef)
     await updateDoc(docRef, { gameId })
   },
   async linkTrackToGameId (trackId: string, gameId: string) {
     if (!trackId || !gameId) return
     const docRef = doc(db, 'tracks', trackId)
-    console.log('Link: ', trackId, docRef)
     await updateDoc(docRef, { gameId })
   },
   getTimesForDriver (driverId: string) {

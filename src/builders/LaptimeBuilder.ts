@@ -47,9 +47,6 @@ export default class LaptimeBuilder {
     laptimeToDate (laptime: string) {
       const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
 
-      if (typeof laptime !== 'string') {
-        console.log('laptime: ', laptime)
-      }
       const l1 = laptime.match(pattern)
       if (!l1) return
       return new Date(parseInt(l1[1]) * 60 * 1000 + parseInt(l1[2]) * 1000 + parseInt(l1[3]))

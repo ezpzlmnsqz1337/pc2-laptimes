@@ -434,9 +434,8 @@ export default class AddLaptime extends Vue {
   autoSubmit = false
   lastRaceState = RaceState.MENU
 
-  mounted () {
-    console.log(this.minutes)
-    this.dataListener = this.$rdb.addListener(this.onMessageCallback)
+  created () {
+    this.dataListener = this.$rdb.addListener(this.onRealTimeDataReceived)
   }
 
   get cars () {
@@ -487,7 +486,6 @@ export default class AddLaptime extends Vue {
     if (this.participants.length === 0 || !this.participants[participantId]?.fastestLapTime) return
 
     const d = new Date(this.participants[participantId].fastestLapTime * 1000)
-    console.log(d)
     return this.$ltb.dateToLaptime(d)
   }
 
@@ -531,17 +529,11 @@ export default class AddLaptime extends Vue {
     }
   }
 
-  onMessageCallback (msg: MessageEvent<any>) {
-    try {
-      let data = JSON.parse(msg.data)
-      if (data.packetType === undefined) return
-      data = data.data
-      if ('raceState' in data) {
-        if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
-        this.lastRaceState = data.raceState
-      }
-    } catch (e: unknown) {
-      console.log('Error: ', (e as SyntaxError).message, msg)
+  onRealTimeDataReceived (data: any) {
+    data = data.data
+    if ('raceState' in data) {
+      if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
+      this.lastRaceState = data.raceState
     }
   }
 

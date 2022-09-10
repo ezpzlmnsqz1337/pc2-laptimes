@@ -98,11 +98,12 @@
 </template>
 
 <script lang="ts">
+import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
 import { PacketType } from '@/constants/PacketType'
 import { Vue } from 'vue-class-component'
 
 export default class RealtimeData extends Vue {
-  protected realtimeDataListener = this.$rdb.addListener(this.onMessageCallback)
+  protected realtimeDataListener!: RealtimeDataListener;
   protected lightsUrl = 'http://malina:4500'
   protected lightsId = 'C82B96407FD3'
 
@@ -161,6 +162,10 @@ export default class RealtimeData extends Vue {
     return this.$realtimeDataStore.trackVariation
   }
 
+  created () {
+    this.realtimeDataListener = this.$rdb.addListener(this.onRealtimeDataReceived)
+  }
+
   toggleLights () {
     this.lightsEnabled = !this.lightsEnabled
     this.$lb.setLightsPower(this.lightsUrl, this.lightsId, this.lightsEnabled)
@@ -170,27 +175,20 @@ export default class RealtimeData extends Vue {
     if (this.realtimeData) {
       this.$rdb.removeListener(this.realtimeDataListener)
     } else {
-      this.realtimeDataListener = this.$rdb.addListener(this.onMessageCallback)
+      this.realtimeDataListener = this.$rdb.addListener(this.onRealtimeDataReceived)
     }
     this.realtimeData = !this.realtimeData
   }
 
-  onMessageCallback (message: MessageEvent<any>) {
-    try {
-      const data = JSON.parse(message.data)
-      if (data.packetType === undefined) return
-      // console.log('Packet type: ', data)
-      if (data.packetType === PacketType.TELEMETRY) {
-        this.setDials()
-        if (this.lightsEnabled) {
-          const { throttle, rpm, maxRpm, brake } = data
-          this.setLightsColor(throttle, rpm, maxRpm, brake)
-        }
+  onRealtimeDataReceived (data: any) {
+    if (data.packetType === PacketType.TELEMETRY) {
+      this.setDials()
+      if (this.lightsEnabled) {
+        const { throttle, rpm, maxRpm, brake } = data
+        this.setLightsColor(throttle, rpm, maxRpm, brake)
       }
-      this.$realtimeDataStore.setValues(data)
-    } catch (e: unknown) {
-      console.log('Error: ', (e as SyntaxError).message, message)
     }
+    this.$realtimeDataStore.setValues(data)
   }
 
   setDials () {

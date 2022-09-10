@@ -10,7 +10,7 @@ export default class RealtimeDataBuilder {
     protected ws: WebSocket | null = null
     protected hostname = 'localhost'
     protected port = 8765
-    protected listeners: Function[] = []
+    listeners: Function[] = []
     protected retryHandler?: number
     protected retries = 0
 
@@ -25,7 +25,16 @@ export default class RealtimeDataBuilder {
       this.hostname = hostname
       this.port = port
       this.ws = new WebSocket(`ws://${hostname}:${port}`)
-      this.ws.onmessage = message => this.listeners.forEach(x => x(message))
+      this.ws.onmessage = message => {
+        try {
+          const data = JSON.parse(message.data)
+          if (data.packetType === undefined) return
+          // console.log('Packet type: ', data)
+          this.listeners.forEach(x => x(data))
+        } catch (e: unknown) {
+          console.log('Error: ', (e as SyntaxError).message, message)
+        }
+      }
 
       if (!this.retryHandler) this.setupRetryHandler()
     }
