@@ -99,10 +99,10 @@
 </template>
 
 <script lang="ts">
-import StatisticsSection from '@/components/StatisticsSection.vue'
-import RacesDaysBarChart from '@/components/RacesDaysBarChart.vue'
-import Medals from '@/components/MedalsComponent.vue'
-import Leaderboards from '@/components/Leaderboards.vue'
+import StatisticsSection from '@/components/statistics/StatisticsSection.vue'
+import RacesDaysBarChart from '@/components/statistics/RacesDaysBarChart.vue'
+import Medals from '@/components/statistics/MedalsComponent.vue'
+import Leaderboards from '@/components/statistics/Leaderboards.vue'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import { Options, Vue } from 'vue-class-component'
 
@@ -116,6 +116,19 @@ import { Options, Vue } from 'vue-class-component'
 })
 export default class Statistics extends Vue {
   refreshing = false
+
+  get activeScreen () {
+    return this.$statisticsStore.activeScreen
+  }
+
+  get trackCarBoardData () {
+    return this.$statisticsStore.trackCarBoardData
+  }
+
+  showScreen (screen: StatisticsScreenType) {
+    this.$statisticsStore.showScreen(screen)
+  }
+
   mounted () {
     this.handleUrl()
     this.refresh()
@@ -126,13 +139,13 @@ export default class Statistics extends Vue {
       const section = this.queryParams.get('section')
       switch (section) {
         case StatisticsScreenType.MEDALS:
-          this.$statisticsStore.showScreen(StatisticsScreenType.MEDALS)
+          this.showScreen(StatisticsScreenType.MEDALS)
           break
         case StatisticsScreenType.CHARTS:
-          this.$statisticsStore.showScreen(StatisticsScreenType.CHARTS)
+          this.showScreen(StatisticsScreenType.CHARTS)
           break
         case StatisticsScreenType.LEADERBOARDS:
-          this.$statisticsStore.showScreen(StatisticsScreenType.LEADERBOARDS)
+          this.showScreen(StatisticsScreenType.LEADERBOARDS)
           break
         default:
           console.error('Unknown section: ', section)
@@ -158,10 +171,12 @@ export default class Statistics extends Vue {
     if (this.refreshing) return
 
     this.refreshing = true
-    const laptimes = this.$dataStore.getTimes()
-    this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers, this.$dataStore.tracks, this.$dataStore.cars)
+    this.$nextTick(() => {
+      const laptimes = this.$dataStore.getTimes()
+      this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers, this.$dataStore.tracks, this.$dataStore.cars)
 
-    this.refreshing = false
+      this.refreshing = false
+    })
   }
 }
 </script>

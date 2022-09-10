@@ -25,7 +25,7 @@
           class="__driver"
         >
           <td class="__name">
-            {{ getDriver(m.driverId) }}
+            {{ getDriverName(m.driverId) }}
           </td>
           <td class="__totalRaces">
             {{ getDriverTotalRaces(m.driverId) }}
@@ -58,15 +58,18 @@
 import { Medals } from '@/builders/StatisticsBuilder'
 import { Rank } from '@/constants/Rank'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
-import TableMixin from '@/mixins/TableMixin.vue'
 import { StatisticsFilter, TotalDriverRaces } from '@/store/statisticsStore'
-import { prop } from 'vue-class-component'
+import { prop, Vue } from 'vue-class-component'
 
 class MedalsProps {
   refresh = prop<Function>({ default: () => {} })
 }
 
-export default class MedalsComponent extends TableMixin.with(MedalsProps) {
+export default class MedalsComponent extends Vue.with(MedalsProps) {
+  get medals () {
+    return this.$statisticsStore.medals
+  }
+
   setFilter (filter: StatisticsFilter) {
     this.$statisticsStore.clearFilter()
     this.$statisticsStore.setFilter(filter)
@@ -79,7 +82,15 @@ export default class MedalsComponent extends TableMixin.with(MedalsProps) {
     this.refresh()
   }
 
-  getRank (driverId: string, position: number) {
+  getDriverName (driverId: string) {
+    return this.$dataStore.getDriverById(driverId)?.name
+  }
+
+  getDriverTotalRaces (driverId: string) {
+    return this.$statisticsStore.getDriverTotalRaces(driverId)
+  }
+
+  getRank (driverId: string) {
     const MIN_RACES_FOR_RANK = 10
 
     const driver = this.$dataStore.getDriverById(driverId)

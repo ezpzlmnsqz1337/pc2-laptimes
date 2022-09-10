@@ -22,7 +22,7 @@
           Driver
         </div>
         <Button :type="ButtonType.SECONDARY">
-          {{ getDriverById(driverId).name }}
+          {{ getDriverName(driverId) }}
         </Button>
       </div>
       <div
@@ -66,105 +66,12 @@
             class="__item"
           >
             <h3>
-              {{ getTrack(column[0]) }} - {{ getCar(column[0]) }}
+              {{ getTrackName(column[0]) }} - {{ getTrackVariantName(column[0]) }} - {{ getCar(column[0]) }}
             </h3>
-            <table
-              class="__trackCarBoard"
-            >
-              <tr class="__header">
-                <th>Rank</th>
-                <th>Driver</th>
-                <th>Laptime</th>
-                <th class="__losing_lg">
-                  Losing
-                </th>
-                <th colspan="2">
-                  Car
-                </th>
-                <th>Settings</th>
-              </tr>
-              <tr v-show="!trackCarBoardData.length">
-                <td
-                  colspan="7"
-                  class="__loading"
-                >
-                  <PulseLoader
-                    color="#188cff"
-                    size="15px"
-                  />
-                </td>
-              </tr>
-              <tr
-                v-for="(time, indexTime) in column"
-                :key="`item-${indexRow}${indexCol}${indexTime}`"
-                :title="getRowTitleText(time)"
-                :class="{__hasNotes: time.notes }"
-                @click="$toast.info(time.notes || 'No comment')"
-              >
-                <td class="__id">
-                  {{ indexTime + 1 }}.
-                </td>
-                <td class="__driver">
-                  <span>{{ getDriver(time) }}</span>
-                </td>
-                <td class="__laptime">
-                  <div>{{ time.laptime }}</div>
-                  <div
-                    v-if="indexTime > 0"
-                    class="__losing __losing_sm"
-                  >
-                    {{ time.losing }}
-                  </div>
-                </td>
-                <td class="__losing __losing_lg">
-                  <span v-if="indexTime > 0">{{ time.losing }}</span>
-                </td>
-                <td class="__car">
-                  {{ getCar(time) }}
-                </td>
-                <td class="__carImage">
-                  <img
-                    v-if="getCarImage(time)"
-                    :src="getCarImage(time)"
-                    :alt="getCar(time)"
-                  >
-                </td>
-                <td class="__settings">
-                  <div
-                    :class="transmissionClass(time.transmission)"
-                  >
-                    <div class="__textContainer">
-                      <div :class="`fa fa-${transmissionIcon(time.transmission)}`" />
-                      <span>{{ time.transmission }}</span>
-                    </div>
-                  </div>
-                  <div
-                    :class="weatherClass(time.weather)"
-                  >
-                    <div class="__textContainer">
-                      <div :class="`fa fa-${weatherIcon(time.weather)}`" />
-                      <span>{{ time.weather }}</span>
-                    </div>
-                  </div>
-                  <div
-                    :class="brakingLineClass(time.brakingLine)"
-                  >
-                    <div class="__textContainer">
-                      <div :class="`fa fa-${time.brakingLine === BrakingLine.ON ? 'check-circle' : 'times-circle'}`" />
-                      <span>{{ time.brakingLine }}</span>
-                    </div>
-                  </div>
-                  <div
-                    :class="controlsClass(time.controls)"
-                  >
-                    <div class="__textContainer">
-                      <div :class="`fa fa-${time.controls}`" />
-                      <span>{{ time.controls }}</span>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            </table>
+            <LaptimeTable
+              :rows="column"
+              :display-columns="displayColumns"
+            />
           </Slide>
           <template #addons="{ slidesCount }">
             <Navigation v-if="slidesCount > 1" />
@@ -177,10 +84,12 @@
 </template>
 
 <script lang="ts">
+import { Laptime } from '@/builders/LaptimeBuilder'
 import { Distinct } from '@/constants/Distinct'
 import { StatisticsFilter } from '@/store/statisticsStore'
 import { Options, prop, Vue } from 'vue-class-component'
 import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
+import LaptimeTable from '@/components/laptime-table/LaptimeTable.vue'
 import 'vue3-carousel/dist/carousel.css'
 
 class LeaderboardsProps {
@@ -192,12 +101,51 @@ class LeaderboardsProps {
     Carousel,
     Slide,
     Pagination,
-    Navigation
+    Navigation,
+    LaptimeTable
   }
 })
 export default class Leaderboards extends Vue.with(LeaderboardsProps) {
+  displayColumns = ['rank', 'driver', 'laptime', 'car', 'settings']
+
+  get times () {
+    return this.$dataStore.times
+  }
+
+  get trackCarBoardData () {
+    return this.$statisticsStore.trackCarBoardData
+  }
+
+  get driverId () {
+    return this.$statisticsStore.driverId
+  }
+
+  get position () {
+    return this.$statisticsStore.position
+  }
+
+  get distinct () {
+    return this.$statisticsStore.distinct
+  }
+
   mounted () {
     this.handleUrl()
+  }
+
+  getCar (laptime: Laptime) {
+    return this.$dataStore.getCarById(laptime.carId)?.name
+  }
+
+  getTrackName (laptime: Laptime) {
+    return this.$dataStore.getTrackById(laptime.trackId)?.track
+  }
+
+  getTrackVariantName (laptime: Laptime) {
+    return laptime.trackVariant
+  }
+
+  getDriverName (driverId: string) {
+    return this.$dataStore.getDriverById(driverId)?.name
   }
 
   handleUrl () {

@@ -13,10 +13,7 @@
         @share:click="share()"
       />
       <h2>Laptime board</h2>
-      <LaptimeTable
-        ref="table"
-        :times="times"
-      />
+      <LaptimeTable ref="table" />
     </div>
   </div>
 </template>

@@ -132,6 +132,7 @@ export type LaptimeTableColumn = 'rank' | 'driver' | 'laptime' | 'car' | 'track'
 export class LaptimeTableProps {
   lastAddedLaptime = prop<Laptime>({ default: null })
   displayColumns = prop<LaptimeTableColumn[]>({ default: ['rank', 'driver', 'laptime', 'car', 'track', 'settings'] })
+  rows = prop<Laptime[]>({ default: [] })
 }
 
 @Options({
@@ -151,6 +152,12 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   filterRef!: LaptimeFilterComponent
 
   debouncedLoadData = _debounce(this._loadData, 300, true)
+
+  created () {
+    if (this.rows) {
+      this.times = this.rows
+    }
+  }
 
   getRowClass (laptime: Laptime) {
     return { __lastAddedLaptime: this.lastAddedLaptime && this.lastAddedLaptime.uid === laptime.uid, __hasNotes: laptime.notes }
@@ -172,6 +179,7 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   addFilter (filter: LaptimeFilter) {
+    if (this.rows) return
     if (this.filterRef) {
       this.filterRef.setFilter(filter)
     } else {

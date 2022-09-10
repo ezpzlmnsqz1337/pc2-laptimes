@@ -10,14 +10,14 @@
     <keep-alive>
       <BrowseTimes v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
     </keep-alive>
-    <!-- <keep-alive>
+    <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
-    </keep-alive> -->
+    </keep-alive>
     <keep-alive>
       <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
     </keep-alive>
     <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
-    <WebsocketTesting v-if="activeScreen === ScreenType.WEBSOCKET_TESTING" />
+    <!-- <WebsocketTesting v-if="activeScreen === ScreenType.WEBSOCKET_TESTING" /> -->
   </div>
 </template>
 
@@ -28,8 +28,8 @@ import BrowseTimes from '@/pages/BrowseTimes.vue'
 import Menu from '@/components/Menu.vue'
 import Background from '@/components/Background.vue'
 import RealtimeData from '@/pages/RealtimeData.vue'
-// import Statistics from '@/pages/Statistics.vue'
-import WebsocketTesting from '@/pages/WebsocketTesting.vue'
+import Statistics from '@/pages/Statistics.vue'
+// import WebsocketTesting from '@/pages/WebsocketTesting.vue'
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from './constants/ScreenType'
@@ -41,8 +41,8 @@ import { ScreenType } from './constants/ScreenType'
     AddLaptime,
     BrowseTimes,
     RealtimeData,
-    WebsocketTesting
-    // Statistics,
+    // WebsocketTesting,
+    Statistics
     // SetCarImage
   }
 })

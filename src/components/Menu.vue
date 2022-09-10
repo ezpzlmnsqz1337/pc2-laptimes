@@ -92,13 +92,13 @@
         >
           Set car image
         </Button> -->
-      <Button
+      <!-- <Button
         :type="ButtonType.DANGER"
         :class="{__selected: activeScreen === ScreenType.WEBSOCKET_TESTING}"
         @click="showScreen(ScreenType.WEBSOCKET_TESTING)"
       >
         Websocket testing
-      </Button>
+      </Button> -->
     </div>
   </div>
 </template>
