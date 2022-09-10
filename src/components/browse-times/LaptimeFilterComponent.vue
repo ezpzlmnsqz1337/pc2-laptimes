@@ -258,8 +258,8 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   }
 
   isFilterSet () {
-    return Boolean(this.filter.carId || this.filter.trackId || this.filter.trackVariant || this.filter.transmission ||
-            this.filter.weather || this.filter.brakingLine || this.filter.controls || this.filter.startType || this.filter.game || this.filter.date || this.filter.distinct === Distinct.NO)
+    // 1 is Distinct filter which is always set
+    return Object.values(this.filter).filter(x => Boolean(x)).length > 1
   }
 
   setRandomFilter () {

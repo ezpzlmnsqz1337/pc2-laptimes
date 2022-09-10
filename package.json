@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "deploy:malina": "yarn build && ssh pi@malina 'rm -rf /home/pi/workspace/laptimes/**' && scp -r ./dist/** pi@malina:/home/pi/workspace/laptimes/"
+    "deploy:malina": "yarn build && ssh pi@malina 'rm -rf /home/pi/workspace/laptimes/**' && scp -r ./dist/** pi@malina:/home/pi/workspace/laptimes/",
+    "emulate:db": "firebase emulators:start --only firestore --import=./test/db --export-on-exit"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",

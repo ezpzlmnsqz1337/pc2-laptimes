@@ -65,7 +65,6 @@ export default class LaptimeBuilder {
     }
 
     isLaptimeValid (minutes: string, seconds: string, milliseconds: string) {
-      console.log('IS LAPTIME VALID', minutes, seconds, milliseconds)
       const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
       // check not set
       if ((minutes.length <= 0 || seconds.length !== SECONDS_LENGTH || milliseconds.length !== MILLISECONDS_LENGTH)) return false
