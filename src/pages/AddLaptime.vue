@@ -1,135 +1,27 @@
 <template>
   <div class="__addLaptime">
-    <Modal
-      v-if="showNewDriverModal"
-      @close="showNewDriverModal = false"
-    >
-      <template #header>
-        <h3>Add driver</h3>
-      </template>
-      <template #body>
-        <input
-          v-model="newDriverName"
-          class="__modalInput"
-          placeholder="Enter driver name"
-          type="text"
-        >
-        <div class="__modalButtons">
-          <Button
-            :type="ButtonType.DANGER"
-            @click="showNewDriverModal = false"
-          >
-            Cancel
-          </Button>
-          <Button
-            :type="ButtonType.PRIMARY"
-            @click="addDriver()"
-          >
-            Add
-          </Button>
-        </div>
-      </template>
-    </Modal>
-
-    <Modal
+    <NewCarModal
       v-if="showNewCarModal"
       @close="showNewCarModal = false"
-    >
-      <template #header>
-        <h3>Add Car</h3>
-      </template>
-      <template #body>
-        <input
-          v-model="newCarName"
-          class="__modalInput"
-          placeholder="Enter car name"
-          type="text"
-        >
-        <div class="__modalButtons">
-          <Button
-            :type="ButtonType.DANGER"
-            @click="showNewCarModal = false"
-          >
-            Cancel
-          </Button>
-          <Button
-            :type="ButtonType.PRIMARY"
-            @click="addCar()"
-          >
-            Add
-          </Button>
-        </div>
-      </template>
-    </Modal>
-
-    <Modal
+    />
+    <NewTrackModal
       v-if="showNewTrackModal"
       @close="showNewTrackModal = false"
-    >
-      <template #header>
-        <h3>Add Track</h3>
-      </template>
-      <template #body>
-        <input
-          v-model="newTrackName"
-          class="__modalInput"
-          placeholder="Enter track name"
-          type="text"
-        >
-        <div class="__modalButtons">
-          <Button
-            :type="ButtonType.DANGER"
-            @click="showNewTrackModal = false"
-          >
-            Cancel
-          </Button>
-          <Button
-            :type="ButtonType.PRIMARY"
-            @click="addTrack()"
-          >
-            Add
-          </Button>
-        </div>
-      </template>
-    </Modal>
-
-    <Modal
+    />
+    <NewTrackVariantModal
       v-if="showNewTrackVariantModal"
+      :track-id="trackId"
       @close="showNewTrackVariantModal = false"
-    >
-      <template #header>
-        <h3>Add Track variant</h3>
-      </template>
-      <template #body>
-        <input
-          v-model="newTrackVariantName"
-          class="__modalInput"
-          placeholder="Enter track variant name"
-          type="text"
-        >
-        <div class="__modalButtons">
-          <Button
-            :type="ButtonType.DANGER"
-            @click="showNewTrackVariantModal = false"
-          >
-            Cancel
-          </Button>
-          <Button
-            :type="ButtonType.PRIMARY"
-            @click="addTrackVariant()"
-          >
-            Add
-          </Button>
-        </div>
-      </template>
-    </Modal>
+    />
+    <NewDriverModal
+      v-if="showNewDriverModal"
+      @close="showNewDriverModal = false"
+    />
 
     <div class="__heading">
       <h1>Add Laptime</h1>
     </div>
-    <div
-      class="__timeWrapper"
-    >
+    <div class="__timeWrapper">
       <div class="__firstPanel">
         <div
           v-if="fastestLapTime"
@@ -149,42 +41,42 @@
             :class="{__error: laptimeError}"
           >
             <input
-              ref="minutes"
+              ref="minutesRef"
               v-model="minutes"
               tabindex="1"
               type="text"
               maxlength="2"
               class="__minutes"
               placeholder="0"
-              @keydown="onLaptimeInputKeyDown($event, null, 'seconds')"
+              @keydown="onLaptimeInputKeyDown($event, null, 'secondsRef')"
               @input="validateLaptimeFormat()"
             >
             <div class="__colon">
               :
             </div>
             <input
-              ref="seconds"
+              ref="secondsRef"
               v-model="seconds"
               tabindex="2"
               maxlength="2"
               type="text"
               class="__seconds"
               placeholder="00"
-              @keydown="onLaptimeInputKeyDown($event, 'minutes', 'milliseconds')"
+              @keydown="onLaptimeInputKeyDown($event, 'minutesRef', 'millisecondsRef')"
               @input="validateLaptimeFormat()"
             >
             <div class="__dot">
               .
             </div>
             <input
-              ref="milliseconds"
+              ref="millisecondsRef"
               v-model="milliseconds"
               tabindex="3"
               maxlength="3"
               type="text"
               class="__milliseconds"
               placeholder="000"
-              @keydown="onLaptimeInputKeyDown($event, 'seconds')"
+              @keydown="onLaptimeInputKeyDown($event, 'secondsRef')"
               @input="validateLaptimeFormat()"
             >
           </div>
@@ -490,28 +382,43 @@
 </template>
 
 <script lang="ts">
-import { TransmissionType } from '@/constants/TransmissionType'
-import { WeatherType } from '@/constants/WeatherType'
+import { Laptime } from '@/builders/LaptimeBuilder'
+import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
+import NewCarModal from '@/components/add-laptime/NewCarModal.vue'
+import NewDriverModal from '@/components/add-laptime/NewDriverModal.vue'
+import NewTrackModal from '@/components/add-laptime/NewTrackModal.vue'
+import NewTrackVariantModal from '@/components/add-laptime/NewTrackVariantModal.vue'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
-import { ScreenType } from '@/constants/ScreenType'
-import { StartType } from '@/constants/StartType'
 import { Game } from '@/constants/Game'
 import { RaceState } from '@/constants/RaceState'
+import { ScreenType } from '@/constants/ScreenType'
+import { StartType } from '@/constants/StartType'
+import { TransmissionType } from '@/constants/TransmissionType'
+import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
-import { Vue } from 'vue-class-component'
-import { Laptime } from '@/builders/LaptimeBuilder'
+import eb from '@/eventBus'
+import { LaptimeFilter } from '@/store/dataStore'
+import { Options, Vue } from 'vue-class-component'
 
+@Options({
+  components: {
+    NewCarModal,
+    NewTrackModal,
+    NewTrackVariantModal,
+    NewDriverModal
+  }
+})
 export default class AddLaptime extends Vue {
-  protected dataListener = this.$rdb.addListener(this.onMessageCallback)
+  protected dataListener!: RealtimeDataListener
 
   carId: string | null = null
   trackId: string | null = null
   trackVariant: string | null = null
   driverId: string | null = null
-  minutes = ''
-  seconds = ''
-  milliseconds = ''
+  minutes: string = ''
+  seconds: string = ''
+  milliseconds: string = ''
   laptimeError = false
   transmission = TransmissionType.SEQUENTIAL
   weather = WeatherType.SUN
@@ -520,20 +427,28 @@ export default class AddLaptime extends Vue {
   startType = StartType.RUNNING
   game = Game.PC2
   notes = ''
-  newDriverName = ''
   showNewDriverModal = false
-  newCarName = ''
-  newTrackName = ''
-  newTrackVariantName = ''
   showNewCarModal = false
   showNewTrackModal = false
   showNewTrackVariantModal = false
   autoSubmit = false
   lastRaceState = RaceState.MENU
 
-  $refs!: {
-    leftInput: HTMLInputElement,
-    rightInput: HTMLInputElement
+  mounted () {
+    console.log(this.minutes)
+    this.dataListener = this.$rdb.addListener(this.onMessageCallback)
+  }
+
+  get cars () {
+    return this.$dataStore.cars
+  }
+
+  get tracks () {
+    return this.$dataStore.tracks
+  }
+
+  get drivers () {
+    return this.$dataStore.drivers
   }
 
   get trackLocation () {
@@ -601,30 +516,6 @@ export default class AddLaptime extends Vue {
     this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d{2}.\d{3}$/) === null
   }
 
-  addCar () {
-    this.$dataStore.addCar(this.newCarName)
-    this.newCarName = ''
-    this.showNewCarModal = false
-  }
-
-  addTrack () {
-    this.$dataStore.addTrack(this.newTrackName)
-    this.newTrackName = ''
-    this.showNewTrackModal = false
-  }
-
-  addTrackVariant () {
-    this.$dataStore.addTrackVariant(this.trackId!, this.newTrackVariantName)
-    this.newTrackVariantName = ''
-    this.showNewTrackVariantModal = false
-  }
-
-  addDriver () {
-    this.$dataStore.addDriver(this.newDriverName)
-    this.newDriverName = ''
-    this.showNewDriverModal = false
-  }
-
   submit () {
     const laptime: Laptime = {
       uid: '',
@@ -655,12 +546,13 @@ export default class AddLaptime extends Vue {
   }
 
   showTimeInTable ({ carId, trackId, trackVariant }: Laptime) {
-    // this.$laptimeFilterStore.clearFilter()
-    // this.$laptimeFilterStore.setFilter({ carId, trackId, trackVariant } as LaptimeFilter)
+    eb.emit('filter:clear')
+    eb.emit('filter:set', { carId, trackId, trackVariant } as LaptimeFilter)
     this.$dataStore.showScreen(ScreenType.LAPTIME_BOARD)
   }
 
   setLaptime (laptime: string) {
+    console.log('Set laptime', laptime)
     const d = this.$ltb.laptimeToDate(laptime)
     this.minutes = `${d?.getMinutes()}`
     this.seconds = `${d?.getSeconds()}`.padStart(2, '0')
@@ -685,8 +577,12 @@ export default class AddLaptime extends Vue {
     this.trackId = track.uid
   }
 
+  getTrackVariants (trackId: string) {
+    return this.$dataStore.getTrackVariants(trackId)
+  }
+
   setTrackVariation (trackVariation: string) {
-    const variant = this.$dataStore.getTrackVariants(this.trackId!)?.find(x => x.includes(trackVariation.replace('_', ' ')))
+    const variant = this.getTrackVariants(this.trackId!)?.find(x => x.includes(trackVariation.replace('_', ' ')))
     if (!variant) {
       this.$toast.error('Unable to set track variant. Track variant does not exist.')
       return
@@ -754,6 +650,23 @@ export default class AddLaptime extends Vue {
   padding: 2rem;
   margin: 0 auto;
   text-align: center;
+}
+
+.__inputRow {
+  display: flex;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  width: 100%;
+  justify-content: center;
+}
+
+.__noColumn {
+  flex-direction: row !important;
+  border-bottom: 0.1rem solid white;
+}
+
+.__noColumn > div {
+  padding: 0.5rem 1rem;
 }
 
 .__firstPanel, .__secondPanel {
@@ -902,16 +815,6 @@ export default class AddLaptime extends Vue {
 
 .__selectLabel {
   text-align: left;
-}
-
-.__modalButtons {
-  display: flex;
-  justify-content: flex-end;
-}
-
-.__modalInput {
-  margin-bottom: 1rem;
-  width: 100%;
 }
 
 .__brakingLine {

@@ -317,8 +317,21 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
 }
 
 .__inputRow {
+  display: flex;
+  margin: 0 auto;
   margin-bottom: 0.7rem;
+  width: 100%;
+  justify-content: center;
   align-items: center;
+}
+
+.__noColumn {
+  flex-direction: row !important;
+  border-bottom: 0.1rem solid white;
+}
+
+.__noColumn > div {
+  padding: 0.5rem 1rem;
 }
 
 .__activeFilter {

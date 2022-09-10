@@ -234,4 +234,10 @@ export default class Menu extends Vue {
   padding: 0.4rem 0.3rem;
 }
 
+@media only screen and (max-width: 700px) {
+  .__menu button {
+    font-size: 0.6rem;
+  }
+}
+
 </style>
