@@ -263,6 +263,7 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   }
 
   setRandomFilter () {
+    if (!this.allTimes.length) return
     if (this.randomizing) return
     this.randomizing = true
     // select random laptime

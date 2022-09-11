@@ -44,7 +44,7 @@ export default class EditableSelect extends Vue.with(EditableSelectProps) {
     select: VueSelectInstance
   }
 
-  startEditing (e: KeyboardEvent) {
+  startEditing (e: MouseEvent) {
     if (!this.editable) return
     if (!this.isLocal() || !e.ctrlKey) return
     this.edit = true

@@ -145,7 +145,7 @@ export class LaptimeTableProps {
   }
 })
 export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
-  loading = true
+  loading = false
   times: Laptime[] = []
   maxRows = 50
 
@@ -154,7 +154,7 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   debouncedLoadData = _debounce(this._loadData, 300, true)
 
   created () {
-    if (this.rows) {
+    if (this.rows.length) {
       this.times = this.rows
     }
   }
@@ -187,11 +187,12 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
     }
   }
 
-  loadData (filter: LaptimeFilter) {
+  loadData (filter?: LaptimeFilter) {
     this.debouncedLoadData(filter)
   }
 
-  private _loadData (filter: LaptimeFilter) {
+  private _loadData (filter?: LaptimeFilter) {
+    if (!filter && this.filterRef) filter = this.filterRef.filter
     this.loading = true
     this.$nextTick(() => {
       this.times = this.$dataStore.getTimes(filter).slice(-this.maxRows)
@@ -200,7 +201,8 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   updateLaptime (e: any, time: Laptime) {
-    this.$dataStore.updateLaptime({ uid: time.uid, [e.type]: e.value })
+    console.log(e, e.key, e.value)
+    this.$dataStore.updateLaptime({ uid: time.uid, [e.key]: e.value })
   }
 }
 </script>

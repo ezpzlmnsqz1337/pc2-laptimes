@@ -5,6 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "deploy:malina": "yarn build && ssh pi@malina 'rm -rf /home/pi/workspace/laptimes/**' && scp -r ./dist/** pi@malina:/home/pi/workspace/laptimes/",
     "emulate:db": "firebase emulators:start --only firestore --import=./test/db --export-on-exit"
@@ -32,6 +33,7 @@
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@types/debounce": "^1.2.1",
     "@types/events": "^3.0.0",
     "@types/uuid": "^8.3.4",
@@ -42,10 +44,13 @@
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-pwa": "~5.0.0",
     "@vue/cli-plugin-typescript": "~5.0.0",
+    "@vue/cli-plugin-unit-jest": "~5.0.0",
     "@vue/cli-service": "~5.0.0",
     "@vue/eslint-config-standard": "^6.1.0",
     "@vue/eslint-config-typescript": "^9.1.0",
     "@vue/test-utils": "^2.0.0-0",
+    "@vue/vue3-jest": "^27.0.0-alpha.1",
+    "babel-jest": "^27.0.6",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.32.0",
     "eslint-plugin-import": "^2.25.3",
@@ -53,8 +58,10 @@
     "eslint-plugin-promise": "^5.1.0",
     "eslint-plugin-standard": "^4.0.0",
     "eslint-plugin-vue": "^8.0.3",
+    "jest": "^27.0.5",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
+    "ts-jest": "^27.0.4",
     "typescript": "~4.5.5"
   }
 }

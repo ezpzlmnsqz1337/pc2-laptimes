@@ -7,7 +7,7 @@
   <div @click="handleClickEvent($event)">
     <EditableSelect
       :editable="editable"
-      label="car"
+      label="name"
       :text="getCarName(time)"
       :options="cars"
       @value:update="handleUpdateEvent('carId', $event.uid)"
@@ -54,8 +54,7 @@ export default class CarComponent extends Vue.with(CarProps) {
   }
 
   getCarName (time: Laptime) {
-    const car = this.$dataStore.getCarById(time.carId)
-    return car ? car.name : 'Loading...'
+    return this.$dataStore.getCarById(time.carId)?.name
   }
 
   getCarImage (time: Laptime) {

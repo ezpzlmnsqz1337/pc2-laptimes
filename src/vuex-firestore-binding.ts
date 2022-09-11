@@ -9,6 +9,7 @@ const subs: FirestoreSubscription[] = []
 
 export const unsubscribeAll = () => {
   subs.forEach(x => x.unsubscribe())
+  subs.splice(0)
 }
 
 export const unsubscribe = (key: string) => {

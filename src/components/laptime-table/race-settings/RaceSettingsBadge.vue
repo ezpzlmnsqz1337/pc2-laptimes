@@ -1,13 +1,14 @@
 <template>
   <div
     :class="getClass(type)"
-    @click="$emit('click', {[type]: value})"
+    @click="handleClickEvent($event)"
   >
     <EditableSelect
       :text="value"
+      :editable="editable"
       :icon="getIcon(type)"
-      :options="Object.values(type).map(x => ({name: x}))"
-      @value:update="$emit('value:update', {[type]: $event.name})"
+      :options="getOptions(type)"
+      @value:update="handleUpdateEvent(type, $event.name)"
     />
   </div>
 </template>
@@ -15,16 +16,11 @@
 <script lang="ts">
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
+import { BadgeType } from '@/constants/BadgeType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { Options, prop, Vue } from 'vue-class-component'
 
-enum BadgeType {
-  TRANSMISSION = 'transmission',
-  BRAKING_LINE = 'brakingLine',
-  CONTROLS = 'controls',
-  WEATHER = 'weather'
-}
 type BadgeValue = TransmissionType | BrakingLine | ControlType | WeatherType
 
 export class RaceSettingsBadgeProps {
@@ -37,6 +33,16 @@ export class RaceSettingsBadgeProps {
   emits: ['click', 'value:update']
 })
 export default class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) {
+  handleClickEvent (e: MouseEvent) {
+    if (!e.ctrlKey) {
+      this.$emit('click', { [this.type]: this.value })
+    }
+  }
+
+  handleUpdateEvent (key: BadgeType, value: string) {
+    this.$emit('value:update', { key, value })
+  }
+
   getClass (type: BadgeType) {
     switch (type) {
       case BadgeType.TRANSMISSION:
@@ -60,6 +66,19 @@ export default class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) 
         return this.getControlsIcon(this.value as ControlType)
       case BadgeType.WEATHER:
         return this.getWeatherIcon(this.value as WeatherType)
+    }
+  }
+
+  getOptions (type: BadgeType) {
+    switch (type) {
+      case BadgeType.TRANSMISSION:
+        return Object.values(TransmissionType).map(x => ({ name: x }))
+      case BadgeType.BRAKING_LINE:
+        return Object.values(BrakingLine).map(x => ({ name: x }))
+      case BadgeType.CONTROLS:
+        return Object.values(ControlType).map(x => ({ name: x }))
+      case BadgeType.WEATHER:
+        return Object.values(WeatherType).map(x => ({ name: x }))
     }
   }
 

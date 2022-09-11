@@ -1,7 +1,7 @@
 <template>
   <div class="__laptimes">
     <LaptimeFilterComponent
-      ref="filter"
+      ref="filterRef"
       :show-filter="showFilter"
       @filter:changed="onFilterChanged($event)"
       @filter:close="toggleFilter()"
@@ -13,7 +13,7 @@
         @share:click="share()"
       />
       <h2>Laptime board</h2>
-      <LaptimeTable ref="table" />
+      <LaptimeTable ref="tableRef" />
     </div>
   </div>
 </template>
@@ -36,8 +36,8 @@ export default class BrowseTimes extends Vue {
   showFilter = true
 
   $refs!: {
-    table: LaptimeTable,
-    filter: LaptimeFilterComponent
+    tableRef: LaptimeTable,
+    filterRef: LaptimeFilterComponent
   }
 
   get times () {
@@ -49,20 +49,21 @@ export default class BrowseTimes extends Vue {
   }
 
   mounted () {
-    if (screen.availWidth >= 700) {
+    if (screen.availWidth <= 700) {
       this.toggleFilter()
     }
-    this.$refs.table.filterRef = this.$refs.filter
+    this.$refs.tableRef.filterRef = this.$refs.filterRef
+    this.$refs.tableRef.loading = true
     setTimeout(() => this.handleUrl(), 500)
   }
 
   onFilterChanged (filter: LaptimeFilter) {
-    this.$refs.table.loadData(filter)
+    this.$refs.tableRef.loadData(filter)
   }
 
   async share () {
     const url = `${window.location.origin}/?page=laptime_board`
-    const filter = this.$refs.filter.filter
+    const filter = this.$refs.filterRef.filter
     const encoded = JSON.stringify(filter)
 
     navigator.clipboard.writeText(`${url}&filter=` + encoded)
@@ -72,10 +73,10 @@ export default class BrowseTimes extends Vue {
   handleUrl () {
     if (this.queryParams.has('filter')) {
       const filter = JSON.parse(this.queryParams.get('filter')!)
-      this.$refs.table.addFilter(filter)
+      this.$refs.tableRef.addFilter(filter)
       return
     }
-    this.$refs.filter.setRandomFilter()
+    this.$refs.filterRef.setRandomFilter()
   }
 
   toggleFilter () {
