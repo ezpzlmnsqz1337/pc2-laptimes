@@ -17,7 +17,7 @@
       <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
     </keep-alive>
     <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
-    <!-- <WebsocketTesting v-if="activeScreen === ScreenType.WEBSOCKET_TESTING" /> -->
+    <WebsocketTesting v-if="activeScreen === ScreenType.WEBSOCKET_TESTING" />
   </div>
 </template>
 
@@ -29,7 +29,7 @@ import Menu from '@/components/Menu.vue'
 import Background from '@/components/Background.vue'
 import RealtimeData from '@/pages/RealtimeData.vue'
 import Statistics from '@/pages/Statistics.vue'
-// import WebsocketTesting from '@/pages/WebsocketTesting.vue'
+import WebsocketTesting from '@/pages/WebsocketTesting.vue'
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from './constants/ScreenType'
@@ -41,7 +41,7 @@ import { ScreenType } from './constants/ScreenType'
     AddLaptime,
     BrowseTimes,
     RealtimeData,
-    // WebsocketTesting,
+    WebsocketTesting,
     Statistics
     // SetCarImage
   }
@@ -184,10 +184,6 @@ a {
 /* Hide scrollbar for Chrome, Safari and Opera */
 .__wrapper::-webkit-scrollbar {
   display: none;
-}
-
-.__inputRow > input, .__inputRow > .v-select {
-  width: 100%;
 }
 
 .__laptimes {

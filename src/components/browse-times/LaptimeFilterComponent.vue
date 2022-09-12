@@ -1,194 +1,185 @@
 <template>
   <div
-    class="__filter"
+    v-show="showFilter"
+    class="__filterWrapper"
   >
-    <div
-      v-show="showFilter"
-      class="__filterWrapper"
-    >
-      <div class="__hideFilter">
-        <Button
-          :type="ButtonType.DANGER"
-          @click="$emit('filter:close')"
-        >
-          <div
-            class="fa fa-window-close"
-          /><span>Close</span>
-        </Button>
-      </div>
-      <h2>Filter times</h2>
-      <div class="__inputRow">
-        <!-- object value -->
-        <v-select
-          :model-value="filter.carId"
-          placeholder="Select car"
-          :options="cars"
-          :reduce="car => car.uid"
-          label="name"
-          :class="{__activeFilter: filter.carId}"
-          @update:model-value="setFilter({carId: $event})"
-        />
-      </div>
-      <div class="__inputRow">
-        <v-select
-          :model-value="filter.trackId"
-          placeholder="Select track"
-          :options="tracks"
-          :reduce="track => track.uid"
-          label="track"
-          :class="{__activeFilter: filter.trackId}"
-          @update:model-value="setFilter({trackId: $event, trackVariant: null})"
-        />
-      </div>
-      <div
-        v-if="filter.trackId"
-        class="__inputRow"
-      >
-        <v-select
-          :model-value="filter.trackVariant"
-          placeholder="Select track variant"
-          :options="getTrackVariants(filter.trackId)"
-          :class="{__activeFilter: filter.trackVariant}"
-          @update:model-value="setFilter({trackVariant: $event})"
-        />
-      </div>
-      <div
-        class="__inputRow"
-      >
-        <v-select
-          :model-value="filter.driverId"
-          placeholder="Select driver"
-          :options="drivers"
-          :reduce="driver => driver.uid"
-          label="name"
-          :class="{__activeFilter: filter.driverId}"
-          @update:model-value="setFilter({driverId: $event})"
-        />
-      </div>
-      <div class="__header">
-        Transmission
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          name="transmission"
-          :values="Object.values(TransmissionType)"
-          :value="filter.transmission"
-          @changed="setFilter({transmission: $event})"
-        />
-      </div>
-
-      <div class="__header">
-        Weather
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          name="weather"
-          :values="Object.values(WeatherType)"
-          :value="filter.weather"
-          @changed="setFilter({weather: $event})"
-        />
-      </div>
-
-      <div class="__header">
-        Braking line
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          name="brakingLine"
-          :values="Object.values(BrakingLine)"
-          :value="filter.brakingLine"
-          @changed="setFilter({brakingLine: $event})"
-        />
-      </div>
-
-      <div class="__header">
-        Controls
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          name="controls"
-          :values="Object.values(ControlType)"
-          :value="filter.controls"
-          @changed="setFilter({controls: $event})"
-        />
-      </div>
-
-      <div class="__header">
-        Start type
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          name="startType"
-          :values="Object.values(StartType)"
-          :value="filter.startType"
-          @changed="setFilter({startType: $event})"
-        />
-      </div>
-
-      <div class="__header">
-        Game
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          name="distinct"
-          :values="Object.values(Game)"
-          :value="filter.game"
-          @changed="setFilter({game: $event})"
-        />
-      </div>
-
-      <div class="__header">
-        Distinct
-      </div>
-      <div class="__inputRow __noColumn">
-        <RadioButtons
-          name="distinct"
-          :values="Object.values(Distinct)"
-          :value="filter.distinct"
-          @changed="setFilter({distinct: $event})"
-        />
-      </div>
-
-      <div class="__header">
-        Date
-      </div>
-      <div class="__inputRow __noColumn">
-        <div>
-          <DatePicker
-            class="__datepicker"
-            input-format="dd.MM.yyyy"
-            :disabled-dates="{predicate: disabledDates}"
-            :model-value="filter.date"
-            @update:model-value="setFilter({date: $event})"
-          />
-        </div>
-
-        <Button
-          :type="ButtonType.DANGER"
-          :disabled="filter.date === null"
-          @click="setFilter({date: null})"
-        >
-          <div
-            class="fa fa-ban"
-            style="margin-right: 0"
-          />
-        </Button>
-      </div>
-
-      <Button
-        :type="ButtonType.SECONDARY"
-        @click="setRandomFilter()"
-      >
-        <div class="fa fa-random" /><span>Random</span>
-      </Button>
+    <div class="__hideFilter">
       <Button
         :type="ButtonType.DANGER"
-        :disabled="!isFilterSet()"
-        @click="clearFilter()"
+        @click="$emit('filter:close')"
       >
-        <div class="fa fa-ban" /><span>Clear filter</span>
+        <div
+          class="fa fa-window-close"
+        /><span>Close</span>
       </Button>
     </div>
+    <h2>Filter times</h2>
+    <InputRow>
+      <SelectInput
+        :model-value="filter.carId"
+        placeholder="Select car"
+        :options="cars"
+        :reduce="car => car.uid"
+        label="name"
+        @update:model-value="setFilter({carId: $event})"
+      />
+    </InputRow>
+    <InputRow>
+      <SelectInput
+        :model-value="filter.trackId"
+        placeholder="Select track"
+        :options="tracks"
+        :reduce="track => track.uid"
+        label="track"
+        @update:model-value="setFilter({trackId: $event, trackVariant: null})"
+      />
+    </InputRow>
+    <InputRow
+      v-if="filter.trackId"
+    >
+      <SelectInput
+        :model-value="filter.trackVariant"
+        placeholder="Select track variant"
+        :reduce="o => o"
+        :options="getTrackVariants(filter.trackId)"
+        :class="{__activeFilter: filter.trackVariant}"
+        @update:model-value="setFilter({trackVariant: $event})"
+      />
+    </InputRow>
+    <InputRow>
+      <SelectInput
+        :model-value="filter.driverId"
+        placeholder="Select driver"
+        :options="drivers"
+        :reduce="driver => driver.uid"
+        label="name"
+        :class="{__activeFilter: filter.driverId}"
+        @update:model-value="setFilter({driverId: $event})"
+      />
+    </InputRow>
+    <InputRow
+      heading="Transmission"
+      :border-bottom="true"
+    >
+      <RadioButtons
+        name="transmission"
+        :values="Object.values(TransmissionType)"
+        :value="filter.transmission"
+        @changed="setFilter({transmission: $event})"
+      />
+    </InputRow>
+
+    <InputRow
+      heading="Weather"
+      :border-bottom="true"
+    >
+      <RadioButtons
+        name="weather"
+        :values="Object.values(WeatherType)"
+        :value="filter.weather"
+        @changed="setFilter({weather: $event})"
+      />
+    </InputRow>
+
+    <InputRow
+      heading="Braking line"
+      :border-bottom="true"
+    >
+      <RadioButtons
+        name="brakingLine"
+        :values="Object.values(BrakingLine)"
+        :value="filter.brakingLine"
+        @changed="setFilter({brakingLine: $event})"
+      />
+    </InputRow>
+
+    <InputRow
+      heading="Controls"
+      :border-bottom="true"
+    >
+      <RadioButtons
+        name="controls"
+        :values="Object.values(ControlType)"
+        :value="filter.controls"
+        @changed="setFilter({controls: $event})"
+      />
+    </InputRow>
+
+    <InputRow
+      heading="Start type"
+      :border-bottom="true"
+    >
+      <RadioButtons
+        name="startType"
+        :values="Object.values(StartType)"
+        :value="filter.startType"
+        @changed="setFilter({startType: $event})"
+      />
+    </InputRow>
+
+    <InputRow
+      heading="Game"
+      :border-bottom="true"
+    >
+      <RadioButtons
+        name="distinct"
+        :values="Object.values(Game)"
+        :value="filter.game"
+        @changed="setFilter({game: $event})"
+      />
+    </InputRow>
+
+    <InputRow
+      heading="Distinct"
+      :border-bottom="true"
+    >
+      <RadioButtons
+        name="distinct"
+        :values="Object.values(Distinct)"
+        :value="filter.distinct"
+        @changed="setFilter({distinct: $event})"
+      />
+    </InputRow>
+
+    <InputRow
+      heading="Date"
+      :border-bottom="true"
+    >
+      <div>
+        <DatePicker
+          class="__datepicker"
+          input-format="dd.MM.yyyy"
+          :disabled-dates="{predicate: disabledDates}"
+          :model-value="filter.date"
+          @update:model-value="setFilter({date: $event})"
+        />
+      </div>
+
+      <Button
+        :type="ButtonType.DANGER"
+        :disabled="filter.date === null"
+        @click="setFilter({date: null})"
+      >
+        <div
+          class="fa fa-ban"
+          style="margin-right: 0"
+        />
+      </Button>
+    </InputRow>
+
+    <Button
+      :type="ButtonType.SECONDARY"
+      @click="setRandomFilter()"
+    >
+      <div class="fa fa-random" /><span>Random</span>
+    </Button>
+    <Button
+      :type="ButtonType.DANGER"
+      :disabled="!isFilterSet()"
+      @click="clearFilter()"
+    >
+      <div class="fa fa-ban" /><span>Clear filter</span>
+    </Button>
   </div>
 </template>
 
@@ -202,6 +193,8 @@ import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { LaptimeFilter } from '@/store/dataStore'
+import InputRow from '@/components/add-laptime/InputRow.vue'
+import SelectInput from '@/components/add-laptime/SelectInput.vue'
 import { Options, prop, Vue } from 'vue-class-component'
 
 interface LaptimeDb extends Laptime {
@@ -213,6 +206,10 @@ class LaptimeFilterComponentProps {
 }
 
 @Options({
+  components: {
+    InputRow,
+    SelectInput
+  },
   emits: ['filter:changed', 'filter:close']
 })
 export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterComponentProps) {
@@ -317,34 +314,9 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   text-align: left;
 }
 
-.__inputRow {
-  display: flex;
-  margin: 0 auto;
-  margin-bottom: 0.7rem;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-}
-
-.__noColumn {
-  flex-direction: row !important;
-  border-bottom: 0.1rem solid white;
-}
-
-.__noColumn > div {
-  padding: 0.5rem 1rem;
-}
-
-.__activeFilter {
-  :deep(.vs__dropdown-toggle) {
-    border: 0.1rem solid #4081C2;
-    box-shadow: 0px 0px 5px 2px #4081C2;
-  }
-
-  :deep(span.vs__selected) {
-    color: #4081C2;
-    font-weight: bold;
-  }
+:deep(.__heading) {
+  font-size: 0.7rem;
+  font-weight: normal;
 }
 
 :deep(.__datepicker) {

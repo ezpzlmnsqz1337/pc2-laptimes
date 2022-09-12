@@ -179,7 +179,7 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   addFilter (filter: LaptimeFilter) {
-    if (this.rows) return
+    if (this.rows.length) return
     if (this.filterRef) {
       this.filterRef.setFilter(filter)
     } else {
