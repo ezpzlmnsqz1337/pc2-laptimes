@@ -186,15 +186,6 @@ a {
   display: none;
 }
 
-.__laptimes {
-  padding: 0 2rem 0 2rem;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
 .fa.fa-steering_wheel {
   display: block;
   margin-top: 0.1rem;
@@ -207,21 +198,11 @@ a {
 }
 
 @media only screen and (max-width: 1024px) {
-  .__laptimes {
-    flex-direction: column;
-  }
-
   .fa.fa-steering_wheel {
     background: url('assets/icons/steering_wheel_sm.svg');
     background-repeat: no-repeat;
     height: 0.5rem;
     margin-left: 0;
-  }
-}
-
-@media only screen and (max-width: 700px) {
-  .__laptimes {
-    padding: 1rem;
   }
 }
 </style>

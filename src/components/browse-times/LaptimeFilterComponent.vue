@@ -194,7 +194,7 @@ import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { LaptimeFilter } from '@/store/dataStore'
 import InputRow from '@/components/add-laptime/InputRow.vue'
-import SelectInput from '@/components/add-laptime/SelectInput.vue'
+import SelectInput from '@/components/ui/SelectInput.vue'
 import { Options, prop, Vue } from 'vue-class-component'
 
 interface LaptimeDb extends Laptime {
@@ -264,7 +264,7 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
     if (this.randomizing) return
     this.randomizing = true
     // select random laptime
-    const index = Math.round(Math.random() * this.allTimes.length)
+    const index = Math.floor(Math.random() * this.allTimes.length)
 
     setTimeout(() => {
       const { trackId, trackVariant, carId, weather } = this.allTimes[index]
@@ -328,6 +328,10 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
 :deep(.v3dp__popout){
   font-size: 1rem;
   bottom: 1rem;
+}
+
+:deep(.__inputRow) {
+  margin-bottom: 0.7rem;
 }
 
 @media only screen and (max-width: 700px) {

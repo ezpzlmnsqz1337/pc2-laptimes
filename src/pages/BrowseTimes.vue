@@ -92,9 +92,28 @@ export default class BrowseTimes extends Vue {
   border-radius: 0.3rem;
 }
 
+.__laptimes {
+  padding: 0 1rem;
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
 @media only screen and (max-width: 1024px) {
+  .__laptimes {
+    flex-direction: column;
+  }
+
   .__laptimeTable {
     padding: 0;
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .__laptimes {
+    padding: 1rem;
   }
 }
 </style>
