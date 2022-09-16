@@ -13,7 +13,10 @@
         @share:click="share()"
       />
       <h2>Laptime board</h2>
-      <LaptimeTable ref="tableRef" />
+      <LaptimeTable
+        ref="tableRef"
+        :last-added-laptime="lastAddedLaptime"
+      />
     </div>
   </div>
 </template>
@@ -24,6 +27,7 @@ import LaptimeTable from '@/components/laptime-table/LaptimeTable.vue'
 import { LaptimeFilter } from '@/store/dataStore'
 import { Options, Vue } from 'vue-class-component'
 import TableControls from '@/components/laptime-table/TableControls.vue'
+import eb from '@/eventBus'
 
 @Options({
   components: {
@@ -48,6 +52,15 @@ export default class BrowseTimes extends Vue {
     return this.times[0].laptime
   }
 
+  get lastAddedLaptime () {
+    return this.$dataStore.lastAddedLaptime
+  }
+
+  created () {
+    eb.on('filter:clear', () => this.$refs.filterRef.clearFilter())
+    eb.on('filter:set', (filter: LaptimeFilter) => this.$refs.filterRef.setFilter(filter))
+  }
+
   mounted () {
     if (screen.availWidth <= 700) {
       this.toggleFilter()
@@ -61,7 +74,7 @@ export default class BrowseTimes extends Vue {
     this.$refs.tableRef.loadData(filter)
   }
 
-  async share () {
+  share () {
     const url = `${window.location.origin}/?page=laptime_board`
     const filter = this.$refs.filterRef.filter
     const encoded = JSON.stringify(filter)

@@ -53,6 +53,7 @@ export interface LaptimeFilter {
 export interface DataStore {
   websocketState: WebsocketState
   activeScreen: ScreenType
+  autoSubmit: boolean
   cars: Car[],
   times: Laptime[],
   tracks: Track[],
@@ -70,6 +71,7 @@ export interface DataStore {
   getTimes (filter?: LaptimeFilter) : Laptime[]
   getTracksTimes (tracks: Track[]) : Laptime[]
   getDistinctTimes (laptimes: Laptime[]): Laptime[]
+  toggleAutoSubmit(): void
 
   addCar (name: string) :void
   addTrack (name: string) :void
@@ -90,6 +92,7 @@ export interface DataStore {
 export const dataStore: DataStore = {
   websocketState: WebsocketState.CLOSED_OR_COULD_NOT_OPEN,
   activeScreen: ScreenType.LAPTIME_BOARD,
+  autoSubmit: false,
   cars: [],
   times: [],
   tracks: [],
@@ -129,6 +132,9 @@ export const dataStore: DataStore = {
   setWebsocketState (websocketState: WebsocketState) {
     if (this.websocketState === websocketState) return
     this.websocketState = websocketState
+  },
+  toggleAutoSubmit () {
+    this.autoSubmit = !this.autoSubmit
   },
   async addCar (name: string) {
     const car = { uid: uuidv4(), name }

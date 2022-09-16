@@ -76,15 +76,13 @@
       heading="Date"
       :border-bottom="true"
     >
-      <div>
-        <DatePicker
-          class="__datepicker"
-          input-format="dd.MM.yyyy"
-          :disabled-dates="{predicate: disabledDates}"
-          :model-value="filter.date"
-          @update:model-value="setFilter({date: $event})"
-        />
-      </div>
+      <DatePicker
+        class="__datepicker"
+        input-format="dd.MM.yyyy"
+        :disabled-dates="{predicate: disabledDates}"
+        :model-value="filter.date"
+        @update:model-value="setFilter({date: $event})"
+      />
 
       <Button
         :type="ButtonType.DANGER"
@@ -305,6 +303,11 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   :deep(.v3dp__popout){
     font-size: 1rem;
     bottom: 1rem;
+  }
+
+  :deep(.__input) {
+    justify-content: center;
+    align-items: center;
   }
 
   :deep(.__inputRow) {

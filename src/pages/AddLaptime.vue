@@ -204,8 +204,9 @@
             :class="{__autoSubmitAnimation: autoSubmit}"
           >
             <input
-              v-model="autoSubmit"
+              :checked="autoSubmit"
               type="checkbox"
+              @change="toggleAutoSubmit()"
             >
             <span>{{ autoSubmit ? 'on' : 'off' }}</span>
           </div>
@@ -233,11 +234,11 @@
 
         <InputRow
           v-if="!autoSubmit"
-          class=" __sm"
+          class="__sm"
         >
           <Button
             :type="ButtonType.PRIMARY"
-            block
+            :block="true"
             class="__submit"
             :disabled="!valid"
             @click="submit()"
@@ -248,22 +249,17 @@
       </div>
     </div>
 
-    <div class="__timeWrapper">
-      <div
+    <div class="__timeWrapper __lg">
+      <Button
         v-if="!autoSubmit"
-        class="__inputRow __lg"
+        :type="ButtonType.PRIMARY"
+        :block="true"
+        class="__submit"
+        :disabled="!valid"
+        @click="submit()"
       >
-        <Button
-          :tabindex="14"
-          :type="ButtonType.PRIMARY"
-          block
-          class="__submit"
-          :disabled="!valid"
-          @click="submit()"
-        >
-          Submit
-        </Button>
-      </div>
+        Submit
+      </Button>
     </div>
   </div>
 </template>
@@ -320,7 +316,6 @@ export default class AddLaptime extends Vue {
   showNewCarModal = false
   showNewTrackModal = false
   showNewTrackVariantModal = false
-  autoSubmit = false
   lastRaceState = RaceState.MENU
 
   $refs!: {
@@ -332,9 +327,6 @@ export default class AddLaptime extends Vue {
 
   created () {
     this.dataListener = this.$rdb.addListener(this.onRealTimeDataReceived)
-    setInterval(() => {
-      console.log(`${this.carId} && ${!this.canSetCar} && ${!this.carAlreadyLinked}`)
-    }, 2000)
   }
 
   get cars () {
@@ -371,6 +363,10 @@ export default class AddLaptime extends Vue {
 
   get canAutoSubmit () {
     return this.websocketState === WebsocketState.ESTABLISHED && this.driverId
+  }
+
+  get autoSubmit () {
+    return this.$dataStore.autoSubmit
   }
 
   get canSetCar () {
@@ -415,6 +411,10 @@ export default class AddLaptime extends Vue {
     this.$refs.laptimeInput.setLaptime(laptime)
   }
 
+  toggleAutoSubmit () {
+    this.$dataStore.toggleAutoSubmit()
+  }
+
   linkCarToGameId (carId: string, gameId: string) {
     this.$dataStore.linkCarToGameId(carId, gameId)
   }
@@ -453,9 +453,11 @@ export default class AddLaptime extends Vue {
   }
 
   showTimeInTable ({ carId, trackId, trackVariant }: Laptime) {
-    eb.emit('filter:clear')
-    eb.emit('filter:set', { carId, trackId, trackVariant } as LaptimeFilter)
     this.$dataStore.showScreen(ScreenType.LAPTIME_BOARD)
+    eb.emit('filter:clear')
+    setTimeout(() => {
+      eb.emit('filter:set', { carId, trackId, trackVariant } as LaptimeFilter)
+    }, 500)
   }
 
   setCarName (carName: string) {
@@ -537,6 +539,10 @@ export default class AddLaptime extends Vue {
   padding: 0 0 0 1rem;
 }
 
+:deep(.__input) {
+  justify-content: center;
+}
+
 @media only screen and (max-width: 1280px) {
   .__timeWrapper {
     flex-direction: row;
@@ -573,20 +579,6 @@ export default class AddLaptime extends Vue {
   margin: 0 auto !important;
 }
 
-@keyframes blinking {
-  0% {
-    background-color: green;
-  }
-  75% {
-    background-color: blue;
-  }
-}
-
-.__autoSubmitAnimation {
-    background-color: green;
-  /* animation: blinking 1s linear infinite; */
-}
-
 .__brakingLine {
   width: 5rem;
 }
@@ -603,8 +595,14 @@ textarea {
   height: 7rem;
 }
 
+.__autoSubmitAnimation {
+  border-radius: 0.3rem;
+}
+
 .__autoSubmit {
+  display: flex;
   align-items: center;
+  padding: 0 0.5rem;
 
   input[type=checkbox] {
     width: 1.7rem;

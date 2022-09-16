@@ -5,8 +5,14 @@
       class="__info"
     >
       <div class="__websocket">
-        <span>Websocket state: </span>
-        <span :class="websocketStateClass">{{ websocketStateText }}</span>
+        <div>
+          <span>Websocket state: </span>
+          <span :class="websocketStateClass">{{ websocketStateText }}</span>
+          <div v-if="websocketState === WebsocketState.ESTABLISHED && raceStateText">
+            <span>Race state: </span>
+            <span :class="raceStateClass">{{ raceStateText }}</span>
+          </div>
+        </div>
         <div
           v-if="websocketState === WebsocketState.ESTABLISHED"
           class="__disconnect"
@@ -19,6 +25,7 @@
           </Button>
         </div>
       </div>
+
       <div
         v-if="!connecting && websocketState !== WebsocketState.ESTABLISHED"
         class="__connect"
@@ -37,11 +44,6 @@
           Connect
         </Button>
       </div>
-
-      <div v-if="websocketState === WebsocketState.ESTABLISHED && raceStateText">
-        <span>Race state: </span>
-        <span :class="raceStateClass">{{ raceStateText }}</span>
-      </div>
     </div>
 
     <div
@@ -58,7 +60,7 @@
       <Button
         v-if="isLocal()"
         :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME}"
+        :class="{__selected: activeScreen === ScreenType.ADD_LAPTIME, __highlight: autoSubmit}"
         @click="showScreen(ScreenType.ADD_LAPTIME)"
       >
         Add laptime
@@ -133,6 +135,10 @@ export default class Menu extends Vue {
     }
   }
 
+  get autoSubmit () {
+    return this.$dataStore.autoSubmit
+  }
+
   get raceState () {
     return this.$realtimeDataStore.raceState
   }
@@ -197,54 +203,62 @@ export default class Menu extends Vue {
   padding-top: 0.5rem;
   z-index: 999;
   text-align: center;
-}
 
-.__menu {
-  padding-top: 0.2rem;
+  .__menu {
+    padding-top: 0.2rem;
 
-  .__selected {
-    background-color: #242424 !important;
+    .__selected {
+      background-color: #242424;
+    }
+
+    .__highlight {
+      background-color: #4081C2;
+      box-shadow: 0px 0px 5px 2px #4081C2;
+    }
   }
-}
 
-.__info {
-  text-align: center;
-  margin-bottom: 0.3rem;
-}
-
-.__websocket {
-  position: relative;
-}
-
-.__notConnected {
-  color: red;
-}
-
-.__connected {
-  color: rgb(28, 197, 28);
-}
-
-.__connect {
-  display: flex;
-  justify-content: center;
-
-  .__select{
-    min-width: 10rem;
+  .__info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0.3rem;
+    gap: 0.1rem;
+    flex-direction: column;
   }
-}
 
-.__disconnect button{
-  position: absolute;
-  margin-left: 5.5rem;
-  top: -0.35rem;
-  font-size: 0.6rem;
-  padding: 0.4rem 0.3rem;
-}
+  .__websocket {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
 
-@media only screen and (max-width: 700px) {
-  .__menu button {
+  .__notConnected {
+    color: red;
+  }
+
+  .__connected {
+    color: rgb(28, 197, 28);
+  }
+
+  .__connect {
+    display: flex;
+    justify-content: center;
+
+    .__select{
+      min-width: 10rem;
+    }
+  }
+
+  .__disconnect button{
     font-size: 0.6rem;
+    padding: 0.4rem 0.3rem;
+  }
+
+  @media only screen and (max-width: 700px) {
+    .__menu button {
+      font-size: 0.6rem;
+    }
   }
 }
-
 </style>

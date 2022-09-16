@@ -125,7 +125,6 @@ import { Laptime } from '@/builders/LaptimeBuilder'
 import { Options, prop, Vue } from 'vue-class-component'
 import { LaptimeFilter } from '@/store/dataStore'
 import LaptimeFilterComponent from '../browse-times/LaptimeFilterComponent.vue'
-import _debounce from 'debounce'
 
 export type LaptimeTableColumn = 'rank' | 'driver' | 'laptime' | 'car' | 'track' | 'settings'
 
@@ -150,8 +149,6 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   maxRows = 50
 
   filterRef!: LaptimeFilterComponent
-
-  debouncedLoadData = _debounce(this._loadData, 300, true)
 
   created () {
     if (this.rows.length) {
@@ -188,10 +185,6 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   loadData (filter?: LaptimeFilter) {
-    this.debouncedLoadData(filter)
-  }
-
-  private _loadData (filter?: LaptimeFilter) {
     if (!filter && this.filterRef) filter = this.filterRef.filter
     this.loading = true
     this.$nextTick(() => {

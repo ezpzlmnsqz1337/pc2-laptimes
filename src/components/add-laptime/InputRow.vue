@@ -80,10 +80,9 @@ export default class InputRow extends Vue.with(InputRowProps) {
 .__input {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
 }
 
-.__inputRow{
+.__inputRow {
   margin-bottom: 1rem;
 }
 
@@ -94,7 +93,7 @@ export default class InputRow extends Vue.with(InputRowProps) {
 
 @media only screen and (max-width: 700px) {
   .__selectInput {
-      flex-direction: column;
+    flex-direction: column;
   }
 }
 </style>
