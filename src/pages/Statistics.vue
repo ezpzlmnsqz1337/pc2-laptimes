@@ -173,7 +173,7 @@ export default class Statistics extends Vue {
     this.refreshing = true
     this.$nextTick(() => {
       const laptimes = this.$dataStore.getTimes()
-      this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers, this.$dataStore.tracks, this.$dataStore.cars)
+      this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers)
 
       this.refreshing = false
     })

@@ -1,5 +1,3 @@
-import { Car } from '@/assets/db/cars'
-import { Track } from '@/assets/db/tracks'
 import LaptimeBuilder, { Laptime } from '@/builders/LaptimeBuilder'
 import StatisticsBuilder, { Driver, Medals } from '@/builders/StatisticsBuilder'
 import { Distinct } from '@/constants/Distinct'
@@ -29,14 +27,14 @@ export interface StatisticsStore {
   getDriverTotalRaces(driverId: string): number | undefined
   handleMedals (laptimes: Laptime[]): void
   handlePositionFilter (laptimes: Laptime[]): boolean
-  refreshData (laptimes: Laptime[], drivers: Driver[], tracks: Track[], cars: Car[]): void
+  refreshData (laptimes: Laptime[], drivers: Driver[]): void
   setFilter (filter: StatisticsFilter): void
   clearFilter (): void
   showScreen (screen: StatisticsScreenType): void
   addMedal (laptimes: Laptime[]): void
   sortMedals (): void
   setMedals (medals: Medals[]): void
-  setTotalRaces (totalRaces: TotalDriverRaces[]): void
+  calculateTotalRacesPerDriver(drivers: Driver[], laptimes: Laptime[]): void
   setTrackCarBoardData (trackCarBoardData: any[]): void
   resetState (): void
 }
@@ -70,42 +68,46 @@ export const statisticsStore: StatisticsStore = {
     // if enough times AND driver is at the wanted position
     return laptimes.length >= this.position && laptimes[this.position - 1].driverId === this.driverId
   },
-  refreshData (laptimes: Laptime[], drivers: Driver[], tracks: Track[], cars: Car[]) {
+  refreshData (laptimes: Laptime[], drivers: Driver[]) {
     this.resetState()
-    const totalRaces: TotalDriverRaces[] = []
-    drivers.forEach((x: Driver) => {
-      const driver: Driver = { uid: x.uid, name: x.name }
-      totalRaces.push({ driver, races: laptimes.filter(y => y.driverId === x.uid).length })
-      totalRaces.sort((a, b) => (b.races - a.races))
-    })
-    this.setTotalRaces(totalRaces)
+    this.calculateTotalRacesPerDriver(drivers, laptimes)
 
-    const trackCarBoardData = []
+    const leaderboardsData: any = []
     const ltb = LaptimeBuilder.getInstance()
     const sb = StatisticsBuilder.getInstance()
 
-    for (const x of tracks) {
-      for (const v of x.variants) {
-        const row = []
-        const trackAndVariant = laptimes.filter(y => x.uid === y.trackId && v === y.trackVariant)
-        if (!trackAndVariant.length) continue
-        for (const y of cars) {
-          let trackAndVariantAndCar = trackAndVariant.filter(z => z.carId === y.uid)
-          if (!trackAndVariantAndCar.length) continue
-          trackAndVariantAndCar = trackAndVariantAndCar.map(z => ({ ...z, losing: ltb.getLaptimeDiff(trackAndVariantAndCar[0].laptime, z.laptime) }))
-          // filtering out duplicates if distinct is set to true
-          if (this.distinct === Distinct.YES) trackAndVariantAndCar = sb.handleDistinct(trackAndVariantAndCar)
+    const sorted = [...laptimes].sort((a, b) =>
+      a.trackId.localeCompare(b.trackId) ||
+      a.trackVariant.localeCompare(b.trackVariant) ||
+      a.carId.localeCompare(b.carId) ||
+      ltb.compareLaptimes(a.laptime, b.laptime)
+    )
 
-          this.handleMedals(trackAndVariantAndCar)
-          // only push laptime board when it matches the filter
-          const matchFilter = this.handlePositionFilter(trackAndVariantAndCar)
-          if (matchFilter) row.push(trackAndVariantAndCar)
-        }
-        // if any laptime board remain in this row after filtering, add it
-        if (row.length > 0) trackCarBoardData.push(row)
+    let row = [] as any
+    let column = [] as any
+    let lastItem = {} as any
+
+    sorted.forEach(x => {
+      if (row.length > 0 && (x.trackId !== lastItem.trackId || x.trackVariant !== lastItem.trackVariant)) {
+        leaderboardsData.push(row)
+        row = []
+        column = []
       }
-    }
-    this.setTrackCarBoardData(trackCarBoardData)
+
+      if (column.length > 0 && x.carId !== lastItem.carId) {
+        if (this.distinct === Distinct.YES) {
+          column = sb.handleDistinct(column)
+        }
+        this.handleMedals(column)
+        const matchFilter = this.handlePositionFilter(column)
+        if (matchFilter) row.push(column)
+        column = []
+      }
+
+      column.push(x)
+      lastItem = x
+    })
+    this.setTrackCarBoardData(leaderboardsData)
   },
   setFilter ({ driverId, position, distinct }: StatisticsFilter) {
     if (driverId !== undefined) this.driverId = driverId
@@ -146,7 +148,13 @@ export const statisticsStore: StatisticsStore = {
   setMedals (medals: Medals[]) {
     this.medals = medals
   },
-  setTotalRaces (totalRaces: TotalDriverRaces[]) {
+  calculateTotalRacesPerDriver (drivers: Driver[], laptimes: Laptime[]) {
+    const totalRaces: TotalDriverRaces[] = []
+    drivers.forEach((x: Driver) => {
+      const driver: Driver = { uid: x.uid, name: x.name }
+      totalRaces.push({ driver, races: laptimes.filter(y => y.driverId === x.uid).length })
+      totalRaces.sort((a, b) => (b.races - a.races))
+    })
     this.totalRaces = totalRaces
   },
   setTrackCarBoardData (trackCarBoardData: any[]) {

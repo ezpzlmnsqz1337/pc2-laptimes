@@ -2,7 +2,7 @@ import { initializeApp } from 'firebase/app'
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
 import firebaseConfig from '@/firebaseConfig'
 
-const debug = true
+const debug = false
 
 // Get a Firestore instance
 initializeApp(firebaseConfig)
