@@ -57,87 +57,18 @@
         @update:model-value="setFilter({driverId: $event})"
       />
     </InputRow>
-    <InputRow
-      heading="Transmission"
-      :border-bottom="true"
-    >
-      <RadioButtons
-        name="transmission"
-        :values="Object.values(TransmissionType)"
-        :value="filter.transmission"
-        @changed="setFilter({transmission: $event})"
-      />
-    </InputRow>
 
     <InputRow
-      heading="Weather"
+      v-for="b in buttons"
+      :key="b.name"
+      :heading="b.heading"
       :border-bottom="true"
     >
       <RadioButtons
-        name="weather"
-        :values="Object.values(WeatherType)"
-        :value="filter.weather"
-        @changed="setFilter({weather: $event})"
-      />
-    </InputRow>
-
-    <InputRow
-      heading="Braking line"
-      :border-bottom="true"
-    >
-      <RadioButtons
-        name="brakingLine"
-        :values="Object.values(BrakingLine)"
-        :value="filter.brakingLine"
-        @changed="setFilter({brakingLine: $event})"
-      />
-    </InputRow>
-
-    <InputRow
-      heading="Controls"
-      :border-bottom="true"
-    >
-      <RadioButtons
-        name="controls"
-        :values="Object.values(ControlType)"
-        :value="filter.controls"
-        @changed="setFilter({controls: $event})"
-      />
-    </InputRow>
-
-    <InputRow
-      heading="Start type"
-      :border-bottom="true"
-    >
-      <RadioButtons
-        name="startType"
-        :values="Object.values(StartType)"
-        :value="filter.startType"
-        @changed="setFilter({startType: $event})"
-      />
-    </InputRow>
-
-    <InputRow
-      heading="Game"
-      :border-bottom="true"
-    >
-      <RadioButtons
-        name="distinct"
-        :values="Object.values(Game)"
-        :value="filter.game"
-        @changed="setFilter({game: $event})"
-      />
-    </InputRow>
-
-    <InputRow
-      heading="Distinct"
-      :border-bottom="true"
-    >
-      <RadioButtons
-        name="distinct"
-        :values="Object.values(Distinct)"
-        :value="filter.distinct"
-        @changed="setFilter({distinct: $event})"
+        :name="b.name"
+        :values="b.values"
+        :value="filter[b.name]"
+        @changed="setFilter({[b.name]: $event})"
       />
     </InputRow>
 
@@ -201,6 +132,12 @@ interface LaptimeDb extends Laptime {
   dateString: string
 }
 
+interface LaptimeFilterButtons {
+  heading: string
+  name: string
+  values: any[]
+}
+
 class LaptimeFilterComponentProps {
   showFilter = prop<boolean>({ default: true })
 }
@@ -214,6 +151,7 @@ class LaptimeFilterComponentProps {
 })
 export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterComponentProps) {
   randomizing = false
+  buttons!: LaptimeFilterButtons[]
 
   filter: LaptimeFilter = {
     carId: null,
@@ -248,6 +186,46 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
 
   get raceDates () {
     return this.allTimes.map(x => x.dateString)
+  }
+
+  created () {
+    this.buttons = [
+      {
+        heading: 'Transmission',
+        name: 'transmission',
+        values: Object.values(TransmissionType)
+      },
+      {
+        heading: 'Weather',
+        name: 'weather',
+        values: Object.values(WeatherType)
+      },
+      {
+        heading: 'Braking line',
+        name: 'brakingLine',
+        values: Object.values(BrakingLine)
+      },
+      {
+        heading: 'Controls',
+        name: 'controls',
+        values: Object.values(ControlType)
+      },
+      {
+        heading: 'Start type',
+        name: 'startType',
+        values: Object.values(StartType)
+      },
+      {
+        heading: 'Game',
+        name: 'game',
+        values: Object.values(Game)
+      },
+      {
+        heading: 'Distinct',
+        name: 'distinct',
+        values: Object.values(Distinct)
+      }
+    ]
   }
 
   getTrackVariants (trackId: string) {
@@ -304,34 +282,34 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
 <style lang="scss" scoped>
 .__filterWrapper {
   padding: 1rem;
-}
 
-.__hideFilter {
-  position: relative;
-  left: 0;
-  top: 0;
-  height: 0;
-  text-align: left;
-}
+  .__hideFilter {
+    position: relative;
+    left: 0;
+    top: 0;
+    height: 0;
+    text-align: left;
+  }
 
-:deep(.__heading) {
-  font-size: 0.7rem;
-  font-weight: normal;
-}
+  :deep(.__heading) {
+    font-size: 0.7rem;
+    font-weight: normal;
+  }
 
-:deep(.__datepicker) {
-  text-align: center;
-  font-size: 1rem;
-  padding: 0.3rem;
-}
+  :deep(.__datepicker) {
+    text-align: center;
+    font-size: 1rem;
+    padding: 0.3rem;
+  }
 
-:deep(.v3dp__popout){
-  font-size: 1rem;
-  bottom: 1rem;
-}
+  :deep(.v3dp__popout){
+    font-size: 1rem;
+    bottom: 1rem;
+  }
 
-:deep(.__inputRow) {
-  margin-bottom: 0.7rem;
+  :deep(.__inputRow) {
+    margin-bottom: 0.7rem;
+  }
 }
 
 @media only screen and (max-width: 700px) {
@@ -339,10 +317,10 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
     padding: 0;
     width: 100%;
     margin-bottom: 1rem;
-  }
 
-  .__hideFilter button {
-    font-size: 0.6rem;
+    .__hideFilter button {
+      font-size: 0.6rem;
+    }
   }
 }
 </style>
