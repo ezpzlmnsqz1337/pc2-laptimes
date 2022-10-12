@@ -9,35 +9,35 @@
           <RadioButtons
             name="distinct"
             :values="Object.values(Distinct)"
-            :value="distinct"
+            :value="filter.distinct"
             @changed="e => setFilter({distinct: e})"
           />
         </div>
       </div>
       <div
-        v-if="driverId"
+        v-if="filter.driverId"
         class="__item"
       >
         <div class="__header">
           Driver
         </div>
         <Button :type="ButtonType.SECONDARY">
-          {{ getDriverName(driverId) }}
+          {{ getDriverName(filter.driverId) }}
         </Button>
       </div>
       <div
-        v-if="position"
+        v-if="filter.position"
         class="__item"
       >
         <div class="__header">
           Position
         </div>
         <Button :type="ButtonType.SECONDARY">
-          {{ position }}.
+          {{ filter.position }}.
         </Button>
       </div>
       <div
-        v-if="driverId || position"
+        v-if="filter.driverId || filter.position"
         class="__item"
       >
         <div class="__header">
@@ -51,33 +51,40 @@
         </Button>
       </div>
     </div>
+
     <div class="__trackCarMatrix">
       <div
-        v-for="(row, indexRow) in trackCarBoardData"
-        :key="`row${indexRow}`"
+        v-for="(track, trackId, index) in leaderboardsData"
+        :key="trackId"
         class="__row"
       >
-        <Carousel
-          :items-to-show="1"
+        <template
+          v-for="(variant, name, indexRow) in track"
+          :key="`row${indexRow}`"
         >
-          <Slide
-            v-for="(column, indexCol) in row"
-            :key="`column-${indexRow}${indexCol}`"
-            class="__item"
+          <Carousel
+            v-if="index < showItems"
+            :items-to-show="1"
           >
-            <h3>
-              {{ getTrackName(column[0]) }} - {{ getTrackVariantName(column[0]) }} - {{ getCar(column[0]) }}
-            </h3>
-            <LaptimeTable
-              :rows="column"
-              :display-columns="displayColumns"
-            />
-          </Slide>
-          <template #addons="{ slidesCount }">
-            <Navigation v-if="slidesCount > 1" />
-            <Pagination v-if="slidesCount > 1" />
-          </template>
-        </Carousel>
+            <Slide
+              v-for="(car, indexCol) in variant"
+              :key="`column-${indexRow}${indexCol}`"
+              class="__item"
+            >
+              <h3>
+                {{ getTrackName(car[0]) }} - {{ getTrackVariantName(car[0]) }} - {{ getCar(car[0]) }}
+              </h3>
+              <LaptimeTable
+                :rows="car"
+                :display-columns="displayColumns"
+              />
+            </Slide>
+            <template #addons="{ slidesCount }">
+              <Navigation v-if="slidesCount > 1" />
+              <Pagination v-if="slidesCount > 1" />
+            </template>
+          </Carousel>
+        </template>
       </div>
     </div>
   </div>
@@ -107,25 +114,14 @@ class LeaderboardsProps {
 })
 export default class Leaderboards extends Vue.with(LeaderboardsProps) {
   displayColumns = ['rank', 'driver', 'laptime', 'car', 'settings']
+  showItems = 5
 
-  get times () {
-    return this.$dataStore.times
+  get leaderboardsData () {
+    return this.$statisticsStore.leaderboardsData
   }
 
-  get trackCarBoardData () {
-    return this.$statisticsStore.trackCarBoardData
-  }
-
-  get driverId () {
-    return this.$statisticsStore.driverId
-  }
-
-  get position () {
-    return this.$statisticsStore.position
-  }
-
-  get distinct () {
-    return this.$statisticsStore.distinct
+  get filter () {
+    return this.$statisticsStore.filter
   }
 
   mounted () {
@@ -179,7 +175,6 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/css/table.css';
 @import '../../assets/css/carousel.css';
 
 .__filter {

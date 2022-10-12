@@ -72,9 +72,9 @@ export default class MedalsComponent extends Vue.with(MedalsProps) {
 
   setFilter (filter: StatisticsFilter) {
     this.$statisticsStore.clearFilter()
+    this.$statisticsStore.showScreen(StatisticsScreenType.LEADERBOARDS)
     this.$statisticsStore.setFilter(filter)
     this.refresh()
-    this.$statisticsStore.showScreen(StatisticsScreenType.LEADERBOARDS)
   }
 
   clearFilter () {

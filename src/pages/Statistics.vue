@@ -85,7 +85,7 @@
         class="__trackCarMatrixSection"
       >
         <h2
-          v-if="trackCarBoardData.length"
+          v-if="Object.keys(leaderboardsData).length"
           class="__center"
         >
           Track times
@@ -121,12 +121,13 @@ export default class Statistics extends Vue {
     return this.$statisticsStore.activeScreen
   }
 
-  get trackCarBoardData () {
-    return this.$statisticsStore.trackCarBoardData
+  get leaderboardsData () {
+    return this.$statisticsStore.leaderboardsData
   }
 
   showScreen (screen: StatisticsScreenType) {
     this.$statisticsStore.showScreen(screen)
+    this.refresh()
   }
 
   mounted () {
@@ -154,10 +155,11 @@ export default class Statistics extends Vue {
   }
 
   share () {
+    if (!navigator || !navigator.clipboard) return
     let url = `${window.location.origin}/?page=statistics`
     url += `&section=${this.$dataStore.activeScreen}`
 
-    const { driverId, position, distinct } = this.$statisticsStore.getFilter()
+    const { driverId, position, distinct } = this.$statisticsStore.filter
     if (driverId && position && distinct) {
       const name = this.$dataStore.getDriverById(driverId)?.name
       url += `&driver=${name}&position=${position}&distinct=${distinct}`
@@ -171,7 +173,7 @@ export default class Statistics extends Vue {
     if (this.refreshing) return
 
     this.refreshing = true
-    this.$nextTick(() => {
+    setTimeout(() => {
       const laptimes = this.$dataStore.getTimes()
       this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers)
 
