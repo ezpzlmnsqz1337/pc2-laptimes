@@ -39,14 +39,14 @@ export interface StatisticsStore {
   getDriverTotalRaces(driverId: string): number | undefined
   handleMedals (laptimes: Laptime[]): void
   handlePositionFilter (laptimes: Laptime[]): boolean
-  refreshData (laptimes: Laptime[], drivers: Driver[]): void
+  refreshData (laptimes: Laptime[]): void
   setFilter (filter: StatisticsFilter): void
   clearFilter (): void
   showScreen (screen: StatisticsScreenType): void
   addMedal (laptimes: Laptime[]): void
   sortMedals (): void
   setMedals (medals: Medals[]): void
-  calculateTotalRacesPerDriver(drivers: Driver[], laptimes: Laptime[]): void
+  calculateTotalRacesPerDriver(laptimes: Laptime[]): void
   setLeaderboardsData (leaderboardsData: Leaderboards.Data): void
   resetState (): void
 }
@@ -75,10 +75,9 @@ export const statisticsStore: StatisticsStore = {
     // if enough times AND driver is at the wanted position
     return laptimes.length >= this.filter.position && laptimes[this.filter.position - 1].driverId === this.filter.driverId
   },
-  refreshData (laptimes: Laptime[], drivers: Driver[]) {
-    console.time()
+  refreshData (laptimes: Laptime[]) {
     this.resetState()
-    this.calculateTotalRacesPerDriver(drivers, laptimes)
+    this.calculateTotalRacesPerDriver(laptimes)
 
     const ltb = LaptimeBuilder.getInstance()
     const sb = StatisticsBuilder.getInstance()
@@ -135,22 +134,17 @@ export const statisticsStore: StatisticsStore = {
     this.activeScreen = screen
   },
   addMedal (laptimes: Laptime[]) {
+    const MAX_SAVED_PLACES = 7
     // filter duplicate drivers
     Array.from(new Set(laptimes.map(x => x.driverId)))
       .forEach((x, index) => {
-        if (index > 3) return
+        if (index >= MAX_SAVED_PLACES) return
         let driverMedals = this.medals.find(y => y.driverId === x)
         if (!driverMedals) {
-          driverMedals = { driverId: x, first: 0, second: 0, third: 0 }
+          driverMedals = { driverId: x, places: new Array(MAX_SAVED_PLACES).fill(0) }
           this.medals.push(driverMedals)
         }
-        if (index === 0) {
-          driverMedals.first++
-        } else if (index === 1) {
-          driverMedals.second++
-        } else if (index === 2) {
-          driverMedals.third++
-        }
+        driverMedals.places[index] += 1
       })
   },
   sortMedals () {
@@ -160,8 +154,8 @@ export const statisticsStore: StatisticsStore = {
   setMedals (medals: Medals[]) {
     this.medals = medals
   },
-  calculateTotalRacesPerDriver (drivers: Driver[], laptimes: Laptime[]) {
-    const totalDriverRaces: TotalDriverRaces[] = Object.values(
+  calculateTotalRacesPerDriver (laptimes: Laptime[]) {
+    this.totalRaces = Object.values(
       laptimes.reduce((acc, cur) => {
         if (!acc[cur.driverId]) {
           acc[cur.driverId] = {
@@ -173,7 +167,6 @@ export const statisticsStore: StatisticsStore = {
         return acc
       }, {} as Record<string, TotalDriverRaces>))
       .sort((a, b) => (b.races - a.races))
-    this.totalRaces = totalDriverRaces
   },
   setLeaderboardsData (leaderboardsData: Leaderboards.Data) {
     this.leaderboardsData = leaderboardsData

@@ -5,7 +5,19 @@
     >
       <h2>Medals</h2>
       <table class="__medalsTable">
-        <tr><th>Driver</th><th>No. of races</th><th>1st</th><th>2nd</th><th>3rd</th><th>Points</th><th>Rank</th></tr>
+        <tr>
+          <th>Driver</th><th>No. of races</th>
+          <th
+            v-for="place in 7"
+            :key="`place-heading-${place}`"
+          >
+            <span v-if="place === 1">{{ place }}st</span>
+            <span v-if="place === 2">{{ place }}nd</span>
+            <span v-if="place === 3">{{ place }}rd</span>
+            <span v-if="place > 3">{{ place }}th</span>
+          </th>
+          <th>Points</th><th>Rank</th>
+        </tr>
         <tr
           v-show="!medals.length"
         >
@@ -30,14 +42,12 @@
           <td class="__totalRaces">
             {{ getDriverTotalRaces(m.driverId) }}
           </td>
-          <td class="__first">
-            <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: 1})">{{ m.first }}</span>
-          </td>
-          <td class="__second">
-            <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: 2})">{{ m.second }}</span>
-          </td>
-          <td class="__third">
-            <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: 3})">{{ m.third }}</span>
+          <td
+            v-for="place in 7"
+            :key="`place-${place}`"
+            class="__place"
+          >
+            <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: place})">{{ m.places[place-1] }}</span>
           </td>
           <td class="__points">
             <span>{{ $sb.calculatePoints(m) }}</span>
@@ -148,7 +158,7 @@ export default class MedalsComponent extends Vue.with(MedalsProps) {
   }
 }
 
-.__first:hover > span, .__second:hover > span, .__third:hover > span {
+.__place:hover > span {
   cursor: pointer;
   color: var(--hover);
 }

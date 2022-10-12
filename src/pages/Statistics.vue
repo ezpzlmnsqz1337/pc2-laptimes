@@ -175,7 +175,7 @@ export default class Statistics extends Vue {
     this.refreshing = true
     setTimeout(() => {
       const laptimes = this.$dataStore.getTimes()
-      this.$statisticsStore.refreshData(laptimes, this.$dataStore.drivers)
+      this.$statisticsStore.refreshData(laptimes)
 
       this.refreshing = false
     })

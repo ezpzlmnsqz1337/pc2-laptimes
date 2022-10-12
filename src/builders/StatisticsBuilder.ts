@@ -7,9 +7,7 @@ export interface Driver {
 
 export interface Medals {
   driverId: string
-  first: number
-  second: number
-  third: number
+  places: number[]
 }
 
 export default class StatisticsBuilder {
@@ -26,16 +24,16 @@ export default class StatisticsBuilder {
       const firstPlacePoints = 3
       const secondPlacePoints = 2
       const thirdPlacePoints = 1
-      return medals.first * firstPlacePoints + medals.second * secondPlacePoints + medals.third * thirdPlacePoints
+      return medals.places[0] * firstPlacePoints + medals.places[1] * secondPlacePoints + medals.places[2] * thirdPlacePoints
     }
 
-    calculateBonus ({ first, second, third }: Medals, totalRaces: number) {
+    calculateBonus ({ places }: Medals, totalRaces: number) {
       let bonus = 0
 
       for (let i = 0; i < 1000; i = i + 10) {
-        if (((first / totalRaces) * 100) > i) bonus += i
-        if (((second / totalRaces) * 100) > i) bonus += i
-        if (((third / totalRaces) * 100) > i) bonus += i
+        if (((places[0] / totalRaces) * 100) > i) bonus += i
+        if (((places[1] / totalRaces) * 100) > i) bonus += i
+        if (((places[2] / totalRaces) * 100) > i) bonus += i
         if (totalRaces > i) bonus += i
       }
 
