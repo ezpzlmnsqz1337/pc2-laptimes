@@ -39,6 +39,7 @@ declare module '@vue/runtime-core' {
     $lb: LightsBuilder
     $sb: StatisticsBuilder
     queryParams: URLSearchParams
+    authorize(pass: string): boolean
     isLocal(): boolean
     mapValueInRange(x: number, inMin: number, inMax: number, outMin: number, outMax: number): number
     isInRange(n: number, min: number, max: number): boolean
@@ -69,6 +70,7 @@ app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
 app.config.globalProperties.$lb = LightsBuilder.getInstance()
 app.config.globalProperties.$sb = StatisticsBuilder.getInstance()
 app.config.globalProperties.isLocal = () => ['localhost:8080', 'malina:3000'].includes(window.location.host)
+app.config.globalProperties.authorize = (pass: string) => pass === '3f83e9ad5be63bd5bf2fd009fffe6b7dd4066243975bc962edc37459c17e65b9'
 
 app.use(storePlugin)
 app.use(Toaster)

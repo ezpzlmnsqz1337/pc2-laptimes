@@ -27,10 +27,7 @@
           :label="fastestLapTime ? `In game best lap: ${fastestLapTime}` : ''"
           @set="onLaptimeSet(fastestLaptime)"
         >
-          <LaptimeInput
-            ref="laptimeInput"
-            :fastest-lap="fastestLapTime"
-          />
+          <LaptimeInput ref="laptimeInput" />
         </InputRow>
 
         <InputRow

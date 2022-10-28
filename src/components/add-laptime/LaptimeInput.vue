@@ -12,7 +12,7 @@
       class="__minutes"
       placeholder="0"
       @keydown="onLaptimeInputKeyDown($event, null, 'secondsRef')"
-      @input="validateLaptimeFormat()"
+      @input="onLaptimeInput()"
     >
     <div class="__colon">
       :
@@ -26,7 +26,7 @@
       class="__seconds"
       placeholder="00"
       @keydown="onLaptimeInputKeyDown($event, 'minutesRef', 'millisecondsRef')"
-      @input="validateLaptimeFormat()"
+      @input="onLaptimeInput()"
     >
     <div class="__dot">
       .
@@ -40,15 +40,23 @@
       class="__milliseconds"
       placeholder="000"
       @keydown="onLaptimeInputKeyDown($event, 'secondsRef')"
-      @input="validateLaptimeFormat()"
+      @input="onLaptimeInput()"
     >
   </div>
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-class-component'
+import { Laptime } from '@/builders/LaptimeBuilder'
+import { Options, prop, Vue } from 'vue-class-component'
 
-export default class LaptimeInput extends Vue {
+export class LaptimeInputProps {
+  value = prop<Laptime>({ default: null, required: false })
+}
+
+@Options({
+  emits: ['changed']
+})
+export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
   minutes: string = ''
   seconds: string = ''
   milliseconds: string = ''
@@ -63,6 +71,12 @@ export default class LaptimeInput extends Vue {
     if (!m || !s || !ms) return
 
     return this.$ltb.isLaptimeValid(m, s, ms) ? this.$ltb.laptimeFromComponents(m, s, ms) : undefined
+  }
+
+  mounted () {
+    if (this.value) {
+      this.setLaptime(this.value.laptime)
+    }
   }
 
   onLaptimeInputKeyDown (e: any, leftInput: string, rightInput: string) {
@@ -83,8 +97,14 @@ export default class LaptimeInput extends Vue {
     }
   }
 
+  onLaptimeInput () {
+    this.validateLaptimeFormat()
+    if (!this.laptimeError) {
+      this.$emit('changed', this.$ltb.laptimeFromComponents(this.minutes, this.seconds, this.milliseconds))
+    }
+  }
+
   setLaptime (laptime: string) {
-    console.log('Set laptime', laptime)
     const d = this.$ltb.laptimeToDate(laptime)
     this.minutes = `${d?.getMinutes()}`
     this.seconds = `${d?.getSeconds()}`.padStart(2, '0')

@@ -1,4 +1,9 @@
 <template>
+  <LaptimeDetailModal
+    v-if="editLaptime"
+    :laptime-id="editLaptime"
+    @close="editLaptime = null"
+  />
   <table>
     <tr class="__row __header">
       <th v-if="displayColumn('rank')">
@@ -44,7 +49,7 @@
       class="__row"
       :class="getRowClass(time)"
       :title="getRowTitleText(time)"
-      @click="handleRowClick(time)"
+      @click="handleRowClick($event, time)"
     >
       <td
         v-if="displayColumn('rank')"
@@ -61,7 +66,6 @@
           :time="time"
           :editable="true"
           @click="addFilter($event)"
-          @value:update="updateLaptime($event, time)"
         />
       </td>
 
@@ -84,7 +88,6 @@
           :time="time"
           :editable="true"
           @click="addFilter($event)"
-          @value:update="updateLaptime($event, time)"
         />
       </td>
 
@@ -96,7 +99,6 @@
           :time="time"
           :editable="true"
           @click="addFilter($event)"
-          @value:update="updateLaptime($event, time)"
         />
       </td>
 
@@ -108,7 +110,6 @@
           :editable="true"
           :time="time"
           @click="addFilter($event)"
-          @value:update="updateLaptime($event, time)"
         />
       </td>
     </tr>
@@ -121,10 +122,12 @@ import TrackComponent from '@/components/laptime-table/track/TrackComponent.vue'
 import CarComponent from '@/components/laptime-table/car/CarComponent.vue'
 import DriverComponent from '@/components/laptime-table/driver/DriverComponent.vue'
 import LaptimeComponent from '@/components/laptime-table/laptime/LaptimeComponent.vue'
+import LaptimeDetailModal from '@/components/laptime-table/LaptimeDetailModal.vue'
 import { Laptime } from '@/builders/LaptimeBuilder'
 import { Options, prop, Vue } from 'vue-class-component'
 import { LaptimeFilter } from '@/store/dataStore'
 import LaptimeFilterComponent from '../browse-times/LaptimeFilterComponent.vue'
+import { Unsubscribe } from '@firebase/firestore'
 
 export type LaptimeTableColumn = 'rank' | 'driver' | 'laptime' | 'car' | 'track' | 'settings'
 
@@ -140,13 +143,16 @@ export class LaptimeTableProps {
     CarComponent,
     TrackComponent,
     DriverComponent,
-    LaptimeComponent
+    LaptimeComponent,
+    LaptimeDetailModal
   }
 })
 export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   loading = false
   times: Laptime[] = []
   maxRows = 50
+  editLaptime: string | null = null
+  laptimesUnsubscribe!: Unsubscribe
 
   filterRef!: LaptimeFilterComponent
 
@@ -154,6 +160,11 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
     if (this.rows.length) {
       this.times = this.rows
     }
+    this.laptimesUnsubscribe = this.$dataStore.onLaptimesChange(() => setTimeout(() => this.loadData()))
+  }
+
+  unmounted () {
+    this.laptimesUnsubscribe()
   }
 
   getRowClass (laptime: Laptime) {
@@ -167,8 +178,10 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
     return result
   }
 
-  handleRowClick (laptime: Laptime) {
-    this.$toast.info(laptime.notes || 'No comment')
+  handleRowClick (e: PointerEvent, laptime: Laptime) {
+    if ((e.target as HTMLElement).tagName !== 'TD') return
+    this.editLaptime = laptime.uid
+    // this.$toast.info(laptime.notes || 'No comment')
   }
 
   displayColumn (column: LaptimeTableColumn) {
@@ -176,7 +189,7 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   addFilter (filter: LaptimeFilter) {
-    if (this.rows.length) return
+    if (this.rows.length) return false
     if (this.filterRef) {
       this.filterRef.setFilter(filter)
     } else {
@@ -191,11 +204,6 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
       this.times = this.$dataStore.getTimes(filter).slice(-this.maxRows)
       this.loading = false
     })
-  }
-
-  updateLaptime (e: any, time: Laptime) {
-    console.log(e, e.key, e.value)
-    this.$dataStore.updateLaptime({ uid: time.uid, [e.key]: e.value })
   }
 }
 </script>

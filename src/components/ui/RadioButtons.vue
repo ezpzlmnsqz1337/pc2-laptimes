@@ -11,6 +11,7 @@
       <Button
         :type="ButtonType.SECONDARY"
         block
+        :disabled="disabled"
         :class="selectedClass(v)"
         @click="setValue(v)"
       >
@@ -36,6 +37,7 @@ class RadioButtonsProps {
   name = prop<string>({ default: 'name' })
   value = prop<string>({ default: '' })
   values = prop<any[]>({ default: [] })
+  disabled = prop<boolean>({ default: false })
 }
 
 export default class RadioButtons extends Vue.with(RadioButtonsProps) {
@@ -89,8 +91,6 @@ label {
 }
 
 button {
-  inset: 1rem;
-
   &:hover {
     background-color: #005db9 !important;
   }
@@ -99,6 +99,16 @@ button {
     background-color: #1d6ebe !important;
     font-weight: bold;
     color: var(--text-light1);
+  }
+
+  &:disabled {
+    background-color: #8c8c8c !important;
+
+    &.__selected {
+      background-color: #265a8f !important;
+      font-weight: bold;
+      color: var(--text-light1);
+    }
   }
 }
 </style>

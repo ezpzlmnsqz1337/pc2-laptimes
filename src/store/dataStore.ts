@@ -13,7 +13,7 @@ import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
 import { db } from '@/firebase'
 import { bindFirestoreCollection } from '@/vuex-firestore-binding'
-import { arrayUnion, collection, doc, setDoc, updateDoc } from 'firebase/firestore'
+import { arrayUnion, collection, doc, onSnapshot, setDoc, Unsubscribe, updateDoc } from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 
 // const debug = process.env.NODE_ENV !== 'production'
@@ -72,6 +72,7 @@ export interface DataStore {
   getTracksTimes (tracks: Track[]) : Laptime[]
   getDistinctTimes (laptimes: Laptime[]): Laptime[]
   toggleAutoSubmit(): void
+  onLaptimesChange(cb: Function): Unsubscribe
 
   addCar (name: string) :void
   addTrack (name: string) :void
@@ -135,6 +136,9 @@ export const dataStore: DataStore = {
   },
   toggleAutoSubmit () {
     this.autoSubmit = !this.autoSubmit
+  },
+  onLaptimesChange (callback: Function): Unsubscribe {
+    return onSnapshot(collection(db, 'times'), () => callback())
   },
   async addCar (name: string) {
     const car = { uid: uuidv4(), name }

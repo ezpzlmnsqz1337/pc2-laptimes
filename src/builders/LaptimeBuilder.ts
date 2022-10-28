@@ -25,6 +25,12 @@ export interface Laptime {
   notes: string
 }
 
+export interface LaptimeComponents {
+  minutes: string
+  seconds: string
+  miliseconds: string
+}
+
 export default class LaptimeBuilder {
     static instance: LaptimeBuilder
 
@@ -83,5 +89,14 @@ export default class LaptimeBuilder {
         parseInt(seconds) * 1000 +
         parseInt(milliseconds)
       ))
+    }
+
+    componentsFromLaptime (laptime: string): LaptimeComponents | undefined {
+      const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
+      const components = laptime.match(pattern)
+      if (!components || components.length !== 3) return
+
+      const [minutes, seconds, miliseconds] = components
+      return { minutes, seconds, miliseconds }
     }
 }

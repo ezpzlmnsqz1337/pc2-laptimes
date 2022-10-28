@@ -1,6 +1,6 @@
 <template>
   <div
-    class="__wrapper"
+    class="__appWrapper"
   >
     <Background />
     <Menu />
@@ -173,7 +173,7 @@ a {
   color: orange;
 }
 
-.__wrapper {
+.__appWrapper {
   height: 100vh;
   overflow-y: scroll;
   /* Hide scrollbar for IE, Edge and Firefox */
@@ -182,7 +182,7 @@ a {
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
-.__wrapper::-webkit-scrollbar {
+::-webkit-scrollbar {
   display: none;
 }
 

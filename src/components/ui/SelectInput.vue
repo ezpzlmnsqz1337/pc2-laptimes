@@ -7,6 +7,8 @@
     :reduce="reduce"
     :class="{__selected: modelValue}"
     :label="label"
+    :disabled="disabled"
+    :clearable="clearable"
     @update:model-value="$emit('update:modelValue', $event)"
   />
 </template>
@@ -19,6 +21,8 @@ class SelectInputProps {
   modelValue = prop<any>({ default: null })
   placeholder = prop<string>({ default: '' })
   label = prop<string>({ default: '' })
+  clearable = prop<boolean>({ default: true })
+  disabled = prop<boolean>({ default: false })
   reduce = prop<(o: any) => string>({ default: (o: any) => o })
 }
 
