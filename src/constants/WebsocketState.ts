@@ -1,0 +1,6 @@
+export enum WebsocketState {
+  NOT_YET_ESTABLISHED = 0,
+  ESTABLISHED = 1,
+  IN_CLOSING_HANDSHAKE = 2,
+  CLOSED_OR_COULD_NOT_OPEN = 3
+}

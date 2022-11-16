@@ -22,48 +22,43 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'EditableSelect',
-  props: {
-    text: {
-      type: String,
-      default: 'Editable text'
-    },
-    icon: {
-      type: String,
-      default: ''
-    },
-    options: {
-      type: Array,
-      default: () => []
-    },
-    label: {
-      type: String,
-      default: 'name'
-    }
-  },
-  emits: ['value:update'],
-  data () {
-    return {
-      edit: false
-    }
-  },
-  methods: {
-    startEditing (e) {
-      if (!this.isLocal() || !e.ctrlKey) return
-      this.edit = true
-      this.$nextTick(() => this.$refs.select.$el.focus())
-    },
-    update (e) {
-      if (e) this.$emit('value:update', e)
-      this.edit = false
-    }
+<script lang="ts">
+import { Options, prop, Vue } from 'vue-class-component'
+import { VueSelectInstance } from 'vue-select'
+
+class EditableSelectProps {
+  text = prop<string>({ default: 'Editable text' })
+  icon = prop<string>({ default: '' })
+  options = prop<any[]>({ default: [] })
+  label = prop<string>({ default: 'name' })
+  editable = prop<boolean>({ default: false })
+}
+
+@Options({
+  emits: ['value:update']
+})
+export default class EditableSelect extends Vue.with(EditableSelectProps) {
+  edit = false
+
+  $refs!: {
+    select: VueSelectInstance
+  }
+
+  startEditing (e: MouseEvent) {
+    if (!this.editable) return
+    if (!this.isLocal() || !e.ctrlKey) return
+    this.edit = true
+    this.$nextTick(() => (this.$refs.select.$el as HTMLSelectElement).focus())
+  }
+
+  update (e?: Event) {
+    if (e) this.$emit('value:update', e)
+    this.edit = false
   }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .__textContainer {
   display: flex;
   justify-content: space-between;

@@ -1,34 +1,15 @@
 <template>
   <div
-    class="__wrapper"
+    class="__appWrapper"
   >
-    <div
-      ref="background1"
-      class="__background1"
-    />
-    <div
-      ref="background2"
-      class="__background2 __hidden"
-    />
-    <div
-      ref="background3"
-      class="__background3 __hidden"
-    />
+    <Background />
     <Menu />
     <keep-alive>
       <AddLaptime v-if="activeScreen === ScreenType.ADD_LAPTIME" />
     </keep-alive>
-    <div
-      v-show="activeScreen === ScreenType.LAPTIME_BOARD"
-      class="__laptimes"
-    >
-      <keep-alive>
-        <LaptimeFilter v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
-      </keep-alive>
-      <keep-alive>
-        <LaptimeBoard v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
-      </keep-alive>
-    </div>
+    <keep-alive>
+      <BrowseTimes v-if="activeScreen === ScreenType.BROWSE_TIMES" />
+    </keep-alive>
     <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
     </keep-alive>
@@ -36,78 +17,69 @@
       <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
     </keep-alive>
     <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
+    <WebsocketTesting v-if="activeScreen === ScreenType.WEBSOCKET_TESTING" />
   </div>
 </template>
 
-<script>
-import { unsubscribeAll } from '@/vuex-firestore-binding'
-import AddLaptime from '@/components/AddLaptime'
-import LaptimeBoard from '@/components/LaptimeBoard'
-import LaptimeFilter from '@/components/LaptimeFilter'
-import Statistics from '@/components/Statistics'
-import RealtimeData from '@/components/RealtimeData'
+<script lang="ts">
+import AddLaptime from '@/pages/AddLaptime.vue'
+import BrowseTimes from '@/pages/BrowseTimes.vue'
 // import SetCarImage from '@/components/SetCarImage'
-import Menu from '@/components/Menu'
-import { mapActions, mapMutations, mapState } from 'vuex'
-import ScreenType from './constants/ScreenType'
+import Menu from '@/components/Menu.vue'
+import Background from '@/components/Background.vue'
+import RealtimeData from '@/pages/RealtimeData.vue'
+import Statistics from '@/pages/Statistics.vue'
+import WebsocketTesting from '@/pages/WebsocketTesting.vue'
+import { unsubscribeAll } from '@/vuex-firestore-binding'
+import { Options, Vue } from 'vue-class-component'
+import { ScreenType } from './constants/ScreenType'
 
-export default {
-  name: 'App',
+@Options({
   components: {
+    Background,
+    Menu,
     AddLaptime,
-    LaptimeBoard,
-    LaptimeFilter,
-    Statistics,
+    BrowseTimes,
     RealtimeData,
-    Menu
+    WebsocketTesting,
+    Statistics
     // SetCarImage
-  },
-  computed: {
-    ...mapState(['activeScreen'])
-  },
-  created () {
-    this.CURRENT_BG_INDEX = 0
-  },
-  async mounted () {
-    await this.bindDb()
+  }
+})
+export default class App extends Vue {
+  mounted () {
+    this.$dataStore.bindDb()
     this.handleUrl()
-    this.refreshTimes()
-    setInterval(() => {
-      this.cycleBackground()
-    }, 15000)
-  },
-  unmounted () {
+  }
+
+  get activeScreen () {
+    return this.$dataStore.activeScreen
+  }
+
+  beforeUnmount () {
     unsubscribeAll()
-  },
-  methods: {
-    ...mapActions(['bindDb', 'refreshTimes']),
-    ...mapMutations(['showScreen']),
-    cycleBackground () {
-      const bgCount = 3
-      this.$refs[`background${this.CURRENT_BG_INDEX + 1}`].style.opacity = 0
-      this.CURRENT_BG_INDEX = ++this.CURRENT_BG_INDEX % bgCount
-      this.$refs[`background${this.CURRENT_BG_INDEX + 1}`].style.opacity = 1
-    },
-    handleUrl () {
-      if (this.queryParams.has('page')) {
-        const page = this.queryParams.get('page')
-        switch (page) {
-          case ScreenType.STATISTICS:
-            this.showScreen({ screen: ScreenType.STATISTICS })
-            break
-          case ScreenType.LAPTIME_BOARD:
-            this.showScreen({ screen: ScreenType.LAPTIME_BOARD })
-            break
-          default:
-            console.error('Unknown page: ', page)
-        }
+  }
+
+  handleUrl () {
+    if (this.queryParams.has('page')) {
+      const page = this.queryParams.get('page')
+      switch (page) {
+        case ScreenType.STATISTICS:
+          this.$dataStore.showScreen(ScreenType.STATISTICS)
+          break
+        case ScreenType.BROWSE_TIMES:
+          this.$dataStore.showScreen(ScreenType.BROWSE_TIMES)
+          break
+        default:
+          console.error('Unknown page: ', page)
       }
     }
   }
 }
 </script>
 
-<style>
+<style lang="scss">
+@import './assets/css/v-select.css';
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 :root {
   --hover: #188cff;
@@ -137,6 +109,10 @@ export default {
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  font-size: 1em;
 }
 
 body {
@@ -185,23 +161,6 @@ a {
   color: var(--anchor);
 }
 
-.__inputRow {
-  display: flex;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  width: 100%;
-  justify-content: center;
-}
-
-.__noColumn {
-  flex-direction: row !important;
-  border-bottom: 0.1rem solid white;
-}
-
-.__noColumn > div {
-  padding: 0.5rem 1rem;
-}
-
 .__red {
   color: red;
 }
@@ -218,16 +177,7 @@ a {
   color: orange;
 }
 
-/* custom scrollbar overrides */
-.ps .ps__rail-x:hover, .ps .ps__rail-y:hover, .ps .ps__rail-x:focus, .ps .ps__rail-y:focus, .ps .ps__rail-x.ps--clicking, .ps .ps__rail-y.ps--clicking {
-  background-color: transparent !important;
-}
-
-.ps__rail-y:hover > .ps__thumb-y, .ps__rail-y:focus > .ps__thumb-y, .ps__rail-y.ps--clicking .ps__thumb-y {
-  width: 7px !important;
-}
-
-.__wrapper {
+.__appWrapper {
   height: 100vh;
   overflow-y: scroll;
   /* Hide scrollbar for IE, Edge and Firefox */
@@ -235,62 +185,9 @@ a {
   scrollbar-width: none;  /* Firefox */
 }
 
-.__background1, .__background2, .__background3 {
-  background-blend-mode: overlay;
-  background-color: var(--bg-dark3);
-  background-size: cover;
-  width: 100%;
-  height: 120%;
-  position: absolute;
-  top: 0;
-  z-index: -999;
-  opacity: 1;
-  transition: opacity 1.5s ease-in;
-}
-
-.__background1 {
-  background-image: url('~@/assets/images/project-cars-2-bg-1.jpg');
-}
-
-.__background2 {
-  background-image: url('~@/assets/images/project-cars-2-bg-2.jpg');
-}
-
-.__background3 {
-  background-image: url('~@/assets/images/project-cars-2-bg-3.jpg');
-}
-
-.__hidden {
-  opacity: 0;
-}
-
 /* Hide scrollbar for Chrome, Safari and Opera */
-.__wrapper::-webkit-scrollbar {
+::-webkit-scrollbar {
   display: none;
-}
-
-.__inputRow > input, .__inputRow > .v-select {
-  width: 100%;
-}
-
-.__laptimes {
-  padding: 0 2rem 0 2rem;
-  margin: 0 auto;
-  text-align: center;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
-}
-
-.v-select > .vs__dropdown-toggle {
-  background-color: var(--bg-light1);
-  border-radius: 0.3rem;
-  padding: 0.5rem;
-  border: 0.1rem solid black;
-}
-
-.vs__actions .vs__clear {
-  fill: red;
 }
 
 .fa.fa-steering_wheel {
@@ -305,10 +202,6 @@ a {
 }
 
 @media only screen and (max-width: 1024px) {
-  .__laptimes {
-    flex-direction: column;
-  }
-
   .fa.fa-steering_wheel {
     background: url('assets/icons/steering_wheel_sm.svg');
     background-repeat: no-repeat;
@@ -317,18 +210,9 @@ a {
   }
 }
 
-@media only screen and (max-width: 700px) {
-  .__background1, .__background2, .__background3 {
-    background-position: center center;
-    background-size: cover;
-  }
-
-  .__laptimes {
-    padding: 1rem;
-  }
-
-  .__menu button {
-    font-size: 0.6rem;
+@media only screen and (min-width: 1600px) {
+  html {
+    font-size: 1.6em;
   }
 }
 </style>
