@@ -226,6 +226,10 @@ export default class RealtimeData extends Vue {
 </script>
 
 <style scoped lang="scss">
+.__realtimeData {
+  padding: 2rem 1rem;
+}
+
 .__topContent {
   padding: 1rem;
   display: flex;

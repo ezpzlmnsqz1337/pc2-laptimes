@@ -1,5 +1,8 @@
 <template>
-  <div class="__laptimes">
+  <div
+    class="__browseTimes"
+    @keypress="onKeyPressEvent($event)"
+  >
     <LaptimeFilterComponent
       ref="filterRef"
       :show-filter="showFilter"
@@ -28,6 +31,7 @@ import { LaptimeFilter } from '@/store/dataStore'
 import { Options, Vue } from 'vue-class-component'
 import TableControls from '@/components/laptime-table/TableControls.vue'
 import eb from '@/eventBus'
+import { ScreenType } from '@/constants/ScreenType'
 
 @Options({
   components: {
@@ -48,6 +52,10 @@ export default class BrowseTimes extends Vue {
     return this.$dataStore.times
   }
 
+  get activeScreen () {
+    return this.$dataStore.activeScreen
+  }
+
   get firstLaptime () {
     return this.times[0].laptime
   }
@@ -59,6 +67,8 @@ export default class BrowseTimes extends Vue {
   created () {
     eb.on('filter:clear', () => this.$refs.filterRef.clearFilter())
     eb.on('filter:set', (filter: LaptimeFilter) => this.$refs.filterRef.setFilter(filter))
+
+    window.addEventListener('keypress', e => this.onKeyPressEvent(e))
   }
 
   mounted () {
@@ -68,6 +78,15 @@ export default class BrowseTimes extends Vue {
     this.$refs.tableRef.filterRef = this.$refs.filterRef
     this.$refs.tableRef.loading = true
     setTimeout(() => this.handleUrl(), 500)
+  }
+
+  onKeyPressEvent (e: KeyboardEvent) {
+    if (this.activeScreen !== ScreenType.BROWSE_TIMES) return
+    if (e.key === 'f') {
+      this.toggleFilter()
+    } else if (e.key === 'c') {
+      this.$refs.filterRef.clearFilter()
+    }
   }
 
   onFilterChanged (filter: LaptimeFilter) {
@@ -105,8 +124,8 @@ export default class BrowseTimes extends Vue {
   border-radius: 0.3rem;
 }
 
-.__laptimes {
-  padding: 0 1rem;
+.__browseTimes {
+  padding: 2rem 1rem;
   margin: 0 auto;
   text-align: center;
   display: flex;
@@ -115,7 +134,7 @@ export default class BrowseTimes extends Vue {
 }
 
 @media only screen and (max-width: 1024px) {
-  .__laptimes {
+  .__browseTimes {
     flex-direction: column;
   }
 
@@ -125,8 +144,8 @@ export default class BrowseTimes extends Vue {
 }
 
 @media only screen and (max-width: 700px) {
-  .__laptimes {
-    padding: 1rem;
+  .__browseTimes {
+    padding: 2rem 1rem;
   }
 }
 </style>

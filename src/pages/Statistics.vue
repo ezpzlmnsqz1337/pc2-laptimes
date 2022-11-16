@@ -185,7 +185,7 @@ export default class Statistics extends Vue {
 
 <style scoped lang="scss">
 .__statistics {
-  padding: 1rem;
+  padding: 2rem 1rem;
   padding-bottom: 6rem;
 }
 

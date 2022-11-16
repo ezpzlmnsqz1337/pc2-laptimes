@@ -74,4 +74,7 @@ export default class WebsocketTesting extends Vue {
 </script>
 
 <style scoped>
+.__websocketTesting {
+  padding: 2rem 1rem;
+}
 </style>

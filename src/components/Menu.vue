@@ -67,10 +67,10 @@
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.LAPTIME_BOARD}"
-        @click="showScreen(ScreenType.LAPTIME_BOARD)"
+        :class="{__selected: activeScreen === ScreenType.BROWSE_TIMES}"
+        @click="showScreen(ScreenType.BROWSE_TIMES)"
       >
-        Laptime board
+        Browse times
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
@@ -198,13 +198,27 @@ export default class Menu extends Vue {
 .__menuWrapper {
   background-color: rgba(72, 72, 72, 0.7);
   top: 0;
+  position: absolute;
   width: 100vw;
-  padding-bottom: 1rem;
-  padding-top: 0.5rem;
+  padding-top: 0.1rem;
   z-index: 999;
   text-align: center;
 
+  &:hover {
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+
+    .__connect {
+      display: flex;
+    }
+
+    .__menu {
+      display: initial;
+    }
+  }
+
   .__menu {
+    display: none;
     padding-top: 0.2rem;
 
     .__selected {
@@ -242,7 +256,7 @@ export default class Menu extends Vue {
   }
 
   .__connect {
-    display: flex;
+    display: none;
     justify-content: center;
 
     .__select{

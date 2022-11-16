@@ -450,7 +450,7 @@ export default class AddLaptime extends Vue {
   }
 
   showTimeInTable ({ carId, trackId, trackVariant }: Laptime) {
-    this.$dataStore.showScreen(ScreenType.LAPTIME_BOARD)
+    this.$dataStore.showScreen(ScreenType.BROWSE_TIMES)
     eb.emit('filter:clear')
     setTimeout(() => {
       eb.emit('filter:set', { carId, trackId, trackVariant } as LaptimeFilter)
@@ -504,109 +504,113 @@ export default class AddLaptime extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.__heading {
-  text-align: center;
-}
+.__addLaptime {
+  padding: 1rem 0;
 
-.__timeWrapper {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  padding: 2rem;
-  margin: 0 auto;
-  text-align: center;
-}
+  .__heading {
+    text-align: center;
+  }
 
-.__firstPanel, .__secondPanel {
-  width: 40%;
-}
-
-.__lg {
-  display: inherit;
-}
-
-.__sm {
-  display: none;
-}
-
-.__raceState {
-  text-transform: uppercase;
-  font-size: 1.3rem;
-  padding: 0 0 0 1rem;
-}
-
-:deep(.__input) {
-  justify-content: center;
-}
-
-@media only screen and (max-width: 1280px) {
   .__timeWrapper {
+    width: 100%;
+    display: flex;
     flex-direction: row;
+    justify-content: space-around;
+    padding: 2rem;
+    margin: 0 auto;
+    text-align: center;
   }
 
   .__firstPanel, .__secondPanel {
     width: 40%;
   }
-}
-
-@media only screen and (max-width: 700px) {
-  .__timeWrapper {
-    flex-direction: column;
-    width: 100%;
-    padding: 1rem;
-  }
-
-  .__firstPanel, .__secondPanel {
-    width: 100%;
-  }
 
   .__lg {
-    display: none;
+    display: inherit;
   }
 
   .__sm {
-    display: inherit;
+    display: none;
   }
-}
 
-.__submit {
-  width: 100%;
-  font-size: 2rem;
-  margin: 0 auto !important;
-}
+  .__raceState {
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    padding: 0 0 0 1rem;
+  }
 
-.__brakingLine {
-  width: 5rem;
-}
+  :deep(.__input) {
+    justify-content: center;
+  }
 
-textarea {
-  width: 100%;
-  background-color: var(--bg-light1);
-  border-radius: 0.3rem;
-  padding: 0.5rem;
-  border: 0.1rem solid black;
-}
+  @media only screen and (max-width: 1280px) {
+    .__timeWrapper {
+      flex-direction: row;
+    }
 
-.__lg textarea {
-  height: 7rem;
-}
+    .__firstPanel, .__secondPanel {
+      width: 40%;
+    }
+  }
 
-.__autoSubmitAnimation {
-  border-radius: 0.3rem;
-}
+  @media only screen and (max-width: 700px) {
+    .__timeWrapper {
+      flex-direction: column;
+      width: 100%;
+      padding: 1rem;
+    }
 
-.__autoSubmit {
-  display: flex;
-  align-items: center;
-  padding: 0 0.5rem;
+    .__firstPanel, .__secondPanel {
+      width: 100%;
+    }
 
-  input[type=checkbox] {
-    width: 1.7rem;
-    height: 1.7rem;
-    display: inline-block;
+    .__lg {
+      display: none;
+    }
+
+    .__sm {
+      display: inherit;
+    }
+  }
+
+  .__submit {
+    width: 100%;
+    font-size: 2rem;
+    margin: 0 auto !important;
+  }
+
+  .__brakingLine {
+    width: 5rem;
+  }
+
+  textarea {
+    width: 100%;
+    background-color: var(--bg-light1);
     border-radius: 0.3rem;
-    margin: 0.5rem;
+    padding: 0.5rem;
+    border: 0.1rem solid black;
+  }
+
+  .__lg textarea {
+    height: 7rem;
+  }
+
+  .__autoSubmitAnimation {
+    border-radius: 0.3rem;
+  }
+
+  .__autoSubmit {
+    display: flex;
+    align-items: center;
+    padding: 0 0.5rem;
+
+    input[type=checkbox] {
+      width: 1.7rem;
+      height: 1.7rem;
+      display: inline-block;
+      border-radius: 0.3rem;
+      margin: 0.5rem;
+    }
   }
 }
 

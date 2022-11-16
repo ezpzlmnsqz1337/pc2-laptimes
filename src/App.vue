@@ -8,7 +8,7 @@
       <AddLaptime v-if="activeScreen === ScreenType.ADD_LAPTIME" />
     </keep-alive>
     <keep-alive>
-      <BrowseTimes v-if="activeScreen === ScreenType.LAPTIME_BOARD" />
+      <BrowseTimes v-if="activeScreen === ScreenType.BROWSE_TIMES" />
     </keep-alive>
     <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
@@ -67,8 +67,8 @@ export default class App extends Vue {
         case ScreenType.STATISTICS:
           this.$dataStore.showScreen(ScreenType.STATISTICS)
           break
-        case ScreenType.LAPTIME_BOARD:
-          this.$dataStore.showScreen(ScreenType.LAPTIME_BOARD)
+        case ScreenType.BROWSE_TIMES:
+          this.$dataStore.showScreen(ScreenType.BROWSE_TIMES)
           break
         default:
           console.error('Unknown page: ', page)
@@ -109,6 +109,10 @@ export default class App extends Vue {
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  font-size: 1em;
 }
 
 body {
@@ -203,6 +207,12 @@ a {
     background-repeat: no-repeat;
     height: 0.5rem;
     margin-left: 0;
+  }
+}
+
+@media only screen and (min-width: 1600px) {
+  html {
+    font-size: 1.6em;
   }
 }
 </style>

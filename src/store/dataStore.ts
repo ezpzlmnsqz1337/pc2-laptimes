@@ -92,7 +92,7 @@ export interface DataStore {
 
 export const dataStore: DataStore = {
   websocketState: WebsocketState.CLOSED_OR_COULD_NOT_OPEN,
-  activeScreen: ScreenType.LAPTIME_BOARD,
+  activeScreen: ScreenType.BROWSE_TIMES,
   autoSubmit: false,
   cars: [],
   times: [],
