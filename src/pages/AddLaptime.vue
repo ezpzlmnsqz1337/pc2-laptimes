@@ -25,7 +25,8 @@
       <div class="__firstPanel">
         <InputRow
           :label="fastestLapTime ? `In game best lap: ${fastestLapTime}` : ''"
-          @set="onLaptimeSet(fastestLaptime)"
+          :show-set-button="fastestLapTime"
+          @set="onLaptimeSet(fastestLapTime)"
         >
           <LaptimeInput ref="laptimeInput" />
         </InputRow>
@@ -505,7 +506,7 @@ export default class AddLaptime extends Vue {
 
 <style lang="scss" scoped>
 .__addLaptime {
-  padding: 1rem 0;
+  padding: 2rem 0 1rem;
 
   .__heading {
     text-align: center;
@@ -516,7 +517,6 @@ export default class AddLaptime extends Vue {
     display: flex;
     flex-direction: row;
     justify-content: space-around;
-    padding: 2rem;
     margin: 0 auto;
     text-align: center;
   }
@@ -574,9 +574,9 @@ export default class AddLaptime extends Vue {
   }
 
   .__submit {
-    width: 100%;
+    width: 90%;
     font-size: 2rem;
-    margin: 0 auto !important;
+    margin: 0 auto;
   }
 
   .__brakingLine {

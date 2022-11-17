@@ -125,7 +125,7 @@ export default class BrowseTimes extends Vue {
 }
 
 .__browseTimes {
-  padding: 2rem 1rem;
+  padding: 3rem 1rem 1rem;
   margin: 0 auto;
   text-align: center;
   display: flex;
@@ -145,7 +145,7 @@ export default class BrowseTimes extends Vue {
 
 @media only screen and (max-width: 700px) {
   .__browseTimes {
-    padding: 2rem 1rem;
+    padding: 3rem 1rem 1rem;
   }
 }
 </style>

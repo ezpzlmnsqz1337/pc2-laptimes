@@ -94,13 +94,14 @@
         >
           Set car image
         </Button> -->
-      <Button
+      <!-- <Button
+        v-if="isLocal()"
         :type="ButtonType.DANGER"
         :class="{__selected: activeScreen === ScreenType.WEBSOCKET_TESTING}"
         @click="showScreen(ScreenType.WEBSOCKET_TESTING)"
       >
         Websocket testing
-      </Button>
+      </Button> -->
     </div>
   </div>
 </template>
@@ -206,7 +207,7 @@ export default class Menu extends Vue {
 
   &:hover {
     padding-top: 0.5rem;
-    padding-bottom: 1rem;
+    padding-bottom: 0.5rem;
 
     .__connect {
       display: flex;
@@ -214,12 +215,21 @@ export default class Menu extends Vue {
 
     .__menu {
       display: initial;
+      height: initial;
+
+      > button {
+        padding: 8px 12px;
+        height: initial;
+        font-size: initial;
+        width: initial;
+        top: 0;
+        position: initial;
+      }
     }
   }
 
   .__menu {
-    display: none;
-    padding-top: 0.2rem;
+    height: 5px;
 
     .__selected {
       background-color: #242424;
@@ -228,6 +238,16 @@ export default class Menu extends Vue {
     .__highlight {
       background-color: #4081C2;
       box-shadow: 0px 0px 5px 2px #4081C2;
+    }
+
+    > button {
+      padding: 0;
+      height: 5px;
+      font-size: 0;
+      vertical-align: top;
+      width: 6rem;
+      top: -4px;
+      position: relative;
     }
   }
 
@@ -270,7 +290,7 @@ export default class Menu extends Vue {
   }
 
   @media only screen and (max-width: 700px) {
-    .__menu button {
+    &:hover .__menu > button {
       font-size: 0.6rem;
     }
   }
