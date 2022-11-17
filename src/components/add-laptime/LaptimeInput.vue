@@ -11,6 +11,7 @@
       maxlength="2"
       class="__minutes"
       placeholder="0"
+      :disabled="disabled"
       @keydown="onLaptimeInputKeyDown($event, null, 'secondsRef')"
       @input="onLaptimeInput()"
     >
@@ -25,6 +26,7 @@
       type="text"
       class="__seconds"
       placeholder="00"
+      :disabled="disabled"
       @keydown="onLaptimeInputKeyDown($event, 'minutesRef', 'millisecondsRef')"
       @input="onLaptimeInput()"
     >
@@ -39,6 +41,7 @@
       type="text"
       class="__milliseconds"
       placeholder="000"
+      :disabled="disabled"
       @keydown="onLaptimeInputKeyDown($event, 'secondsRef')"
       @input="onLaptimeInput()"
     >
@@ -51,6 +54,7 @@ import { Options, prop, Vue } from 'vue-class-component'
 
 export class LaptimeInputProps {
   value = prop<Laptime>({ default: null, required: false })
+  disabled = prop<boolean>({ default: false })
 }
 
 @Options({
@@ -167,6 +171,10 @@ export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
 
     &:focus {
       outline: 0;
+    }
+
+    &:disabled {
+      background-color: #ffffff;
     }
   }
 
