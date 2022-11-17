@@ -184,11 +184,11 @@ export default class RealtimeData extends Vue {
     if (data.packetType === PacketType.TELEMETRY) {
       this.setDials()
       if (this.lightsEnabled) {
-        const { throttle, rpm, maxRpm, brake } = data
+        const { throttle, rpm, maxRpm, brake } = data.data
         this.setLightsColor(throttle, rpm, maxRpm, brake)
       }
     }
-    this.$realtimeDataStore.setValues(data)
+    this.$realtimeDataStore.setValues(data.data)
   }
 
   setDials () {
