@@ -121,17 +121,6 @@
               @changed="updateLaptime({[b.name]: $event}, laptime)"
             />
           </InputRow>
-
-          <InputRow
-            heading="Notes"
-            class="__lg"
-          >
-            <textarea
-              :value="laptime.notes"
-              :disabled="!editEnabled"
-              @change="updateLaptime({notes: $event.target.value}, laptime)"
-            />
-          </InputRow>
         </div>
         <div class="__secondPanel">
           <InputRow
@@ -152,11 +141,11 @@
 
           <InputRow
             heading="Notes"
-            class="__sm"
           >
             <textarea
               :value="laptime.notes"
               :disabled="!editEnabled"
+              style="resize: none"
               @change="updateLaptime({notes: $event.target.value}, laptime)"
             />
           </InputRow>
@@ -366,10 +355,10 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
 @media only screen and (max-width: 1280px) {
   .__wrapper {
     flex-direction: row;
-  }
 
-  .__firstPanel, .__secondPanel {
-    max-width: 40%;
+    .__firstPanel, .__secondPanel {
+      max-width: 40%;
+    }
   }
 }
 
@@ -378,10 +367,10 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
     flex-direction: column;
     width: 100%;
     padding: 1rem;
-  }
 
-  .__firstPanel, .__secondPanel {
-    max-width: 100%;
+    .__firstPanel, .__secondPanel {
+      max-width: 100%;
+    }
   }
 
   .__lg {
