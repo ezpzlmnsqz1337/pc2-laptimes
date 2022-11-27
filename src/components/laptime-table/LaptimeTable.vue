@@ -198,6 +198,7 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   loadData (filter?: LaptimeFilter) {
+    if (this.rows.length > 0) return
     if (!filter && this.filterRef) filter = this.filterRef.filter
     this.loading = true
     this.$nextTick(() => {

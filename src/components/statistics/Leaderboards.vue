@@ -1,5 +1,41 @@
 <template>
   <div class="__leaderboards">
+    <div class="__trackCarMatrix">
+      <div
+        v-for="(track, trackId, index) in leaderboardsData"
+        :key="trackId"
+        class="__row"
+      >
+        <template
+          v-for="(variant, name, indexRow) in track"
+          :key="`row${indexRow}`"
+        >
+          <Carousel
+            v-if="index < showItems"
+            :items-to-show="1"
+          >
+            <Slide
+              v-for="(laptimes, indexCol) in variant"
+              :key="`column-${indexRow}${indexCol}`"
+              class="__item"
+            >
+              <h3>
+                {{ getTrackName(laptimes[0]) }} - {{ getTrackVariantName(laptimes[0]) }} - {{ getCar(laptimes[0]) }}
+              </h3>
+              <LaptimeTable
+                :rows="laptimes"
+                :display-columns="displayColumns"
+              />
+            </Slide>
+            <template #addons="{ slidesCount }">
+              <Navigation v-if="slidesCount > 1" />
+              <Pagination v-if="slidesCount > 1" />
+            </template>
+          </Carousel>
+        </template>
+      </div>
+    </div>
+
     <div class="__filter">
       <div class="__item">
         <div class="__header">
@@ -49,42 +85,6 @@
         >
           <div class="fa fa-ban" /><span>Clear filter</span>
         </Button>
-      </div>
-    </div>
-
-    <div class="__trackCarMatrix">
-      <div
-        v-for="(track, trackId, index) in leaderboardsData"
-        :key="trackId"
-        class="__row"
-      >
-        <template
-          v-for="(variant, name, indexRow) in track"
-          :key="`row${indexRow}`"
-        >
-          <Carousel
-            v-if="index < showItems"
-            :items-to-show="1"
-          >
-            <Slide
-              v-for="(car, indexCol) in variant"
-              :key="`column-${indexRow}${indexCol}`"
-              class="__item"
-            >
-              <h3>
-                {{ getTrackName(car[0]) }} - {{ getTrackVariantName(car[0]) }} - {{ getCar(car[0]) }}
-              </h3>
-              <LaptimeTable
-                :rows="car"
-                :display-columns="displayColumns"
-              />
-            </Slide>
-            <template #addons="{ slidesCount }">
-              <Navigation v-if="slidesCount > 1" />
-              <Pagination v-if="slidesCount > 1" />
-            </template>
-          </Carousel>
-        </template>
       </div>
     </div>
   </div>
