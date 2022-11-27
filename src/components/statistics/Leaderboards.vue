@@ -2,21 +2,20 @@
   <div class="__leaderboards">
     <div class="__trackCarMatrix">
       <div
-        v-for="(track, trackId, index) in leaderboardsData"
-        :key="trackId"
+        v-for="track in leaderboardsData"
+        :key="track"
         class="__row"
       >
         <template
-          v-for="(variant, name, indexRow) in track"
-          :key="`row${indexRow}`"
+          v-for="variant in track"
+          :key="variant"
         >
           <Carousel
-            v-if="index < showItems"
             :items-to-show="1"
           >
             <Slide
-              v-for="(laptimes, indexCol) in variant"
-              :key="`column-${indexRow}${indexCol}`"
+              v-for="laptimes in variant"
+              :key="laptimes"
               class="__item"
             >
               <h3>
