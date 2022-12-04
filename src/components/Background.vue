@@ -41,7 +41,7 @@ export default class Background extends Vue {
 
 <style scoped lang="scss">
 .__background1, .__background2, .__background3 {
-  background-blend-mode: overlay;
+  background-blend-mode: multiply;
   background-color: var(--bg-dark3);
   background-size: cover;
   width: 100%;

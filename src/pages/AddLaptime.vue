@@ -235,10 +235,10 @@
           class="__sm"
         >
           <Button
+            v-if="!autoSubmit && valid"
             :type="ButtonType.PRIMARY"
             :block="true"
             class="__submit"
-            :disabled="!valid"
             @click="submit()"
           >
             Submit
@@ -249,11 +249,10 @@
 
     <div class="__timeWrapper __lg">
       <Button
-        v-if="!autoSubmit"
+        v-if="!autoSubmit && valid"
         :type="ButtonType.PRIMARY"
         :block="true"
         class="__submit"
-        :disabled="!valid"
         @click="submit()"
       >
         Submit
@@ -543,6 +542,12 @@ export default class AddLaptime extends Vue {
     justify-content: center;
   }
 
+  .__submit {
+    width: 90%;
+    font-size: 2rem;
+    margin: 0 auto;
+  }
+
   @media only screen and (max-width: 1280px) {
     .__timeWrapper {
       flex-direction: row;
@@ -560,6 +565,10 @@ export default class AddLaptime extends Vue {
       padding: 1rem;
     }
 
+    .__submit {
+      width: 100%;
+    }
+
     .__firstPanel, .__secondPanel {
       width: 100%;
     }
@@ -571,12 +580,6 @@ export default class AddLaptime extends Vue {
     .__sm {
       display: inherit;
     }
-  }
-
-  .__submit {
-    width: 90%;
-    font-size: 2rem;
-    margin: 0 auto;
   }
 
   .__brakingLine {

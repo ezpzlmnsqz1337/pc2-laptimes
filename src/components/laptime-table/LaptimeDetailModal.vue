@@ -318,6 +318,7 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
   display: flex;
   align-items: center;
   justify-content: space-around;
+  text-align: center;
 
   .__firstPanel {
     max-width: 30vw;

@@ -54,10 +54,11 @@ export interface DataStore {
   websocketState: WebsocketState
   activeScreen: ScreenType
   autoSubmit: boolean
-  cars: Car[],
-  times: Laptime[],
-  tracks: Track[],
-  drivers: Driver[],
+  editLaptime: string | null
+  cars: Car[]
+  times: Laptime[]
+  tracks: Track[]
+  drivers: Driver[]
   lastAddedLaptime: Laptime | null
   getCarById(id: string): Car | undefined
   getCarByGameId(id: string): Car | undefined
@@ -85,6 +86,7 @@ export interface DataStore {
   updateLaptime (laptime: LaptimeUpdate) :void
 
   showScreen (screen: ScreenType):void
+  setEditLaptime(laptimeId: string | null): void
   setLastAddedLaptime (laptime: Laptime) :void
   setWebsocketState (websocketState: WebsocketState) :void
   bindDb () : void
@@ -94,6 +96,7 @@ export const dataStore: DataStore = {
   websocketState: WebsocketState.CLOSED_OR_COULD_NOT_OPEN,
   activeScreen: ScreenType.BROWSE_TIMES,
   autoSubmit: false,
+  editLaptime: null,
   cars: [],
   times: [],
   tracks: [],
@@ -126,6 +129,9 @@ export const dataStore: DataStore = {
   },
   showScreen (screen: ScreenType) {
     this.activeScreen = screen
+  },
+  setEditLaptime (laptimeId: string | null) {
+    this.editLaptime = laptimeId
   },
   setLastAddedLaptime (laptime: Laptime) {
     this.lastAddedLaptime = laptime

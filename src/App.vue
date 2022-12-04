@@ -18,6 +18,13 @@
     </keep-alive>
     <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
     <WebsocketTesting v-if="activeScreen === ScreenType.WEBSOCKET_TESTING" />
+    <transition name="bounce">
+      <LaptimeDetailModal
+        v-if="editLaptime"
+        :laptime-id="editLaptime"
+        @close="$dataStore.setEditLaptime(null)"
+      />
+    </transition>
   </div>
 </template>
 
@@ -30,6 +37,7 @@ import Background from '@/components/Background.vue'
 import RealtimeData from '@/pages/RealtimeData.vue'
 import Statistics from '@/pages/Statistics.vue'
 import WebsocketTesting from '@/pages/WebsocketTesting.vue'
+import LaptimeDetailModal from '@/components/laptime-table/LaptimeDetailModal.vue'
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from './constants/ScreenType'
@@ -42,7 +50,8 @@ import { ScreenType } from './constants/ScreenType'
     BrowseTimes,
     RealtimeData,
     WebsocketTesting,
-    Statistics
+    Statistics,
+    LaptimeDetailModal
     // SetCarImage
   }
 })
@@ -54,6 +63,10 @@ export default class App extends Vue {
 
   get activeScreen () {
     return this.$dataStore.activeScreen
+  }
+
+  get editLaptime () {
+    return this.$dataStore.editLaptime
   }
 
   beforeUnmount () {
@@ -215,4 +228,23 @@ a {
     font-size: 1.6em;
   }
 }
+
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .3s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 </style>

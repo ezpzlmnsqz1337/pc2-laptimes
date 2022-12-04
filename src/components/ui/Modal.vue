@@ -69,9 +69,13 @@ export default class Modal extends Vue {}
   overflow-y: scroll;
 }
 
-.__modalHeader h3 {
-  margin-top: 0;
-  color: var(--text-light1);
+.__modalHeader {
+  text-align: center;
+
+  h3 {
+    margin-top: 0;
+    color: var(--text-light1);
+  }
 }
 
 .__modalBody {
