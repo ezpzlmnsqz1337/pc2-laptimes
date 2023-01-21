@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
-    "deploy:malina": "yarn build && bash -c ./deploy.sh",
+    "deploy:malina": "bash -c ./deploy.sh",
     "emulate:db": "firebase emulators:start --only firestore --import=./tests/db --export-on-exit"
   },
   "dependencies": {
