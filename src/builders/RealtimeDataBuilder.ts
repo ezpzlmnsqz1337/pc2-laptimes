@@ -8,7 +8,7 @@ export default class RealtimeDataBuilder {
     static instance: RealtimeDataBuilder
 
     protected ws: WebSocket | null = null
-    protected hostname = 'localhost'
+    protected hostname = window.location.hostname
     protected port = 8765
     listeners: Function[] = []
     protected retryHandler?: number
