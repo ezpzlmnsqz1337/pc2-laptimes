@@ -14,6 +14,16 @@
             class="fa fa-pen"
           /><span>Edit</span>
         </Button>
+        <Button
+          v-if="editEnabled"
+          class="__delete"
+          :type="ButtonType.DANGER"
+          @click="deleteLaptime(laptimeId)"
+        >
+          <div
+            class="fa fa-trash"
+          /><span>Delete</span>
+        </Button>
         <h2>Laptime detail</h2>
       </div>
     </template>
@@ -296,6 +306,12 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
   updateLaptime (e: any, time: Laptime) {
     if (!this.isLocal()) return
     this.$dataStore.updateLaptime({ uid: time.uid, ...e })
+  }
+
+  deleteLaptime (laptimeId: string) {
+    this.$emit('close')
+    setTimeout(() => this.$dataStore.deleteLaptime(laptimeId))
+    this.$toast.success('Laptime deleted successfully')
   }
 }
 </script>
