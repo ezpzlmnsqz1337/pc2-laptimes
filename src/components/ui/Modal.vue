@@ -67,6 +67,7 @@ export default class Modal extends Vue {}
   transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
   overflow-y: scroll;
+  text-align: center;
 }
 
 .__modalHeader {

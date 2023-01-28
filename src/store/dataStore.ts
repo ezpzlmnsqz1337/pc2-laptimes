@@ -13,7 +13,7 @@ import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
 import { db } from '@/firebase'
 import { bindFirestoreCollection } from '@/vuex-firestore-binding'
-import { arrayUnion, collection, doc, onSnapshot, setDoc, Unsubscribe, updateDoc } from 'firebase/firestore'
+import { arrayUnion, collection, deleteDoc, doc, onSnapshot, setDoc, Unsubscribe, updateDoc } from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
 
 // const debug = process.env.NODE_ENV !== 'production'
@@ -68,28 +68,29 @@ export interface DataStore {
   getTimeById(id: string): Laptime | undefined
   getDriverById(id: string): Driver | undefined
   getDriverByName(name: string): Driver | undefined
-  getTimesForDriver (driverId: string) : Laptime[]
-  getTimes (filter?: LaptimeFilter) : Laptime[]
-  getTracksTimes (tracks: Track[]) : Laptime[]
+  getTimesForDriver (driverId: string): Laptime[]
+  getTimes (filter?: LaptimeFilter): Laptime[]
+  getTracksTimes (tracks: Track[]): Laptime[]
   getDistinctTimes (laptimes: Laptime[]): Laptime[]
   toggleAutoSubmit(): void
   onLaptimesChange(cb: Function): Unsubscribe
 
-  addCar (name: string) :void
-  addTrack (name: string) :void
-  addTrackVariant (trackId: string, variant: string) :void
-  addDriver (name: string) :void
-  addLaptime (laptime: Laptime) :void
+  addCar (name: string): void
+  addTrack (name: string): void
+  addTrackVariant (trackId: string, variant: string): void
+  addDriver (name: string): void
+  addLaptime (laptime: Laptime): void
 
-  linkCarToGameId (carId: string, gameId: string) :void
-  linkTrackToGameId (trackId: string, gameId: string) :void
-  updateLaptime (laptime: LaptimeUpdate) :void
+  linkCarToGameId (carId: string, gameId: string): void
+  linkTrackToGameId (trackId: string, gameId: string): void
+  updateLaptime (laptime: LaptimeUpdate): void
+  deleteLaptime (laptimeId: string): void
 
-  showScreen (screen: ScreenType):void
+  showScreen (screen: ScreenType): void
   setEditLaptime(laptimeId: string | null): void
-  setLastAddedLaptime (laptime: Laptime) :void
-  setWebsocketState (websocketState: WebsocketState) :void
-  bindDb () : void
+  setLastAddedLaptime (laptime: Laptime): void
+  setWebsocketState (websocketState: WebsocketState): void
+  bindDb (): void
 }
 
 export const dataStore: DataStore = {
@@ -175,6 +176,10 @@ export const dataStore: DataStore = {
     if (!laptime || !laptime.uid) return
     const docRef = doc(db, 'times', laptime.uid)
     await setDoc(docRef, laptime, { merge: true })
+  },
+  async deleteLaptime (laptimeId: string) {
+    const docRef = doc(db, 'times', laptimeId)
+    await deleteDoc(docRef)
   },
   async linkCarToGameId (carId: string, gameId: string) {
     if (!carId || !gameId) return
