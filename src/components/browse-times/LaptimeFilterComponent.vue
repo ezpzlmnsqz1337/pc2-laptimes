@@ -59,43 +59,44 @@
     </InputRow>
 
     <InputRow
-      v-for="b in buttons"
-      :key="b.name"
-      :heading="b.heading"
-      :border-bottom="true"
-    >
-      <RadioButtons
-        :name="b.name"
-        :values="b.values"
-        :value="filter[b.name]"
-        @changed="setFilter({[b.name]: $event})"
-      />
-    </InputRow>
-
-    <InputRow
       heading="Date"
       :border-bottom="true"
     >
-      <DatePicker
-        class="__datepicker"
-        input-format="dd.MM.yyyy"
-        :disabled-dates="{predicate: disabledDates}"
-        :model-value="filter.date"
-        @update:model-value="setFilter({date: $event})"
-      />
-
-      <Button
-        :type="ButtonType.DANGER"
-        :disabled="filter.date === null"
-        @click="setFilter({date: null})"
-      >
-        <div
-          class="fa fa-ban"
-          style="margin-right: 0"
+      <div class="__datePickerInput">
+        <DatePicker
+          class="__datepicker"
+          input-format="dd.MM.yyyy"
+          :disabled-dates="{predicate: disabledDates}"
+          :model-value="filter.date"
+          @update:model-value="setFilter({date: $event})"
         />
-      </Button>
+      </div>
+
+      <div
+        class="__datePickerClearBtn"
+      >
+        <Button
+          :type="
+            ButtonType.DANGER"
+          :disabled="filter.date === null"
+          @click="setFilter({date: null})"
+        >
+          <div
+            class="fa fa-ban"
+            style="margin-right: 0"
+          />
+        </Button>
+      </div>
     </InputRow>
 
+    <Button
+      :type="ButtonType.SECONDARY"
+      @click="showMoreFilters = !showMoreFilters"
+    >
+      <div
+        :class="`fa fa-chevron-${showMoreFilters ? 'up' : 'down'}`"
+      />More filters
+    </Button>
     <Button
       :type="ButtonType.SECONDARY"
       @click="setRandomFilter()"
@@ -109,6 +110,25 @@
     >
       <div class="fa fa-ban" /><span>Clear filter</span>
     </Button>
+
+    <div
+      class="__moreFilters"
+      :class="{__hidden: !showMoreFilters}"
+    >
+      <InputRow
+        v-for="b in buttons"
+        :key="b.name"
+        :heading="b.heading"
+        :border-bottom="true"
+      >
+        <RadioButtons
+          :name="b.name"
+          :values="b.values"
+          :value="filter[b.name]"
+          @changed="setFilter({[b.name]: $event})"
+        />
+      </InputRow>
+    </div>
   </div>
 </template>
 
@@ -150,6 +170,7 @@ class LaptimeFilterComponentProps {
 export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterComponentProps) {
   randomizing = false
   buttons!: LaptimeFilterButtons[]
+  showMoreFilters = false;
 
   filter: LaptimeFilter = {
     carId: null,
@@ -289,6 +310,24 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
     text-align: left;
   }
 
+  .__moreFilters {
+    margin-top: 0.7rem;
+
+    &.__hidden {
+      visibility: hidden;
+    }
+  }
+
+  .__datePickerInput {
+    width: 100%;
+  }
+
+  .__datePickerClearBtn {
+    :deep(button) {
+      padding: 0.75rem 0.9rem;
+    }
+  }
+
   :deep(.__heading) {
     font-size: 0.7rem;
     font-weight: normal;
@@ -297,7 +336,8 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   :deep(.__datepicker) {
     text-align: center;
     font-size: 1rem;
-    padding: 0.3rem;
+    display: block;
+    width: 100%;
   }
 
   :deep(.v3dp__popout){
@@ -312,6 +352,16 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
 
   :deep(.__inputRow) {
     margin-bottom: 0.7rem;
+  }
+}
+
+@media only screen and (max-width: 1600px) {
+  .__filterWrapper {
+    .__datePickerClearBtn {
+      :deep(button) {
+        padding: 0.5rem 0.9rem;
+      }
+    }
   }
 }
 
