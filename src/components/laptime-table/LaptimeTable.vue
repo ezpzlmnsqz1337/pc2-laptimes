@@ -211,25 +211,4 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   50% { box-shadow: inset 0 0 0 0 var(--blink-color); }
   100% { box-shadow: inset 0 0 1.5rem 0.8rem var(--blink-color); }
 }
-
-.__tableControls {
-  position: relative;
-
-  .__share {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-  .__showFilter {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-}
-
-@media only screen and (max-width: 700px) {
-  .__tableControls button {
-    font-size: 0.6rem;
-  }
-}
 </style>

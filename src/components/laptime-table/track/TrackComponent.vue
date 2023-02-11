@@ -8,7 +8,10 @@
       @value:update="handleUpdateEvent('trackId', $event.uid)"
     />
   </div>
-  <div @click="handleClickEvent($event)">
+  <div
+    v-if="time.trackVariant"
+    @click="handleClickEvent($event)"
+  >
     <EditableSelect
       :editable="editable"
       :text="time.trackVariant"
