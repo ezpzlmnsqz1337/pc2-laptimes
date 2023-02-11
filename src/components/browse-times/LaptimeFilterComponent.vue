@@ -35,7 +35,7 @@
       />
     </InputRow>
     <InputRow
-      v-if="filter.trackId"
+      v-if="filter.trackId && getTrackVariants(filter.trackId).length > 0"
     >
       <SelectInput
         :model-value="filter.trackVariant"

@@ -71,11 +71,11 @@
         </InputRow>
 
         <InputRow
-          v-if="trackId"
+          v-if="trackId && getTrackVariants(trackId).length > 0"
           :label="trackVariation ? `In game track variant: ${trackVariation}` : ''"
           :show-add-button="true"
           :show-set-button="canSetTrack"
-          @set="setTrackVariation(trackVariation)"
+          @set="setTrackVariation(trackLocation, trackVariation)"
           @link="linkTrackToGameId(trackId, trackLocation)"
           @add="showNewTrackVariantModal = true"
         >
@@ -283,6 +283,7 @@ import SelectInput from '@/components/ui/SelectInput.vue'
 import eb from '@/eventBus'
 import { LaptimeFilter } from '@/store/dataStore'
 import { Options, Vue } from 'vue-class-component'
+import { trackMapping } from '@/utils/trackMapping'
 
 @Options({
   components: {
@@ -355,7 +356,7 @@ export default class AddLaptime extends Vue {
   }
 
   get valid () {
-    return this.carId && this.trackId && this.trackVariant && this.driverId && this.$refs.laptimeInput.valid && this.transmission && this.weather && this.brakingLine
+    return this.carId && this.trackId && (this.trackVariant || this.getTrackVariants(this.trackId)?.length === 0) && this.driverId && this.$refs.laptimeInput.valid && this.transmission && this.weather && this.brakingLine
   }
 
   get canAutoSubmit () {
@@ -425,7 +426,7 @@ export default class AddLaptime extends Vue {
       uid: '',
       carId: this.carId!,
       trackId: this.trackId!,
-      trackVariant: this.trackVariant!,
+      trackVariant: this.trackVariant || '',
       driverId: this.driverId!,
       laptime: this.$refs.laptimeInput.laptime!,
       transmission: this.transmission,
@@ -472,6 +473,7 @@ export default class AddLaptime extends Vue {
       this.$toast.error('Unable to set track. Track does not exist.')
       return
     }
+    this.trackVariant = null
     this.trackId = track.uid
   }
 
@@ -479,8 +481,8 @@ export default class AddLaptime extends Vue {
     return this.$dataStore.getTrackVariants(trackId)
   }
 
-  setTrackVariation (trackVariation: string) {
-    const variant = this.getTrackVariants(this.trackId!)?.find(x => x.includes(trackVariation.replace('_', ' ')))
+  setTrackVariation (trackLocation: string, trackVariation: string) {
+    const variant = (trackMapping as any)[trackLocation][trackVariation || '-']
     if (!variant) {
       this.$toast.error('Unable to set track variant. Track variant does not exist.')
       return
@@ -495,7 +497,7 @@ export default class AddLaptime extends Vue {
         this.$refs.laptimeInput.setLaptime(this.fastestLapTime!)
         this.setCarName(this.carName)
         this.setTrackLocation(this.trackLocation)
-        this.setTrackVariation(this.trackVariation)
+        this.setTrackVariation(this.trackLocation, this.trackVariation)
         if (this.valid) this.submit()
       }, 1000)
     }
