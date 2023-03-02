@@ -327,6 +327,23 @@ export default class AddLaptime extends Vue {
     this.dataListener = this.$rdb.addListener(this.onRealTimeDataReceived)
   }
 
+  mounted (): void {
+    this.handleUrl()
+  }
+
+  handleUrl () {
+    if (this.queryParams.has('autosubmit-driver')) {
+      const name = this.queryParams.get('autosubmit-driver')
+      setTimeout(() => {
+        this.driverId = this.drivers.find(x => x.name === name)?.uid || null
+
+        if (this.driverId) {
+          this.toggleAutoSubmit()
+        }
+      }, 1000)
+    }
+  }
+
   get cars () {
     return this.$dataStore.cars
   }

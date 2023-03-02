@@ -77,6 +77,9 @@ export default class App extends Vue {
     if (this.queryParams.has('page')) {
       const page = this.queryParams.get('page')
       switch (page) {
+        case ScreenType.ADD_LAPTIME:
+          this.$dataStore.showScreen(ScreenType.ADD_LAPTIME)
+          break
         case ScreenType.STATISTICS:
           this.$dataStore.showScreen(ScreenType.STATISTICS)
           break

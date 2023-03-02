@@ -168,6 +168,10 @@ export default class Menu extends Vue {
     }
   }
 
+  mounted (): void {
+    this.handleUrl()
+  }
+
   showScreen (screen: ScreenType) {
     this.$dataStore.showScreen(screen)
   }
@@ -191,6 +195,23 @@ export default class Menu extends Vue {
   disconnect () {
     this.$rdb.disconnect()
     this.$dataStore.setWebsocketState(WebsocketState.CLOSED_OR_COULD_NOT_OPEN)
+  }
+
+  handleUrl () {
+    if (this.queryParams.has('wshost')) {
+      const wshost = this.queryParams.get('wshost')
+      switch (wshost) {
+        case 'wallpc':
+          this.host = 'wallpc'
+          break
+        case 'deskpc':
+          this.host = 'deskpc'
+          break
+        default:
+          console.error('Unknown websocket host: ', wshost)
+      }
+      this.connect()
+    }
   }
 }
 </script>
