@@ -169,7 +169,6 @@ export default class Statistics extends Vue {
   }
 
   refresh (delay: number = 0) {
-    console.log('refresh', this.refreshing)
     if (this.refreshing) return
 
     this.refreshing = true

@@ -209,19 +209,24 @@ a {
 .fa.fa-steering_wheel {
   display: block;
   margin-top: 0.1rem;
-  margin-left: -0.1rem;
-  width: 1rem;
+  width: 0.8rem;
   height: 0.8rem;
-  font-size: 2rem;
-  background: url('assets/icons/steering_wheel.svg');
+  margin-left: -0.1rem;
+  background-image: url('assets/icons/steering_wheel.svg');
+  background-size: 0.8rem;
+  background-position: 50% 50%;
   background-repeat: no-repeat;
 }
 
 @media only screen and (max-width: 1024px) {
   .fa.fa-steering_wheel {
-    background: url('assets/icons/steering_wheel_sm.svg');
-    background-repeat: no-repeat;
+    background-image: url('assets/icons/steering_wheel_sm.svg');
     height: 0.5rem;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .fa.fa-steering_wheel {
     margin-left: 0;
   }
 }

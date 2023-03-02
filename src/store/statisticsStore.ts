@@ -100,9 +100,7 @@ export const statisticsStore: StatisticsStore = {
       for (const variant in leaderboardsData[track]) {
         for (const carId in leaderboardsData[track][variant]) {
           leaderboardsData[track][variant][carId].sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
-          if (this.filter.distinct === Distinct.YES) {
-            leaderboardsData[track][variant][carId] = sb.handleDistinct(leaderboardsData[track][variant][carId])
-          }
+          leaderboardsData[track][variant][carId] = sb.handleDistinct(leaderboardsData[track][variant][carId])
           this.handleMedals(leaderboardsData[track][variant][carId])
 
           const filter = this.handlePositionFilter(leaderboardsData[track][variant][carId])
