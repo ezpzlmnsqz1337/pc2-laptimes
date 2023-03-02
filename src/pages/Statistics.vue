@@ -127,12 +127,11 @@ export default class Statistics extends Vue {
 
   showScreen (screen: StatisticsScreenType) {
     this.$statisticsStore.showScreen(screen)
-    this.refresh()
   }
 
   mounted () {
     this.handleUrl()
-    this.refresh()
+    this.refresh(1000)
   }
 
   handleUrl () {
@@ -157,7 +156,7 @@ export default class Statistics extends Vue {
   share () {
     if (!navigator || !navigator.clipboard) return
     let url = `${window.location.origin}/?page=statistics`
-    url += `&section=${this.$dataStore.activeScreen}`
+    url += `&section=${this.$statisticsStore.activeScreen}`
 
     const { driverId, position, distinct } = this.$statisticsStore.filter
     if (driverId && position && distinct) {
@@ -169,7 +168,8 @@ export default class Statistics extends Vue {
     this.$toast.success('Link copied to clipboard.')
   }
 
-  refresh () {
+  refresh (delay: number = 0) {
+    console.log('refresh', this.refreshing)
     if (this.refreshing) return
 
     this.refreshing = true
@@ -178,7 +178,7 @@ export default class Statistics extends Vue {
       this.$statisticsStore.refreshData(laptimes)
 
       this.refreshing = false
-    })
+    }, delay)
   }
 }
 </script>
