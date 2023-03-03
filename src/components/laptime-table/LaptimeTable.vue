@@ -1,5 +1,8 @@
 <template>
-  <table>
+  <TransitionGroup
+    name="list"
+    tag="table"
+  >
     <tr class="__row __header">
       <th v-if="displayColumn('rank')">
         Rank
@@ -106,7 +109,7 @@
         />
       </td>
     </tr>
-  </table>
+  </TransitionGroup>
 </template>
 
 <script lang="ts">
@@ -211,4 +214,23 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   50% { box-shadow: inset 0 0 0 0 var(--blink-color); }
   100% { box-shadow: inset 0 0 1.5rem 0.8rem var(--blink-color); }
 }
+
+.list-move, /* apply transition to moving elements */
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(100vw);
+}
+
+/* ensure leaving items are taken out of layout flow so that moving
+   animations can be calculated correctly. */
+.list-leave-active {
+  position: absolute;
+}
+
 </style>
