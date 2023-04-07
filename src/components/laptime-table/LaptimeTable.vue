@@ -3,7 +3,10 @@
     name="list"
     tag="table"
   >
-    <tr class="__row __header">
+    <tr
+      key="header"
+      class="__row __header"
+    >
       <th v-if="displayColumn('rank')">
         Rank
       </th>
@@ -23,7 +26,10 @@
         Settings
       </th>
     </tr>
-    <tr v-show="!times.length">
+    <tr
+      v-show="!times.length"
+      key="loading-row"
+    >
       <td
         colspan="999"
         class="__loading"
@@ -41,7 +47,7 @@
     </tr>
     <tr
       v-for="(time, index) in times"
-      :key="index"
+      :key="time.uid"
       class="__row"
       :class="getRowClass(time)"
       :title="getRowTitleText(time)"
@@ -113,16 +119,16 @@
 </template>
 
 <script lang="ts">
-import RaceSettings from '@/components/laptime-table/race-settings/RaceSettings.vue'
-import TrackComponent from '@/components/laptime-table/track/TrackComponent.vue'
+import { Laptime } from '@/builders/LaptimeBuilder'
 import CarComponent from '@/components/laptime-table/car/CarComponent.vue'
 import DriverComponent from '@/components/laptime-table/driver/DriverComponent.vue'
 import LaptimeComponent from '@/components/laptime-table/laptime/LaptimeComponent.vue'
-import { Laptime } from '@/builders/LaptimeBuilder'
-import { Options, prop, Vue } from 'vue-class-component'
+import RaceSettings from '@/components/laptime-table/race-settings/RaceSettings.vue'
+import TrackComponent from '@/components/laptime-table/track/TrackComponent.vue'
 import { LaptimeFilter } from '@/store/dataStore'
-import LaptimeFilterComponent from '../browse-times/LaptimeFilterComponent.vue'
 import { Unsubscribe } from '@firebase/firestore'
+import { Options, prop, Vue } from 'vue-class-component'
+import LaptimeFilterComponent from '../browse-times/LaptimeFilterComponent.vue'
 
 export type LaptimeTableColumn = 'rank' | 'driver' | 'laptime' | 'car' | 'track' | 'settings'
 
@@ -171,7 +177,7 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
     return result
   }
 
-  handleRowClick (e: PointerEvent, laptime: Laptime) {
+  handleRowClick (e: MouseEvent, laptime: Laptime) {
     if ((e.target as HTMLElement).tagName !== 'TD') return
     this.$dataStore.setEditLaptime(laptime.uid)
     // this.$toast.info(laptime.notes || 'No comment')

@@ -10,6 +10,7 @@
     :styles="styles"
     :width="width"
     :height="height"
+    @click="handleClick($event)"
   />
 </template>
 
@@ -18,6 +19,24 @@ import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 import { Options, prop, Vue } from 'vue-class-component'
 import { Laptime } from '@/builders/LaptimeBuilder'
+
+interface Drivers {
+  [name: string]: number
+}
+
+interface RacesAndDrivers {
+  totalRaces: number
+  drivers: Drivers
+}
+
+interface RacesByDate {
+  [date: string]: RacesAndDrivers
+}
+
+export interface ChartClickEvent {
+  label: string
+  dataset: any
+}
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
@@ -32,12 +51,17 @@ class RacesDaysBarChartProps {
 }
 
 @Options({
-  components: { Bar }
+  components: { Bar },
+  emits: ['click']
 })
 export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
   chartData = {
     labels: [] as string[],
     datasets: [] as any[]
+  }
+
+  $refs!: {
+    myChart: InstanceType<typeof Bar>,
   }
 
   chartOptions = {
@@ -107,8 +131,8 @@ export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) 
     this.getData()
   }
 
-  countNumberOfRaces (laptimes: Laptime[]) {
-    const result = {} as any
+  countNumberOfRaces (laptimes: Laptime[]): RacesByDate {
+    const result = {} as RacesByDate
     laptimes.forEach(x => {
       const driverName = this.$dataStore.getDriverById(x.driverId)!.name
       const date = new Date(x.date).toLocaleDateString()
@@ -124,7 +148,7 @@ export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) 
     return result
   }
 
-  generateChartData (noOfRaces: any) {
+  generateChartData (noOfRaces: RacesByDate) {
     Object.keys(noOfRaces).forEach(date => {
       this.chartData.labels.push(date)
       // total races
@@ -163,6 +187,17 @@ export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) 
       this.chartData.datasets.push(ds)
     }
     return ds
+  }
+
+  handleClick (event: PointerEvent) {
+    const chart = this.$refs.myChart.chart as ChartJS
+    const activePoints = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true)
+    if (activePoints.length > 0) {
+      const { index, datasetIndex } = activePoints[0]
+      const dataset = chart.data.datasets![datasetIndex]
+      const label = chart.data.labels![index]
+      this.$emit('click', { label, dataset } as ChartClickEvent)
+    }
   }
 }
 </script>

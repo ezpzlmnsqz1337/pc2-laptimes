@@ -58,6 +58,7 @@ import { ScreenType } from './constants/ScreenType'
 export default class App extends Vue {
   mounted () {
     this.$dataStore.bindDb()
+    this.refresh()
     this.handleUrl()
   }
 
@@ -90,6 +91,13 @@ export default class App extends Vue {
           console.error('Unknown page: ', page)
       }
     }
+  }
+
+  refresh () {
+    setTimeout(() => {
+      const laptimes = this.$dataStore.getTimes()
+      this.$statisticsStore.refreshData(laptimes)
+    }, 1000)
   }
 }
 </script>

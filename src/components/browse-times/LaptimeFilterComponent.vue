@@ -248,7 +248,7 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   }
 
   getTrackVariants (trackId: string) {
-    return this.$dataStore.getTrackVariants(trackId)
+    return this.$dataStore.getTrackVariants(trackId) ?? []
   }
 
   isFilterSet () {

@@ -41,8 +41,6 @@ declare module '@vue/runtime-core' {
     queryParams: URLSearchParams
     authorize(pass: string): boolean
     isLocal(): boolean
-    mapValueInRange(x: number, inMin: number, inMax: number, outMin: number, outMax: number): number
-    isInRange(n: number, min: number, max: number): boolean
     $toast: any
   }
 }
@@ -60,8 +58,6 @@ app.config.globalProperties.StatisticsScreenType = StatisticsScreenType
 app.config.globalProperties.Game = Game
 app.config.globalProperties.Distinct = Distinct
 app.config.globalProperties.debounce = debounce
-app.config.globalProperties.mapValueInRange = (x: number, inMin: number, inMax: number, outMin: number, outMax: number) => (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
-app.config.globalProperties.isInRange = (n: number, min: number, max: number) => min <= n && n <= max
 app.config.globalProperties.queryParams = new URLSearchParams(window.location.search)
 
 // builders

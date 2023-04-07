@@ -32,7 +32,7 @@
           </td>
         </tr>
         <tr
-          v-for="(m, index) in medals"
+          v-for="m in medals"
           :key="m.driverId"
           class="__driver"
         >
@@ -54,7 +54,7 @@
           </td>
           <td class="__rank">
             <img
-              :src="getRank(m.driverId, index)"
+              :src="getRank(m.driverId)"
               alt="rank"
             >
           </td>
@@ -65,10 +65,9 @@
 </template>
 
 <script lang="ts">
-import { Medals } from '@/builders/StatisticsBuilder'
 import { Rank } from '@/constants/Rank'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
-import { StatisticsFilter, TotalDriverRaces } from '@/store/statisticsStore'
+import { StatisticsFilter } from '@/store/statisticsStore'
 import { prop, Vue } from 'vue-class-component'
 
 class MedalsProps {
@@ -101,48 +100,9 @@ export default class MedalsComponent extends Vue.with(MedalsProps) {
   }
 
   getRank (driverId: string) {
-    const MIN_RACES_FOR_RANK = 10
-
     const driver = this.$dataStore.getDriverById(driverId)
     if (!driver) return Rank.UNRANKED
-    // if (driver.name === 'mazel') return Rank.GLOBAL
-    // if (driver.name === 'jara') return Rank.SILVER1
-
-    const driverTotalRaces = this.$statisticsStore.totalRaces.find((x: TotalDriverRaces) => x.driver.name === driver.name)
-    if (!driverTotalRaces) return Rank.UNRANKED
-    if (driverTotalRaces.races < MIN_RACES_FOR_RANK) return Rank.UNRANKED
-
-    const driverMedals = this.$statisticsStore.medals.find((x: Medals) => x.driverId === driver.uid)
-
-    // get max points currently
-    const maxBonus = this.$sb.calculateBonus(this.$statisticsStore.medals[0], this.$statisticsStore.totalRaces[0].races)
-    const maxPoints = driverTotalRaces.races / this.$sb.calculatePoints(this.$statisticsStore.medals[0]) * 10 + maxBonus
-
-    const bonus = this.$sb.calculateBonus(driverMedals!, driverTotalRaces.races)
-    const points = driverTotalRaces.races / this.$sb.calculatePoints(driverMedals!) * 10 + bonus
-
-    const weightedPoints = this.mapValueInRange(points, 0, maxPoints, 0, 1) * 1000
-
-    if (weightedPoints > 910) return Rank.GLOBAL
-    if (this.isInRange(weightedPoints, 510, 910)) return Rank.SUPREME
-    if (this.isInRange(weightedPoints, 310, 510)) return Rank.LEM
-    if (this.isInRange(weightedPoints, 200, 310)) return Rank.EAGLE
-    if (this.isInRange(weightedPoints, 100, 200)) return Rank.SHERIF
-    if (this.isInRange(weightedPoints, 80, 100)) return Rank.DOUBLE_AK
-    if (this.isInRange(weightedPoints, 61, 80)) return Rank.AK1
-    if (this.isInRange(weightedPoints, 59, 61)) return Rank.AK
-    if (this.isInRange(weightedPoints, 57, 59)) return Rank.GOLD4
-    if (this.isInRange(weightedPoints, 55, 57)) return Rank.GOLD3
-    if (this.isInRange(weightedPoints, 51, 55)) return Rank.GOLD2
-    if (this.isInRange(weightedPoints, 46, 51)) return Rank.GOLD1
-    if (this.isInRange(weightedPoints, 41, 46)) return Rank.SILVER_ELITE_MASTER
-    if (this.isInRange(weightedPoints, 36, 41)) return Rank.SILVER_ELITE
-    if (this.isInRange(weightedPoints, 31, 36)) return Rank.SILVER4
-    if (this.isInRange(weightedPoints, 23, 61)) return Rank.SILVER3
-    if (this.isInRange(weightedPoints, 11, 23)) return Rank.SILVER2
-    if (this.isInRange(weightedPoints, 0, 11)) return Rank.SILVER1
-
-    return Rank.EXPIRED
+    return this.$sb.getRank(driver, this.$statisticsStore.totalRaces, this.$statisticsStore.medals)
   }
 }
 </script>

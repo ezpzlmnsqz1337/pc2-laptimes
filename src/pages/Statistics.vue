@@ -74,7 +74,10 @@
           Races per day
         </h2>
         <div class="__chart">
-          <RacesDaysBarChart :height="1400" />
+          <RacesDaysBarChart
+            :height="1400"
+            @click="onChartClick($event)"
+          />
         </div>
       </StatisticsSection>
     </keep-alive>
@@ -100,11 +103,14 @@
 
 <script lang="ts">
 import StatisticsSection from '@/components/statistics/StatisticsSection.vue'
-import RacesDaysBarChart from '@/components/statistics/RacesDaysBarChart.vue'
+import RacesDaysBarChart, { ChartClickEvent } from '@/components/statistics/RacesDaysBarChart.vue'
 import Medals from '@/components/statistics/MedalsComponent.vue'
 import Leaderboards from '@/components/statistics/Leaderboards.vue'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import { Options, Vue } from 'vue-class-component'
+import { ScreenType } from '@/constants/ScreenType'
+import eb from '@/eventBus'
+import { LaptimeFilter } from '@/store/dataStore'
 
 @Options({
   components: {
@@ -178,6 +184,21 @@ export default class Statistics extends Vue {
 
       this.refreshing = false
     }, delay)
+  }
+
+  onChartClick (event: ChartClickEvent) {
+    const { label, dataset } = event
+    const driver = this.$dataStore.getDriverByName(dataset.label)
+    if (!driver) return
+    const dateRegex = /(\d+)\. (\d+)\. (\d+)/g
+    const matches = label.match(dateRegex)
+    if (!matches) return
+    const [day, month, year] = matches[0].split('.').map(Number)
+    this.$dataStore.showScreen(ScreenType.BROWSE_TIMES)
+    eb.emit('filter:clear')
+    setTimeout(() => {
+      eb.emit('filter:set', { driverId: driver.uid, date: new Date(year, month - 1, day) } as LaptimeFilter)
+    }, 500)
   }
 }
 </script>
