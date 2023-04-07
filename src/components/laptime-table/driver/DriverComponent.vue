@@ -1,17 +1,16 @@
 <template>
   <div @click="handleClickEvent($event)">
-    <EditableSelect
-      label="name"
-      :editable="editable"
-      :text="getDriver(time)"
-      :options="drivers"
-      @value:update="handleUpdateEvent('driverId', $event.uid)"
-    />
+    <div>{{ getDriverName(time) }}</div>
+    <img
+      :src="getRank(time.driverId)"
+      alt="rank"
+    >
   </div>
 </template>
 
 <script lang="ts">
 import { Laptime } from '@/builders/LaptimeBuilder'
+import { Rank } from '@/constants/Rank'
 import { Options, prop, Vue } from 'vue-class-component'
 
 type UpdateEventKey = 'driverId'
@@ -48,9 +47,15 @@ export default class DriverComponent extends Vue.with(DriverProps) {
     return this.$dataStore.drivers
   }
 
-  getDriver (time: Laptime) {
+  getDriverName (time: Laptime) {
     const driver = this.$dataStore.getDriverById(time.driverId)
     return driver ? driver.name : 'Loading...'
+  }
+
+  getRank (driverId: string): string {
+    const driver = this.$dataStore.getDriverById(driverId)
+    if (!driver) return Rank.UNRANKED as unknown as string
+    return this.$sb.getRank(driver, this.$statisticsStore.totalRaces, this.$statisticsStore.medals) as unknown as string
   }
 }
 </script>

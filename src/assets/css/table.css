@@ -66,12 +66,17 @@ td div:hover {
   width: 8rem;
 }
 
-.__driver span {
+.__driver > div {
   border-radius: 0.3rem;
   padding: 0.2rem;
 }
 
-tr:nth-child(3) .__driver span {
+.__driver img {
+    margin: 0.3rem;
+    width: 4.5rem;
+}
+
+tr:nth-child(3) .__driver > div {
   box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   color: gold;
   background-color: var(--bg-dark3);
@@ -80,7 +85,7 @@ tr:nth-child(3) .__driver span {
   border: 0.1rem solid gold;
 }
 
-tr:nth-child(4) .__driver span {
+tr:nth-child(4) .__driver > div {
   box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   color: silver;
   background-color: var(--bg-dark3);
@@ -89,7 +94,7 @@ tr:nth-child(4) .__driver span {
   border: 0.1rem solid silver;
 }
 
-tr:nth-child(5) .__driver span {
+tr:nth-child(5) .__driver > div {
   box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   color: #cd7f32;
   background-color: var(--bg-dark3);
@@ -244,5 +249,10 @@ tr.__hasNotes {
 
   .__car > img{
     width: 4rem;
+  }
+
+  .__driver img {
+      margin: 0.1rem;
+      width: 3rem;
   }
 }
