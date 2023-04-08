@@ -19,7 +19,7 @@
         :model-value="filter.carId"
         placeholder="Select car"
         :options="cars"
-        :reduce="car => car.uid"
+        :reduce="(car: typeof Car) => car.uid"
         label="name"
         @update:model-value="setFilter({carId: $event})"
       />
@@ -29,7 +29,7 @@
         :model-value="filter.trackId"
         placeholder="Select track"
         :options="tracks"
-        :reduce="track => track.uid"
+        :reduce="(track: typeof Track) => track.uid"
         label="track"
         @update:model-value="setFilter({trackId: $event, trackVariant: null})"
       />
@@ -40,7 +40,7 @@
       <SelectInput
         :model-value="filter.trackVariant"
         placeholder="Select track variant"
-        :reduce="o => o"
+        :reduce="(o: string) => o"
         :options="getTrackVariants(filter.trackId)"
         :class="{__activeFilter: filter.trackVariant}"
         @update:model-value="setFilter({trackVariant: $event})"
@@ -51,7 +51,7 @@
         :model-value="filter.driverId"
         placeholder="Select driver"
         :options="drivers"
-        :reduce="driver => driver.uid"
+        :reduce="(driver: typeof Driver) => driver.uid"
         label="name"
         :class="{__activeFilter: filter.driverId}"
         @update:model-value="setFilter({driverId: $event})"
@@ -124,7 +124,7 @@
         <RadioButtons
           :name="b.name"
           :values="b.values"
-          :value="filter[b.name]"
+          :value="filter[b.name as keyof LaptimeFilter]"
           @changed="setFilter({[b.name]: $event})"
         />
       </InputRow>

@@ -27,10 +27,12 @@ import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 import LaptimeBuilder from './builders/LaptimeBuilder'
 import LightsBuilder from './builders/LightsBuilder'
 import RealtimeDataBuilder from './builders/RealtimeDataBuilder'
-import StatisticsBuilder from './builders/StatisticsBuilder'
+import StatisticsBuilder, { Driver } from './builders/StatisticsBuilder'
 import { WebsocketState } from './constants/WebsocketState'
 import { storePlugin } from './plugins/store-plugin'
 import './registerServiceWorker'
+import { Track } from './assets/db/tracks'
+import { Car } from './assets/db/cars'
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -41,7 +43,24 @@ declare module '@vue/runtime-core' {
     queryParams: URLSearchParams
     authorize(pass: string): boolean
     isLocal(): boolean
+    // types
     $toast: any
+    ButtonType: typeof ButtonType
+    TransmissionType: typeof TransmissionType
+    WeatherType: typeof WeatherType
+    BrakingLine: typeof BrakingLine
+    ControlType: typeof ControlType
+    StartType: typeof StartType
+    ScreenType: typeof ScreenType
+    WebsocketState: typeof WebsocketState
+    StatisticsScreenType: typeof StatisticsScreenType
+    Game: typeof Game
+    Track: Track
+    Car: Car
+    Driver: Driver
+    Distinct: typeof Distinct
+    debounce: typeof debounce
+
   }
 }
 

@@ -2,8 +2,8 @@
   <div class="__leaderboards">
     <div class="__trackCarMatrix">
       <div
-        v-for="track in leaderboardsData"
-        :key="track"
+        v-for="(track, trackId) of leaderboardsData"
+        :key="trackId"
         class="__row"
       >
         <template
@@ -45,7 +45,7 @@
             name="distinct"
             :values="Object.values(Distinct)"
             :value="filter.distinct"
-            @changed="e => setFilter({distinct: e})"
+            @changed="(e: Distinct) => setFilter({distinct: e})"
           />
         </div>
       </div>

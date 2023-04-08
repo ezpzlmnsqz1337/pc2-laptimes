@@ -3,7 +3,7 @@
     v-for="(s, index) in settings"
     :key="index"
     :type="s"
-    :value="time[s]"
+    :value="time[s as keyof Laptime]"
     :editable="editable"
     @click="handleClickEvent($event)"
     @value:update="handleUpdateEvent($event)"

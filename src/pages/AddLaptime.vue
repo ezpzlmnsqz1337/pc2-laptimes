@@ -26,7 +26,7 @@
         <InputRow
           :label="fastestLapTime ? `In game best lap: ${fastestLapTime}` : ''"
           :show-set-button="fastestLapTime"
-          @set="onLaptimeSet(fastestLapTime)"
+          @set="onLaptimeSet(fastestLapTime as string)"
         >
           <LaptimeInput ref="laptimeInput" />
         </InputRow>
@@ -37,14 +37,14 @@
           :show-set-button="canSetCar"
           :show-link-button="carId && !canSetCar && !carAlreadyLinked"
           @set="setCarName(carName)"
-          @link="linkCarToGameId(carId, carName)"
+          @link="linkCarToGameId(carId as string, carName)"
           @add="showNewCarModal = true"
         >
           <SelectInput
             ref="carInput"
             v-model="carId"
             :options="cars"
-            :reduce="o => o.uid"
+            :reduce="(car: typeof Car) => car.uid"
             placeholder="Select car"
             label="name"
           />
@@ -56,27 +56,27 @@
           :show-set-button="canSetTrack"
           :show-link-button="trackId && !canSetTrack && !trackAlreadyLinked"
           @set="setTrackLocation(trackLocation)"
-          @link="linkTrackToGameId(trackId, trackLocation)"
+          @link="linkTrackToGameId(trackId as string, trackLocation)"
           @add="showNewTrackModal = true"
         >
           <SelectInput
             ref="trackInput"
             v-model="trackId"
             :options="tracks"
-            :reduce="o => o.uid"
+            :reduce="(track: typeof Track) => track.uid"
             placeholder="Select track"
             label="track"
-            @update:model-value="trackVariant = getTrackVariants($event.uid)[0]"
+            @update:model-value="trackVariant = (getTrackVariants($event.uid) as string[])[0]"
           />
         </InputRow>
 
         <InputRow
-          v-if="trackId && getTrackVariants(trackId).length > 0"
+          v-if="trackId && (getTrackVariants(trackId as string) as string[]).length > 0"
           :label="trackVariation ? `In game track variant: ${trackVariation}` : ''"
           :show-add-button="true"
           :show-set-button="canSetTrack"
           @set="setTrackVariation(trackLocation, trackVariation)"
-          @link="linkTrackToGameId(trackId, trackLocation)"
+          @link="linkTrackToGameId(trackId as string, trackLocation)"
           @add="showNewTrackVariantModal = true"
         >
           <SelectInput
@@ -84,7 +84,7 @@
             v-model="trackVariant"
             placeholder="Select track variant"
             :options="getTrackVariants(trackId)"
-            :reduce="o => o"
+            :reduce="(o: string) => o"
           />
         </InputRow>
         <InputRow
@@ -95,7 +95,7 @@
             ref="driverInput"
             v-model="driverId"
             :options="drivers"
-            :reduce="o => o.uid"
+            :reduce="(driver: typeof Driver) => driver.uid"
             placeholder="Select driver"
             label="name"
           />
@@ -121,7 +121,7 @@
             name="ALgame"
             :values="Object.values(Game)"
             :value="game"
-            @changed="e => game = e"
+            @changed="(e: Game) => game = e"
           />
         </InputRow>
       </div>
@@ -136,7 +136,7 @@
             name="ALtransmission"
             :values="Object.values(TransmissionType)"
             :value="transmission"
-            @changed="e => transmission = e"
+            @changed="(e: TransmissionType) => transmission = e"
           />
         </InputRow>
 
@@ -150,7 +150,7 @@
             name="ALweather"
             :values="Object.values(WeatherType)"
             :value="weather"
-            @changed="e => weather = e"
+            @changed="(e: WeatherType) => weather = e"
           />
         </InputRow>
 
@@ -163,7 +163,7 @@
             name="ALbrakingLine"
             :values="Object.values(BrakingLine)"
             :value="brakingLine"
-            @changed="e => brakingLine = e"
+            @changed="(e: BrakingLine) => brakingLine = e"
           />
         </InputRow>
 
@@ -176,7 +176,7 @@
             name="ALcontrols"
             :values="Object.values(ControlType)"
             :value="controls"
-            @changed="e => controls = e"
+            @changed="(e: ControlType) => controls = e"
           />
         </InputRow>
 
@@ -189,7 +189,7 @@
             name="ALstartType"
             :values="Object.values(StartType)"
             :value="startType"
-            @changed="e => startType = e"
+            @changed="(e: StartType) => startType = e"
           />
         </InputRow>
 
@@ -219,7 +219,7 @@
             name="ALgame"
             :values="Object.values(Game)"
             :value="game"
-            @changed="e => game = e"
+            @changed="(e: Game) => game = e"
           />
         </InputRow>
 

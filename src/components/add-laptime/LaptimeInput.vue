@@ -12,7 +12,7 @@
       class="__minutes"
       placeholder="0"
       :disabled="disabled"
-      @keydown="onLaptimeInputKeyDown($event, null, 'secondsRef')"
+      @keydown="onLaptimeInputKeyDown($event, undefined, 'secondsRef')"
       @input="onLaptimeInput()"
     >
     <div class="__colon">
@@ -83,7 +83,7 @@ export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
     }
   }
 
-  onLaptimeInputKeyDown (e: any, leftInput: string, rightInput: string) {
+  onLaptimeInputKeyDown (e: any, leftInput?: string, rightInput?: string) {
     if (e.key === 'ArrowRight') {
       if (!rightInput) return
       const ri = (this.$refs as any)[rightInput]

@@ -79,7 +79,7 @@
             </div>
           </div>
           <div class="__speed">
-            <div>{{ parseInt(speed*(3600/1000)) }} km/h</div>
+            <div>{{ Math.round(speed * (3600/1000)) }} km/h</div>
           </div>
         </div>
 

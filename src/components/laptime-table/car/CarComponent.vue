@@ -57,9 +57,8 @@ export default class CarComponent extends Vue.with(CarProps) {
     return this.$dataStore.getCarById(time.carId)?.name
   }
 
-  getCarImage (time: Laptime) {
+  getCarImage (time: Laptime): string {
     const car = this.$dataStore.getCarById(time.carId)
-    if (!car?.imageUrl) return false
     return car ? `images/${car.imageUrl}` : 'Loading...'
   }
 }
