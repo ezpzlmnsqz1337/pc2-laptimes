@@ -25,9 +25,9 @@ export interface TotalDriverRaces {
 }
 
 export interface StatisticsFilter {
-  driverId: string
-  position: number
-  distinct: Distinct
+  driverId?: string
+  position?: number
+  distinct?: Distinct
 }
 
 export interface StatisticsStore {

@@ -64,7 +64,7 @@
             <SelectInput
               :model-value="laptime.carId"
               :options="cars"
-              :reduce="o => o.uid"
+              :reduce="(car: typeof Car) => car.uid"
               placeholder="Select car"
               label="name"
               :clearable="false"
@@ -83,7 +83,7 @@
             <SelectInput
               :model-value="laptime.trackId"
               :options="tracks"
-              :reduce="o => o.uid"
+              :reduce="(track: typeof Track) => track.uid"
               placeholder="Select track"
               label="track"
               :clearable="false"
@@ -96,7 +96,7 @@
             <SelectInput
               :model-value="laptime.trackVariant"
               :options="getTrackVariants(laptime.trackId)"
-              :reduce="o => o"
+              :reduce="(variant: string) => variant"
               placeholder="Select track variant"
               :clearable="false"
               :disabled="!editEnabled"
@@ -107,7 +107,7 @@
             <SelectInput
               :model-value="laptime.driverId"
               :options="drivers"
-              :reduce="o => o.uid"
+              :reduce="(driver: typeof Driver) => driver.uid"
               placeholder="Select driver"
               label="name"
               :clearable="false"
@@ -125,7 +125,7 @@
             <RadioButtons
               :name="`${b.name}-laptime-detail-modal`"
               :values="b.values"
-              :value="laptime[b.name]"
+              :value="laptime[b.name as keyof Laptime]"
               :no-any="true"
               :disabled="!editEnabled"
               @changed="updateLaptime({[b.name]: $event}, laptime)"
@@ -142,7 +142,7 @@
             <RadioButtons
               :name="`${b.name}-laptime-detail-modal`"
               :values="b.values"
-              :value="laptime[b.name]"
+              :value="laptime[b.name as keyof Laptime]"
               :no-any="true"
               :disabled="!editEnabled"
               @changed="updateLaptime({[b.name]: $event}, laptime)"
@@ -156,7 +156,7 @@
               :value="laptime.notes"
               :disabled="!editEnabled"
               style="resize: none"
-              @change="updateLaptime({notes: $event.target.value}, laptime)"
+              @change="updateLaptime({notes: ($event.target as HTMLTextAreaElement).value}, laptime)"
             />
           </InputRow>
 
@@ -207,7 +207,7 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
   passwordHash = ''
 
   get laptime () {
-    return this.$dataStore.getTimeById(this.laptimeId)
+    return this.$dataStore.getTimeById(this.laptimeId)!
   }
 
   get cars () {
@@ -294,7 +294,6 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
 
   getCarImage (time: Laptime) {
     const car = this.$dataStore.getCarById(time.carId)
-    if (!car?.imageUrl) return false
     return car ? `images/${car.imageUrl}` : 'Loading...'
   }
 

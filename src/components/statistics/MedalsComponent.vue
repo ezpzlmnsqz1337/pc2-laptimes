@@ -99,10 +99,10 @@ export default class MedalsComponent extends Vue.with(MedalsProps) {
     return this.$statisticsStore.getDriverTotalRaces(driverId)
   }
 
-  getRank (driverId: string) {
+  getRank (driverId: string): string {
     const driver = this.$dataStore.getDriverById(driverId)
-    if (!driver) return Rank.UNRANKED
-    return this.$sb.getRank(driver, this.$statisticsStore.totalRaces, this.$statisticsStore.medals)
+    if (!driver) return Rank.UNRANKED as unknown as string
+    return this.$sb.getRank(driver, this.$statisticsStore.totalRaces, this.$statisticsStore.medals) as unknown as string
   }
 }
 </script>
