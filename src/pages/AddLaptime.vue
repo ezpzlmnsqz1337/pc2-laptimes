@@ -66,7 +66,7 @@
             :reduce="(track: typeof Track) => track.uid"
             placeholder="Select track"
             label="track"
-            @update:model-value="trackVariant = (getTrackVariants($event.uid) as string[])[0]"
+            @update:model-value="onTrackSelectionChanged($event)"
           />
         </InputRow>
 
@@ -284,6 +284,7 @@ import eb from '@/eventBus'
 import { LaptimeFilter } from '@/store/dataStore'
 import { Options, Vue } from 'vue-class-component'
 import { trackMapping } from '@/utils/trackMapping'
+import { Track } from '@/assets/db/tracks'
 
 @Options({
   components: {
@@ -505,6 +506,19 @@ export default class AddLaptime extends Vue {
       return
     }
     this.trackVariant = variant
+  }
+
+  onTrackSelectionChanged (track: Track): void {
+    if (!track) {
+      this.trackVariant = null
+      return
+    }
+    const variants = this.getTrackVariants(track.uid)
+    if (!variants) {
+      this.trackVariant = null
+      return
+    }
+    this.trackVariant = variants.pop() || null
   }
 
   handleAutoSubmit (raceState: RaceState) {

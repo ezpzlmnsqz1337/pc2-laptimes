@@ -181,7 +181,7 @@ export const trackMapping = {
     A_Circuit: 'A Circuit',
     B_Circuit: 'B Circuit'
   },
-  Sakkito: {
+  Sakitto: {
     'Grand Prix': 'Grand Prix Circuit',
     Sprint: 'Sprint Circuit',
     National: 'National Circuit',
