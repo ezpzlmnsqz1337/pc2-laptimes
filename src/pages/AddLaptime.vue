@@ -281,7 +281,7 @@ import LaptimeInput from '@/components/add-laptime/LaptimeInput.vue'
 import InputRow from '@/components/add-laptime/InputRow.vue'
 import SelectInput from '@/components/ui/SelectInput.vue'
 import eb from '@/eventBus'
-import { LaptimeFilter } from '@/store/dataStore'
+import { LaptimeFilter, FailedAutoSubmitData } from '@/store/dataStore'
 import { Options, Vue } from 'vue-class-component'
 import { trackMapping } from '@/utils/trackMapping'
 import { Track } from '@/assets/db/tracks'
@@ -529,9 +529,21 @@ export default class AddLaptime extends Vue {
         this.setCarName(this.carName)
         this.setTrackLocation(this.trackLocation)
         this.setTrackVariation(this.trackLocation, this.trackVariation)
-        if (this.valid) this.submit()
+        if (this.valid) {
+          this.submit()
+        } else {
+          this.storeFailedAutoSubmitData()
+        }
       }, 1000)
     }
+  }
+
+  storeFailedAutoSubmitData (): void {
+    this.$dataStore.storeFailedAutoSubmitData({
+      carName: this.carName,
+      trackLocation: this.trackLocation,
+      trackVariation: this.trackVariation
+    } as FailedAutoSubmitData)
   }
 }
 </script>
