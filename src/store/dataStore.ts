@@ -35,6 +35,12 @@ export interface LaptimeUpdate {
   notes?: string
 }
 
+export interface FailedAutoSubmitData {
+  carName: string
+  trackLocation: string
+  trackVariation: string
+}
+
 export interface LaptimeFilter {
   carId?: string | null
   trackId?: string | null
@@ -80,6 +86,7 @@ export interface DataStore {
   addTrackVariant (trackId: string, variant: string): void
   addDriver (name: string): void
   addLaptime (laptime: Laptime): void
+  storeFailedAutoSubmitData (data: FailedAutoSubmitData): void
 
   linkCarToGameId (carId: string, gameId: string): void
   linkTrackToGameId (trackId: string, gameId: string): void
@@ -190,6 +197,12 @@ export const dataStore: DataStore = {
     if (!trackId || !gameId) return
     const docRef = doc(db, 'tracks', trackId)
     await updateDoc(docRef, { gameId })
+  },
+  async storeFailedAutoSubmitData (data: FailedAutoSubmitData) {
+    if (!data) return
+    const failedData = { uid: uuidv4(), ...data, dateString: new Date().toLocaleDateString('en-GB') }
+    const docRef = doc(db, 'failedAutoSubmitData', failedData.uid)
+    await setDoc(docRef, failedData)
   },
   getTimesForDriver (driverId: string) {
     if (!driverId) return []
