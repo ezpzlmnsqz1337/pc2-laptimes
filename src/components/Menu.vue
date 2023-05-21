@@ -107,10 +107,10 @@
 </template>
 
 <script lang="ts">
-import { WebsocketState } from '@/constants/WebsocketState'
 import { RaceState } from '@/constants/RaceState'
-import { Vue } from 'vue-class-component'
 import { ScreenType } from '@/constants/ScreenType'
+import { WebsocketState } from '@/constants/WebsocketState'
+import { Vue } from 'vue-class-component'
 
 export default class Menu extends Vue {
   connecting = false

@@ -15,10 +15,10 @@
 </template>
 
 <script lang="ts">
-import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
-import { Options, prop, Vue } from 'vue-class-component'
 import { Laptime } from '@/builders/LaptimeBuilder'
+import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js'
+import { Bar } from 'vue-chartjs'
+import { Options, Vue, prop } from 'vue-class-component'
 
 interface Drivers {
   [name: string]: number

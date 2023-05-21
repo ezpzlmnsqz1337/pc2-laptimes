@@ -27,11 +27,11 @@
 <script lang="ts">
 import LaptimeFilterComponent from '@/components/browse-times/LaptimeFilterComponent.vue'
 import LaptimeTable from '@/components/laptime-table/LaptimeTable.vue'
+import TableControls from '@/components/laptime-table/TableControls.vue'
+import { ScreenType } from '@/constants/ScreenType'
+import eb from '@/eventBus'
 import { LaptimeFilter } from '@/store/dataStore'
 import { Options, Vue } from 'vue-class-component'
-import TableControls from '@/components/laptime-table/TableControls.vue'
-import eb from '@/eventBus'
-import { ScreenType } from '@/constants/ScreenType'
 
 @Options({
   components: {

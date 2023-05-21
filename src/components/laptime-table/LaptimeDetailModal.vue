@@ -169,17 +169,17 @@
 
 <script lang="ts">
 import { Laptime } from '@/builders/LaptimeBuilder'
+import InputRow from '@/components/add-laptime/InputRow.vue'
+import LaptimeInput from '@/components/add-laptime/LaptimeInput.vue'
+import SelectInput from '@/components/ui/SelectInput.vue'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
 import { Game } from '@/constants/Game'
 import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
-import { Options, prop, Vue } from 'vue-class-component'
-import LaptimeInput from '@/components/add-laptime/LaptimeInput.vue'
-import InputRow from '@/components/add-laptime/InputRow.vue'
-import SelectInput from '@/components/ui/SelectInput.vue'
 import sha256 from 'crypto-js/sha256'
+import { Options, prop, Vue } from 'vue-class-component'
 
 interface LaptimeSettings {
   heading: string
