@@ -108,6 +108,12 @@ export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
     }
   }
 
+  reset (): void {
+    this.minutes = ''
+    this.seconds = ''
+    this.milliseconds = ''
+  }
+
   setLaptime (laptime: string) {
     const d = this.$ltb.laptimeToDate(laptime)
     this.minutes = `${d?.getMinutes()}`
