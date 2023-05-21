@@ -262,12 +262,16 @@
 </template>
 
 <script lang="ts">
+import { Track } from '@/assets/db/tracks'
 import { Laptime } from '@/builders/LaptimeBuilder'
 import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
+import InputRow from '@/components/add-laptime/InputRow.vue'
+import LaptimeInput from '@/components/add-laptime/LaptimeInput.vue'
 import NewCarModal from '@/components/add-laptime/NewCarModal.vue'
 import NewDriverModal from '@/components/add-laptime/NewDriverModal.vue'
 import NewTrackModal from '@/components/add-laptime/NewTrackModal.vue'
 import NewTrackVariantModal from '@/components/add-laptime/NewTrackVariantModal.vue'
+import SelectInput from '@/components/ui/SelectInput.vue'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
 import { Game } from '@/constants/Game'
@@ -277,14 +281,10 @@ import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
-import LaptimeInput from '@/components/add-laptime/LaptimeInput.vue'
-import InputRow from '@/components/add-laptime/InputRow.vue'
-import SelectInput from '@/components/ui/SelectInput.vue'
 import eb from '@/eventBus'
-import { LaptimeFilter, FailedAutoSubmitData } from '@/store/dataStore'
-import { Options, Vue } from 'vue-class-component'
+import { FailedAutoSubmitData, LaptimeFilter } from '@/store/dataStore'
 import { trackMapping } from '@/utils/trackMapping'
-import { Track } from '@/assets/db/tracks'
+import { Options, Vue } from 'vue-class-component'
 
 @Options({
   components: {
@@ -457,12 +457,9 @@ export default class AddLaptime extends Vue {
       notes: this.notes
     }
     this.$dataStore.addLaptime(laptime)
-    if (!this.autoSubmit) {
-      this.driverId = null
-    }
     this.showTimeInTable(laptime)
     this.$toast.success('Laptime added successfully!', {
-      duration: 3000,
+      duration: 10000,
       maxToasts: 1,
       queue: false
     })
@@ -479,7 +476,9 @@ export default class AddLaptime extends Vue {
   setCarName (carName: string) {
     const car = this.$dataStore.getCarByGameId(carName)
     if (!car) {
-      this.$toast.error('Unable to set car. Car does not exist.')
+      this.$toast.error('Unable to set car. Car does not exist.', {
+        duration: false
+      })
       return
     }
     this.carId = car.uid
@@ -488,7 +487,9 @@ export default class AddLaptime extends Vue {
   setTrackLocation (trackLocation: string) {
     const track = this.$dataStore.getTrackByGameId(trackLocation)
     if (!track) {
-      this.$toast.error('Unable to set track. Track does not exist.')
+      this.$toast.error('Unable to set track. Track does not exist.', {
+        duration: false
+      })
       return
     }
     this.trackVariant = null
@@ -500,9 +501,11 @@ export default class AddLaptime extends Vue {
   }
 
   setTrackVariation (trackLocation: string, trackVariation: string) {
-    const variant = (trackMapping as any)[trackLocation][trackVariation || '-']
+    const variant = (trackMapping as any)[trackLocation]?.[trackVariation || '-']
     if (!variant) {
-      this.$toast.error('Unable to set track variant. Track variant does not exist.')
+      this.$toast.error('Unable to set track variant. Track variant does not exist.', {
+        duration: false
+      })
       return
     }
     this.trackVariant = variant
@@ -521,9 +524,17 @@ export default class AddLaptime extends Vue {
     this.trackVariant = variants.pop() || null
   }
 
+  reset (): void {
+    this.$refs.laptimeInput.reset()
+    this.carId = null
+    this.trackId = null
+    this.trackVariant = null
+  }
+
   handleAutoSubmit (raceState: RaceState) {
     if (this.lastRaceState === RaceState.RACE_IS_ON && raceState === RaceState.RACE_FINISHED) {
       this.$dataStore.showScreen(ScreenType.ADD_LAPTIME)
+      this.reset()
       setTimeout(() => {
         this.$refs.laptimeInput.setLaptime(this.fastestLapTime!)
         this.setCarName(this.carName)

@@ -14,9 +14,9 @@
 </template>
 
 <script lang="ts">
+import { BadgeType } from '@/constants/BadgeType'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
-import { BadgeType } from '@/constants/BadgeType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { Options, prop, Vue } from 'vue-class-component'

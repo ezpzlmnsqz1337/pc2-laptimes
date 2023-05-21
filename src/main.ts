@@ -24,6 +24,8 @@ import PulseLoader from 'vue-spinner/src/PulseLoader'
 import Datepicker from 'vue3-datepicker'
 import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
+import { Car } from './assets/db/cars'
+import { Track } from './assets/db/tracks'
 import LaptimeBuilder from './builders/LaptimeBuilder'
 import LightsBuilder from './builders/LightsBuilder'
 import RealtimeDataBuilder from './builders/RealtimeDataBuilder'
@@ -31,8 +33,30 @@ import StatisticsBuilder, { Driver } from './builders/StatisticsBuilder'
 import { WebsocketState } from './constants/WebsocketState'
 import { storePlugin } from './plugins/store-plugin'
 import './registerServiceWorker'
-import { Track } from './assets/db/tracks'
-import { Car } from './assets/db/cars'
+
+export interface VueToasterOptions {
+  message?: string // -- Message text/html (required)
+  type?: string // default One of success, info, warning, error, default
+  position?: string // bottom-right One of top, bottom, top-right, bottom-right,top-left, bottom-left
+  duration?: number | false // 4000 Visibility duration in milliseconds or false that disables duration
+  dismissible?: boolean // true Allow user close by clicking
+  onClick?: Function // -- Do something when user clicks
+  onClose?: Function // -- Do something after toast gets dismissed
+  queue?: boolean // false Wait for existing to close before showing new
+  maxToasts?: number | false // false Defines the max of toasts showed in simultaneous
+  pauseOnHover?: boolean // true Pause the timer when mouse on over a toast
+  useDefaultCss?: boolean // true User default css styles
+}
+
+export type VueToasterFn = (message: string, options?: VueToasterOptions) => void
+
+export interface VueToaster {
+  show: VueToasterFn
+  success: VueToasterFn
+  error: VueToasterFn
+  warning: VueToasterFn
+  info: VueToasterFn
+}
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -43,8 +67,8 @@ declare module '@vue/runtime-core' {
     queryParams: URLSearchParams
     authorize(pass: string): boolean
     isLocal(): boolean
+    $toast: VueToaster
     // types
-    $toast: any
     ButtonType: typeof ButtonType
     TransmissionType: typeof TransmissionType
     WeatherType: typeof WeatherType

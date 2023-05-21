@@ -91,11 +91,11 @@
 
 <script lang="ts">
 import { Laptime } from '@/builders/LaptimeBuilder'
+import LaptimeTable from '@/components/laptime-table/LaptimeTable.vue'
 import { Distinct } from '@/constants/Distinct'
 import { StatisticsFilter } from '@/store/statisticsStore'
 import { Options, prop, Vue } from 'vue-class-component'
 import { Carousel, Navigation, Pagination, Slide } from 'vue3-carousel'
-import LaptimeTable from '@/components/laptime-table/LaptimeTable.vue'
 import 'vue3-carousel/dist/carousel.css'
 
 class LeaderboardsProps {

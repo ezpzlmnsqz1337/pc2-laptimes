@@ -102,15 +102,15 @@
 </template>
 
 <script lang="ts">
-import StatisticsSection from '@/components/statistics/StatisticsSection.vue'
-import RacesDaysBarChart, { ChartClickEvent } from '@/components/statistics/RacesDaysBarChart.vue'
-import Medals from '@/components/statistics/MedalsComponent.vue'
 import Leaderboards from '@/components/statistics/Leaderboards.vue'
-import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
-import { Options, Vue } from 'vue-class-component'
+import Medals from '@/components/statistics/MedalsComponent.vue'
+import RacesDaysBarChart, { ChartClickEvent } from '@/components/statistics/RacesDaysBarChart.vue'
+import StatisticsSection from '@/components/statistics/StatisticsSection.vue'
 import { ScreenType } from '@/constants/ScreenType'
+import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import eb from '@/eventBus'
 import { LaptimeFilter } from '@/store/dataStore'
+import { Options, Vue } from 'vue-class-component'
 
 @Options({
   components: {
