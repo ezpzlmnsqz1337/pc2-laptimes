@@ -75,6 +75,7 @@ export interface DataStore {
   getDriverById(id: string): Driver | undefined
   getDriverByName(name: string): Driver | undefined
   getTimesForDriver (driverId: string): Laptime[]
+  getTimesForTrack(track: Track): Laptime[]
   getTimes (filter?: LaptimeFilter): Laptime[]
   getTracksTimes (tracks: Track[]): Laptime[]
   getDistinctTimes (laptimes: Laptime[]): Laptime[]
@@ -207,6 +208,9 @@ export const dataStore: DataStore = {
   getTimesForDriver (driverId: string) {
     if (!driverId) return []
     return this.times.filter(x => x.driverId === driverId)
+  },
+  getTimesForTrack (track: Track) {
+    return this.times.filter(x => x.trackId === track.uid)
   },
   getTracksTimes (tracks: Track[]) {
     const ltb = LaptimeBuilder.getInstance()

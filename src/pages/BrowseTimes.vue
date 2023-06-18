@@ -93,12 +93,12 @@ export default class BrowseTimes extends Vue {
     this.$refs.tableRef.loadData(filter)
   }
 
-  share () {
+  async share () {
     const url = `${window.location.origin}/?page=laptime_board`
     const filter = this.$refs.filterRef.filter
     const encoded = JSON.stringify(filter)
 
-    navigator.clipboard.writeText(`${url}&filter=` + encoded)
+    await navigator.clipboard.writeText(`${url}&filter=` + encoded)
     this.$toast.success('Link copied to clipboard.')
   }
 

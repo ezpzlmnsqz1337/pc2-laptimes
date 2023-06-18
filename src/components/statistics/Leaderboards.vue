@@ -1,6 +1,58 @@
 <template>
   <div class="__leaderboards">
-    <div class="__trackCarMatrix">
+    <div>
+      <h2>Track</h2>
+      <div class="__buttons">
+        <Button
+          v-for="track in tracks"
+          :key="track.uid"
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeTrack?.uid === track.uid}"
+          @click="activeTrack = track"
+        >
+          <div>{{ track.track }}</div><div>({{ getTimesForTrack(track).length }} times)</div>
+        </Button>
+      </div>
+    </div>
+
+    <div v-if="activeTrack">
+      <h2>Variant</h2>
+      <div class="__buttons">
+        <Button
+          v-for="variant in activeTrack?.variants.sort((a,b) => getTimesForActiveTrackAndVariant(b).length - getTimesForActiveTrackAndVariant(a).length)"
+          :key="variant"
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeVariant === variant}"
+          @click="activeVariant = variant"
+        >
+          <div>{{ variant }}</div><div>({{ getTimesForActiveTrackAndVariant(variant).length }} times)</div>
+        </Button>
+      </div>
+    </div>
+
+    <div v-if="activeTrack && activeVariant">
+      <h2>Car</h2>
+      <div class="__buttons">
+        <Button
+          v-for="car in getCarsForTimes(getTimesForActiveTrackAndVariant(activeVariant))"
+          :key="car.uid"
+          :type="ButtonType.SECONDARY"
+          :class="{__selected: activeCar?.uid === car.uid}"
+          @click="activeCar = car"
+        >
+          <div class="__carImage">
+            <img
+              :src="`images/${car.imageUrl}`"
+              :alt="car.name"
+            >
+          </div>
+          <div>{{ car.name }}</div>
+          <div>({{ getTimesForActiveTrackAndActiveVariantAndCar(car).length }} times)</div>
+        </Button>
+      </div>
+    </div>
+
+    <!-- <div class="__trackCarMatrix">
       <div
         v-for="(track, trackId) of leaderboardsData"
         :key="trackId"
@@ -19,7 +71,7 @@
               class="__item"
             >
               <h3>
-                {{ getTrackName(laptimes[0]) }} - {{ getTrackVariantName(laptimes[0]) }} - {{ getCar(laptimes[0]) }}
+                {{ getTrackName(laptimes[0]) }} - {{ getTrackVariantName(laptimes[0]) }} - {{ getCarName(laptimes[0]) }}
               </h3>
               <LaptimeTable
                 :rows="laptimes"
@@ -33,7 +85,7 @@
           </Carousel>
         </template>
       </div>
-    </div>
+    </div> -->
 
     <div class="__filter">
       <div class="__item">
@@ -90,6 +142,8 @@
 </template>
 
 <script lang="ts">
+import { Car } from '@/assets/db/cars'
+import { Track } from '@/assets/db/tracks'
 import { Laptime } from '@/builders/LaptimeBuilder'
 import LaptimeTable from '@/components/laptime-table/LaptimeTable.vue'
 import { Distinct } from '@/constants/Distinct'
@@ -114,6 +168,9 @@ class LeaderboardsProps {
 export default class Leaderboards extends Vue.with(LeaderboardsProps) {
   displayColumns = ['rank', 'driver', 'laptime', 'car', 'settings']
   showItems = 5
+  activeTrack: Track | null = null
+  activeVariant: string = ''
+  activeCar: Car | null = null
 
   get leaderboardsData () {
     return this.$statisticsStore.leaderboardsData
@@ -123,11 +180,15 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
     return this.$statisticsStore.filter
   }
 
+  get tracks () {
+    return this.$dataStore.tracks.sort((a, b) => this.getTimesForTrack(b).length - this.getTimesForTrack(a).length)
+  }
+
   mounted () {
     this.handleUrl()
   }
 
-  getCar (laptime: Laptime) {
+  getCarName (laptime: Laptime) {
     return this.$dataStore.getCarById(laptime.carId)?.name
   }
 
@@ -141,6 +202,28 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
 
   getDriverName (driverId: string) {
     return this.$dataStore.getDriverById(driverId)?.name
+  }
+
+  getTimesForTrack (track: Track): Laptime[] {
+    return this.$dataStore.getTimesForTrack(track)
+  }
+
+  getTimesForActiveTrackAndVariant (variant: string): Laptime[] {
+    return this.getTimesForTrack(this.activeTrack!).filter(x => x.trackVariant === variant)
+  }
+
+  getTimesForActiveTrackAndActiveVariantAndCar (car: Car): Laptime[] {
+    return this.getTimesForActiveTrackAndVariant(this.activeVariant!).filter(x => x.carId === car.uid)
+  }
+
+  getCarsForTimes (times: Laptime[]): Car[] {
+    return times.map(x => this.$dataStore.getCarById(x.carId)!).filter((car, index, cars) => cars.indexOf(car) === index)
+      .sort((a, b) => this.getTimesForActiveTrackAndActiveVariantAndCar(b).length - this.getTimesForActiveTrackAndActiveVariantAndCar(a).length)
+  }
+
+  getCarImage (time: Laptime): string {
+    const car = this.$dataStore.getCarById(time.carId)
+    return car ? `images/${car.imageUrl}` : 'Loading...'
   }
 
   handleUrl () {
@@ -176,6 +259,18 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
 <style lang="scss" scoped>
 @import '../../assets/css/carousel.css';
 
+h2 {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.__buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .__filter {
   position: fixed;
   bottom: 0;
@@ -200,6 +295,14 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
   }
 }
 
+.__selected {
+  background-color: #242424 !important;
+}
+
+.__carImage > img{
+  width: 8rem;
+}
+
 .__trackCarMatrix {
   max-width: 100vw;
   display: flex;
@@ -215,10 +318,6 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
     flex-direction: column;
     align-items: flex-start;
   }
-}
-
-.__carImage > img{
-  width: 8rem;
 }
 
 .__textContainer {
