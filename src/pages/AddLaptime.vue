@@ -408,10 +408,11 @@ export default class AddLaptime extends Vue {
   }
 
   get fastestLapTime () {
-    const participantId = this.$rdb.getHostname() === 'wallpc' ? 0 : 1
-    if (this.participants.length === 0 || !this.participants[participantId]?.fastestLapTime) return
+    const participantName = this.$rdb.getHostname() === 'wallpc' ? 'ezpzlmnsqz1337' : 'tvojemama'
+    const participant = this.participants.find(p => p.name === participantName)
+    if (!participant) return
 
-    const d = new Date(this.participants[participantId].fastestLapTime * 1000)
+    const d = new Date(participant.fastestLapTime * 1000)
     return this.$ltb.dateToLaptime(d)
   }
 
