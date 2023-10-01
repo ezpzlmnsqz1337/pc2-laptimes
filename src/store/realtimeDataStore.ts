@@ -120,6 +120,18 @@ export interface PC2MotionData {
 export interface PC2ParticipantData {
   name: string
   fastestLapTime: number
+  classSameAsPlayer: boolean
+  currentLap: number
+  currentLapDistance: number
+  isActive: 1 | 0
+  lapInvalidated: number
+  lapsCompleted: number
+  lastSectorTime: number
+  racePosition: number
+  sector: number
+  worldPositionX: number
+  worldPositionY: number
+  worldPositionZ: number
 }
 
 export interface PC2UDPData {
@@ -231,7 +243,12 @@ export const realtimeDataStore: RealtimeDataStore = {
     Object.keys(data).forEach(x => {
       // console.log(x)
       if ((this as any)[x] === undefined) return
-      if (x === 'participants' && !data[x][0].fastestLapTime) return
+      if (x === 'participants') {
+        data[x].forEach((p: PC2ParticipantData, index: number) =>
+          (this.participants[index] = this.participants[index] ? { ...this.participants[index], ...p } : { ...p })
+        )
+        return
+      }
       (this as any)[x] = data[x]
     })
   }

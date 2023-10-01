@@ -59,7 +59,19 @@ export default class WebsocketTesting extends Vue {
       participants: [
         {
           name: driver,
-          fastestLapTime: laptimeS
+          fastestLapTime: laptimeS,
+          classSameAsPlayer: false,
+          currentLap: 0,
+          currentLapDistance: 0,
+          isActive: 1,
+          lapInvalidated: 1,
+          lapsCompleted: 0,
+          lastSectorTime: 0,
+          racePosition: 0,
+          sector: 0,
+          worldPositionX: 0,
+          worldPositionY: 0,
+          worldPositionZ: 0
         }
       ]
     })

@@ -43,6 +43,31 @@
       </div>
     </div>
 
+    <div class="__middleContent">
+      <div class="__participants">
+        <div
+          v-for="(p, index) in sortedActiveParticipants"
+          :key="`participant-${index}`"
+        >
+          <div class="__heading">
+            {{ p.racePosition }}. {{ p.name }}
+          </div>
+          <div>Fastest laptime: {{ $ltb.dateToLaptime(new Date(p.fastestLapTime*1000)) }}</div>
+          <div>Class same as player: {{ p.classSameAsPlayer }}</div>
+          <div>Current lap: {{ p.currentLap }}</div>
+          <div>Current lap distance: {{ p.currentLapDistance }}</div>
+          <div>Is active: {{ p.isActive }}</div>
+          <div>Lap invalidated: {{ p.lapInvalidated }}</div>
+          <div>Laps completed: {{ p.lapsCompleted }}</div>
+          <div>Last sector time: {{ $ltb.dateToLaptime(new Date(p.lastSectorTime*1000)) }}</div>
+          <div>Sector: {{ p.sector }}</div>
+          <div>World position x: {{ p.worldPositionX }}</div>
+          <div>World position y: {{ p.worldPositionY }}</div>
+          <div>World position z: {{ p.worldPositionZ }}</div>
+        </div>
+      </div>
+    </div>
+
     <div class="__bottomContent">
       <div class="__telemetry">
         <div class="__brake">
@@ -162,6 +187,14 @@ export default class RealtimeData extends Vue {
     return this.$realtimeDataStore.trackVariation
   }
 
+  get participants () {
+    return this.$realtimeDataStore.participants
+  }
+
+  get sortedActiveParticipants () {
+    return this.participants.filter(p => p.isActive === 1).sort((a, b) => a.racePosition - b.racePosition)
+  }
+
   created () {
     this.realtimeDataListener = this.$rdb.addListener(this.onRealtimeDataReceived)
   }
@@ -234,6 +267,23 @@ export default class RealtimeData extends Vue {
   padding: 1rem;
   display: flex;
   justify-content: space-around;
+}
+
+.__middleContent {
+  .__participants {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    > div {
+      width: 15rem;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background-color: rgba(46, 46, 46, 0.809);
+      border-radius: 0.3rem;
+      border: 0.3rem solid rgba(0, 0, 0, 0.464);
+    }
+  }
 }
 
 .__bottomContent > .__telemetry {
@@ -340,5 +390,11 @@ export default class RealtimeData extends Vue {
   font-size: 2rem;
   z-index: 10;
   line-height: 4rem;
+}
+
+.__heading {
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
 }
 </style>
