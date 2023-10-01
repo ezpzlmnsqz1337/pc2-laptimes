@@ -41,6 +41,29 @@
           >
         </div>
       </div>
+
+      <div class="__participants">
+        <div
+          v-for="(p, index) in participants.filter(p => p.isActive === 1)"
+          :key="`participant-${index}`"
+        >
+          <div>Participant {{ index }}</div>
+          <div>Name: {{ p.name }}</div>
+          <div>Fastest laptime: {{ p.fastestLapTime }}</div>
+          <div>Class same as player: {{ p.classSameAsPlayer }}</div>
+          <div>Current lap: {{ p.currentLap }}</div>
+          <div>Current lap distance: {{ p.currentLapDistance }}</div>
+          <div>Is active: {{ p.isActive }}</div>
+          <div>Lap invalidated: {{ p.lapInvalidated }}</div>
+          <div>Laps completed: {{ p.lapsCompleted }}</div>
+          <div>Last sector time: {{ p.lastSectorTime }}</div>
+          <div>Race position: {{ p.racePosition }}</div>
+          <div>Sector: {{ p.sector }}</div>
+          <div>World position x: {{ p.worldPositionX }}</div>
+          <div>World position y: {{ p.worldPositionY }}</div>
+          <div>World position z: {{ p.worldPositionZ }}</div>
+        </div>
+      </div>
     </div>
 
     <div class="__bottomContent">
@@ -162,6 +185,10 @@ export default class RealtimeData extends Vue {
     return this.$realtimeDataStore.trackVariation
   }
 
+  get participants () {
+    return this.$realtimeDataStore.participants
+  }
+
   created () {
     this.realtimeDataListener = this.$rdb.addListener(this.onRealtimeDataReceived)
   }
@@ -234,6 +261,12 @@ export default class RealtimeData extends Vue {
   padding: 1rem;
   display: flex;
   justify-content: space-around;
+
+  .__participants {
+    > div {
+      margin-bottom: 1rem;
+    }
+  }
 }
 
 .__bottomContent > .__telemetry {
