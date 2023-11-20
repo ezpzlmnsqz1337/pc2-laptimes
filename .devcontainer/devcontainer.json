@@ -1,0 +1,65 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+	"name": "Debian",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true,
+			"version": "16",
+			"nvmVersion": "latest"
+		}
+	},
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"github.vscode-github-actions",
+				"Vue.volar",
+				"vue.vscode-typescript-vue-plugin",
+				"mhutchie.git-graph",
+				"streetsidesoftware.code-spell-checker",
+				"eamodio.gitlens",
+				"formulahendry.auto-rename-tag",
+				"rogalmic.bash-debug",
+				"wmaurer.change-case",
+				"naumovs.color-highlight",
+				"vivaxy.vscode-conventional-commits",
+				"EditorConfig.EditorConfig",
+				"usernamehw.errorlens",
+				"sibiraj-s.vscode-scss-formatter",
+				"mrmlnc.vscode-scss",
+				"sdras.vue-vscode-snippets",
+				"redhat.vscode-yaml"
+			],
+			"settings": {
+				"eslint.validate": [
+					"vue",
+					"javascript",
+					"javascriptreact"
+				],
+				"editor.codeActionsOnSave": {
+					"source.fixAll.eslint": true
+				},
+				"path-intellisense.mappings": {
+					"@": "${workspaceRoot}/src"
+				},
+				"editor.formatOnSave": false
+			}
+		}
+	},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+
+	"postCreateCommand": "yarn install --frozen-lockfile --ignore-engines"
+}
