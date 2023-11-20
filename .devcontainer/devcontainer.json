@@ -25,8 +25,36 @@
 				"dbaeumer.vscode-eslint",
 				"github.vscode-github-actions",
 				"Vue.volar",
-				"vue.vscode-typescript-vue-plugin"
-			]
+				"vue.vscode-typescript-vue-plugin",
+				"mhutchie.git-graph",
+				"streetsidesoftware.code-spell-checker",
+				"eamodio.gitlens",
+				"formulahendry.auto-rename-tag",
+				"rogalmic.bash-debug",
+				"wmaurer.change-case",
+				"naumovs.color-highlight",
+				"vivaxy.vscode-conventional-commits",
+				"EditorConfig.EditorConfig",
+				"usernamehw.errorlens",
+				"sibiraj-s.vscode-scss-formatter",
+				"mrmlnc.vscode-scss",
+				"sdras.vue-vscode-snippets",
+				"redhat.vscode-yaml"
+			],
+			"settings": {
+				"eslint.validate": [
+					"vue",
+					"javascript",
+					"javascriptreact"
+				],
+				"editor.codeActionsOnSave": {
+					"source.fixAll.eslint": true
+				},
+				"path-intellisense.mappings": {
+					"@": "${workspaceRoot}/src"
+				},
+				"editor.formatOnSave": false
+			}
 		}
 	},
 
