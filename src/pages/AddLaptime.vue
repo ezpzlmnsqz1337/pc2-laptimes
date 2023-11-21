@@ -504,9 +504,7 @@ export default class AddLaptime extends Vue {
   setTrackVariation (trackLocation: string, trackVariation: string) {
     const variant = (trackMapping as any)[trackLocation]?.[trackVariation || '-']
     if (!variant) {
-      this.$toast.error('Unable to set track variant. Track variant does not exist.', {
-        duration: false
-      })
+      this.$toast.warning('Unable to set track variant. Track variant does not exist.')
       return
     }
     this.trackVariant = variant

@@ -48,6 +48,10 @@
         <div
           v-for="(p, index) in sortedActiveParticipants"
           :key="`participant-${index}`"
+          :class="{
+            __player1: p.name === 'ezpzlmnsqz1337',
+            __player2: p.name === 'tvojemama'
+          }"
         >
           <div class="__heading">
             {{ p.racePosition }}. {{ p.name }}
@@ -282,6 +286,22 @@ export default class RealtimeData extends Vue {
       background-color: rgba(46, 46, 46, 0.809);
       border-radius: 0.3rem;
       border: 0.3rem solid rgba(0, 0, 0, 0.464);
+
+      &.__player1 {
+        border: 0.3rem solid rgb(15, 0, 255);
+      }
+
+      &.__player2 {
+        border: 0.3rem solid rgb(0, 131, 17);
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .__middleContent {
+    .__participants {
+      justify-content: center;
     }
   }
 }
