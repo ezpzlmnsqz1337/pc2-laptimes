@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="__appWrapper"
-  >
+  <div class="__appWrapper">
     <Background />
     <Menu />
     <keep-alive>
@@ -40,7 +38,9 @@ import Statistics from '@/pages/Statistics.vue'
 import WebsocketTesting from '@/pages/WebsocketTesting.vue'
 import { unsubscribeAll } from '@/vuex-firestore-binding'
 import { Options, Vue } from 'vue-class-component'
-import { ScreenType } from './constants/ScreenType'
+import { ScreenType } from '@/constants/ScreenType'
+import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
+import { RaceState } from '@/constants/RaceState'
 
 @Options({
   components: {
@@ -56,6 +56,13 @@ import { ScreenType } from './constants/ScreenType'
   }
 })
 export default class App extends Vue {
+  protected dataListener!: RealtimeDataListener
+  lastRaceState = RaceState.MENU
+
+  created () {
+    this.dataListener = this.$rdb.addListener(this.onRealTimeDataReceived)
+  }
+
   mounted () {
     this.$dataStore.bindDb()
     this.refresh()
@@ -70,7 +77,18 @@ export default class App extends Vue {
     return this.$dataStore.editLaptime
   }
 
+  onRealTimeDataReceived (data: any) {
+    data = data.data
+    if ('raceState' in data) {
+      if (this.lastRaceState === RaceState.BEFORE_RACE_MENU && data.raceState === RaceState.RACE_IS_ON) {
+        this.$dataStore.showScreen(ScreenType.REALTIME_DATA)
+      }
+      this.lastRaceState = data.raceState
+    }
+  }
+
   beforeUnmount () {
+    this.$rdb.removeListener(this.dataListener)
     unsubscribeAll()
   }
 
@@ -105,6 +123,7 @@ export default class App extends Vue {
 <style lang="scss">
 @import './assets/css/v-select.css';
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+
 :root {
   --hover: #188cff;
   --active: #1d6ebe;
@@ -158,7 +177,10 @@ h2 {
   margin-top: 0;
 }
 
-input[type=text], input[type=password], input[type=email], input[type=number]{
+input[type=text],
+input[type=password],
+input[type=email],
+input[type=number] {
   padding: 0.5rem;
   border-radius: 0.3rem;
   border: 0.1rem solid black;
@@ -176,7 +198,7 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
-select{
+select {
   padding: 0.5rem;
   border-radius: 0.3rem;
 }
@@ -205,8 +227,10 @@ a {
   height: 100vh;
   overflow-y: scroll;
   /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -248,19 +272,21 @@ a {
 .bounce-enter-active {
   animation: bounce-in .5s;
 }
+
 .bounce-leave-active {
   animation: bounce-in .3s reverse;
 }
+
 @keyframes bounce-in {
   0% {
     transform: scale(0);
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
-}
-
-</style>
+}</style>
