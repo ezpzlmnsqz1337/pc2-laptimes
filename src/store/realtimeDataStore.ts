@@ -244,8 +244,9 @@ export const realtimeDataStore: RealtimeDataStore = {
       // console.log(x)
       if ((this as any)[x] === undefined) return
       if (x === 'participants') {
+        const offset = data.offset || 0 // participants are split into two packets of 16
         data[x].forEach((p: PC2ParticipantData, index: number) =>
-          (this.participants[index] = this.participants[index] ? { ...this.participants[index], ...p } : { ...p })
+          (this.participants[offset + index] = this.participants[offset + index] ? { ...this.participants[offset + index], ...p } : { ...p })
         )
         return
       }

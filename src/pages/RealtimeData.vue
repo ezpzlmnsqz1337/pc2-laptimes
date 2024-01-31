@@ -56,7 +56,9 @@
           <div class="__heading">
             {{ p.racePosition }}. {{ p.name }}
           </div>
-          <div>Fastest laptime: {{ $ltb.dateToLaptime(new Date(p.fastestLapTime*1000)) }}</div>
+          <div v-if="p.fastestLapTime">
+            Fastest laptime: {{ $ltb.dateToLaptime(new Date(p.fastestLapTime*1000)) }}
+          </div>
           <div>Class same as player: {{ p.classSameAsPlayer }}</div>
           <div>Current lap: {{ p.currentLap }}</div>
           <div>Current lap distance: {{ p.currentLapDistance }}</div>
