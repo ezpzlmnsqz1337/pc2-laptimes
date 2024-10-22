@@ -248,6 +248,10 @@ export default class Statistics extends Vue {
 }
 
 @media only screen and (max-width: 700px) {
+  .__statistics {
+    padding: 1rem;
+  }
+
   .__controls {
     margin-top: 1rem;
 

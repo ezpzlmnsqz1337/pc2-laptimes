@@ -614,6 +614,8 @@ export default class AddLaptime extends Vue {
   }
 
   @media only screen and (max-width: 700px) {
+    padding: 1rem 0;
+
     .__timeWrapper {
       flex-direction: column;
       width: 100%;

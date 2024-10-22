@@ -308,6 +308,12 @@ export default class RealtimeData extends Vue {
   }
 }
 
+@media only screen and (max-width: 700px) {
+  .__realtimeData {
+    padding: 1rem;
+  }
+}
+
 .__bottomContent > .__telemetry {
   width: 80vw;
   height: 60vh;
