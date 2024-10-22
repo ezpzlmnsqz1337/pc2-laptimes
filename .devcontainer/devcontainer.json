@@ -24,8 +24,7 @@
 			"extensions": [
 				"dbaeumer.vscode-eslint",
 				"github.vscode-github-actions",
-				"Vue.volar",
-				"vue.vscode-typescript-vue-plugin",
+				"vue.volar",
 				"mhutchie.git-graph",
 				"streetsidesoftware.code-spell-checker",
 				"eamodio.gitlens",
@@ -34,7 +33,7 @@
 				"wmaurer.change-case",
 				"naumovs.color-highlight",
 				"vivaxy.vscode-conventional-commits",
-				"EditorConfig.EditorConfig",
+				"editorConfig.editorConfig",
 				"usernamehw.errorlens",
 				"sibiraj-s.vscode-scss-formatter",
 				"mrmlnc.vscode-scss",
@@ -48,7 +47,7 @@
 					"javascriptreact"
 				],
 				"editor.codeActionsOnSave": {
-					"source.fixAll.eslint": true
+					"source.fixAll.eslint": "always"
 				},
 				"path-intellisense.mappings": {
 					"@": "${workspaceRoot}/src"

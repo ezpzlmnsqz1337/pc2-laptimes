@@ -309,10 +309,43 @@ export default class Menu extends Vue {
     font-size: 0.6rem;
     padding: 0.4rem 0.3rem;
   }
+}
 
-  @media only screen and (max-width: 700px) {
-    &:hover .__menu > button {
-      font-size: 0.6rem;
+@media only screen and (max-width: 700px) {
+  .__menuWrapper {
+    position: initial;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    &:hover {
+      .__menu {
+        > button {
+          padding: 8px 12px;
+          height: initial;
+          font-size: 0.6rem;
+          width: initial;
+          top: 0;
+          position: initial;
+        }
+      }
+    }
+
+    .__menu {
+      display: initial;
+      height: initial;
+
+      > button {
+        padding: 8px 12px;
+        height: initial;
+        font-size: 0.6rem;
+        width: initial;
+        top: 0;
+        position: initial;
+      }
+    }
+
+    .__connect {
+      display: flex;
     }
   }
 }

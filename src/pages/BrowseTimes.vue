@@ -145,7 +145,7 @@ export default class BrowseTimes extends Vue {
 
 @media only screen and (max-width: 700px) {
   .__browseTimes {
-    padding: 3rem 1rem 1rem;
+    padding: 1rem;
   }
 }
 </style>
