@@ -75,11 +75,19 @@ export default class InputRow extends Vue.with(InputRowProps) {
   justify-content: space-between;
   align-items: center;
   font-size: 1rem;
+
+  button {
+    margin: 0;
+  }
 }
 
 .__input {
   display: flex;
   flex-direction: row;
+
+  button {
+    margin: 0;
+  }
 }
 
 .__inputRow {

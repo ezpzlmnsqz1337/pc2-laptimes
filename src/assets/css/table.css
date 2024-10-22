@@ -2,13 +2,12 @@ table {
   width: 100%;
   overflow: hidden;
   border-spacing: 0;
-  border-radius: 0.3rem;
   font-size: 1rem;
 }
 
 th {
   border-bottom: 1px solid var(--border-dark1);
-  background-color: #4081c2;
+  background-color: #1d6ebe;
   color: var(--text-light1);
   padding: 1rem 0.5rem;
 }
@@ -67,7 +66,6 @@ td div:hover {
 }
 
 .__driver > div {
-  border-radius: 0.3rem;
   padding: 0.2rem;
 }
 
@@ -81,7 +79,6 @@ tr:nth-child(3) .__driver > div {
   color: gold;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
-  border-radius: 0.3rem;
   border: 0.1rem solid gold;
 }
 
@@ -90,7 +87,6 @@ tr:nth-child(4) .__driver > div {
   color: silver;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
-  border-radius: 0.3rem;
   border: 0.1rem solid silver;
 }
 
@@ -99,7 +95,6 @@ tr:nth-child(5) .__driver > div {
   color: #cd7f32;
   background-color: var(--bg-dark3);
   padding: 0.2rem;
-  border-radius: 0.3rem;
   border: 0.1rem solid #cd7f32;
 }
 
@@ -180,7 +175,6 @@ tr.__hasNotes {
 .__settings > div {
   box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   padding: 0.3rem 0.7rem;;
-  border-radius: 0.3rem;
   margin-bottom: 0.3rem;
   font-size: 0.7rem;
   min-width: 6rem;
@@ -192,9 +186,6 @@ tr.__hasNotes {
   }
 
   th {
-    border-bottom: 1px solid var(--border-dark1);
-    background-color: #4081c2;
-    color: var(--text-light1);
     padding: 1rem 0.2rem;
   }
 
@@ -214,7 +205,6 @@ tr.__hasNotes {
 
   .__settings > div {    
     padding: 0.15rem 0.3rem;
-    border-radius: 0.3rem;
     margin-bottom: 0.3rem;
     font-size: 0.5rem;    
   }
@@ -236,7 +226,6 @@ tr.__hasNotes {
 
   .__settings > div {    
     padding: 0.15rem 0.3rem;
-    border-radius: 0.3rem;
     margin-bottom: 0.3rem;
     font-size: 0.5rem;
     min-width: 1.3rem;

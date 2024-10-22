@@ -232,6 +232,10 @@ export default class Menu extends Vue {
 
     .__connect {
       display: flex;
+
+      button {
+        margin: 0;
+      }
     }
 
     .__menu {
@@ -257,8 +261,8 @@ export default class Menu extends Vue {
     }
 
     .__highlight {
-      background-color: #4081C2;
-      box-shadow: 0px 0px 5px 2px #4081C2;
+      background-color: #1d6ebe;
+      box-shadow: 0px 0px 5px 2px #1d6ebe;
     }
 
     > button {

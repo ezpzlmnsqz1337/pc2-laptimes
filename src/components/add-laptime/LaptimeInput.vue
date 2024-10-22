@@ -129,27 +129,19 @@ export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
 
 <style lang="scss" scoped>
 .__laptimeInputs {
-  border-radius: 0.3rem;
   display: flex;
   width: 100%;
 
   .__minutes {
     width: 100%;
     text-align: right;
-    border-right: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
+    border: none;
     padding-right: 0.3rem;
   }
 
   .__seconds {
     width: 3.1rem;
-    border-right: 0;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    border-left: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border: none;
     text-align: center;
     padding-left: 0.3rem;
     padding-right: 0.3rem;
@@ -157,9 +149,7 @@ export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
 
   .__milliseconds {
     width: 100%;
-    border-left: 0;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
+    border: none;
     padding-left: 0.3rem;
   }
 
@@ -167,9 +157,8 @@ export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
     background-color: white;
     color: var(--text-dark1);
     font-size: 2rem;
-    padding-top: 0.45rem;
-    border-top: 0.1rem solid black;
-    border-bottom: 0.1rem solid black;
+    padding-top: 0.15rem;
+    border: none;
   }
 
   input {

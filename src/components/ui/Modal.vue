@@ -62,7 +62,6 @@ export default class Modal extends Vue {}
   margin: 0px auto;
   padding: 1rem;
   background-color: var(--bg-dark4);
-  border-radius: 0.7rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;

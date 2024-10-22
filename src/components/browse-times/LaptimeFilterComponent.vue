@@ -111,6 +111,21 @@
       <div class="fa fa-ban" /><span>Clear filter</span>
     </Button>
 
+    <div class="__distinctFilter">
+      <InputRow
+        key="distinct"
+        heading="Distinct"
+        :border-bottom="showMoreFilters"
+      >
+        <RadioButtons
+          name="distinct"
+          :values="Object.values(Distinct)"
+          :value="filter['distinct' as keyof LaptimeFilter]"
+          @changed="setFilter({distinct: $event})"
+        />
+      </InputRow>
+    </div>
+
     <div
       class="__moreFilters"
       :class="{__hidden: !showMoreFilters}"
@@ -238,11 +253,6 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
         heading: 'Game',
         name: 'game',
         values: Object.values(Game)
-      },
-      {
-        heading: 'Distinct',
-        name: 'distinct',
-        values: Object.values(Distinct)
       }
     ]
   }
@@ -310,7 +320,8 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
     text-align: left;
   }
 
-  .__moreFilters {
+  .__moreFilters,
+  .__distinctFilter {
     margin-top: 0.7rem;
 
     &.__hidden {
@@ -338,6 +349,7 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
     font-size: 1rem;
     display: block;
     width: 100%;
+    border: 1px solid white;
   }
 
   :deep(.v3dp__popout){

@@ -40,7 +40,7 @@ button {
   --btn-text-light: var(--text-light1);
   --btn-default: #ffffff;
   --btn-default-hover: #e7e7e7;
-  --btn-primary: #4081c2;
+  --btn-primary: #1d6ebe;
   --btn-primary-hover: #3f71a3;
   --btn-secondary: #787879;
   --btn-secondary-hover: #5f5f5f;
@@ -61,7 +61,6 @@ button {
   transition: background-color 0.1s;
   margin: 0.1rem;
   padding: 0.5rem 0.8rem;
-  border-radius: 0.3rem;
 
   &:deep(.fa) {
     margin-right: 0.3rem;
