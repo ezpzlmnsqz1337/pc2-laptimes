@@ -3,7 +3,7 @@ module.exports = {
   productionSourceMap: false,
   pwa: {
     name: 'Laptimes',
-    themeColor: '#4081c2',
+    themeColor: '#1d6ebe',
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'blue',

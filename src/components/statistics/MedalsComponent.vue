@@ -139,7 +139,6 @@ export default class MedalsComponent extends Vue.with(MedalsProps) {
   img {
     width: 5rem;
     margin-top: 0.2rem;
-    border-radius: 0.3rem;
     box-shadow: 0.2rem 0.2rem 0.3rem 0.2rem #333333;
   }
 }

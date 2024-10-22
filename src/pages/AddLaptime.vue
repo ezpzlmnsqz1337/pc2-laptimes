@@ -199,7 +199,6 @@
         >
           <div
             class="__autoSubmit"
-            :class="{__autoSubmitAnimation: autoSubmit}"
           >
             <input
               :checked="autoSubmit"
@@ -646,17 +645,12 @@ export default class AddLaptime extends Vue {
   textarea {
     width: 100%;
     background-color: var(--bg-light1);
-    border-radius: 0.3rem;
     padding: 0.5rem;
     border: 0.1rem solid black;
   }
 
   .__lg textarea {
     height: 7rem;
-  }
-
-  .__autoSubmitAnimation {
-    border-radius: 0.3rem;
   }
 
   .__autoSubmit {
@@ -668,7 +662,6 @@ export default class AddLaptime extends Vue {
       width: 1.7rem;
       height: 1.7rem;
       display: inline-block;
-      border-radius: 0.3rem;
       margin: 0.5rem;
     }
   }

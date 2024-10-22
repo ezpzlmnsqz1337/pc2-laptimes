@@ -182,8 +182,7 @@ input[type=password],
 input[type=email],
 input[type=number] {
   padding: 0.5rem;
-  border-radius: 0.3rem;
-  border: 0.1rem solid black;
+  border-radius: 0;
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -200,7 +199,6 @@ input[type=number] {
 
 select {
   padding: 0.5rem;
-  border-radius: 0.3rem;
 }
 
 a {

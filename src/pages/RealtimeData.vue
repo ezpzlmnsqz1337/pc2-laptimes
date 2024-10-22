@@ -286,7 +286,6 @@ export default class RealtimeData extends Vue {
       padding: 1rem;
       margin-bottom: 1rem;
       background-color: rgba(46, 46, 46, 0.809);
-      border-radius: 0.3rem;
       border: 0.3rem solid rgba(0, 0, 0, 0.464);
 
       &.__player1 {
@@ -343,16 +342,14 @@ export default class RealtimeData extends Vue {
   position: relative;
   width: 1.5rem;
   height: 10rem;
-  border-radius: 0.5rem;
   border: 0.1rem solid var(--border-dark1);
   background-color: var(--bg-light1);
   display: inline-block;
 
-  > .__filler{
+  > .__filler {
     position: relative;
     width: 1.3rem;
     height: 100%;
-    border-radius: 0.5rem;
   }
 }
 
@@ -360,7 +357,6 @@ export default class RealtimeData extends Vue {
   position: relative;
   width: 10rem;
   height: 1.5rem;
-  border-radius: 0.5rem;
   border: 0.1rem solid var(--border-dark1);
   background-color: var(--bg-light1);
 
@@ -368,7 +364,6 @@ export default class RealtimeData extends Vue {
     position: relative;
     width: 100%;
     height: 1.3rem;
-    border-radius: 0.5rem;
     margin-top: 0.03rem;
     margin-left: 0.03rem;
   }

@@ -1,8 +1,7 @@
 .v-select > .vs__dropdown-toggle {
   background-color: var(--bg-light1);
-  border-radius: 0.3rem;
   padding: 0.5rem;
-  border: 0.1rem solid black;
+  border-radius: 0;
 }
 
 .vs__actions .vs__clear {

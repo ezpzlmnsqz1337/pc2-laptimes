@@ -354,7 +354,6 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
   textarea {
     width: 100%;
     background-color: var(--bg-light1);
-    border-radius: 0.3rem;
     padding: 0.5rem;
     border: 0.1rem solid black;
 

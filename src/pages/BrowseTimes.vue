@@ -121,7 +121,6 @@ export default class BrowseTimes extends Vue {
 .__laptimeTable {
   width: 100%;
   padding: 1rem;
-  border-radius: 0.3rem;
 }
 
 .__browseTimes {
