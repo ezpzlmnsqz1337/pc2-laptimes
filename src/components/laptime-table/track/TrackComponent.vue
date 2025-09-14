@@ -1,23 +1,12 @@
 <template>
   <div @click="handleClickEvent($event)">
-    <EditableSelect
-      :editable="editable"
-      label="track"
-      :text="getTrackName(time)"
-      :options="tracks"
-      @value:update="handleUpdateEvent('trackId', $event.uid)"
-    />
+    {{ getTrackName(time) }}
   </div>
   <div
     v-if="time.trackVariant"
     @click="handleClickEvent($event)"
   >
-    <EditableSelect
-      :editable="editable"
-      :text="time.trackVariant"
-      :options="getTrackVariants(time.trackId)"
-      @value:update="handleUpdateEvent('trackVariant', $event)"
-    />
+    {{ time.trackVariant }}
   </div>
 </template>
 
@@ -43,17 +32,14 @@ export class TrackProps {
 }
 
 @Options({
-  emits: ['click', 'value:update']
+  emits: ['click']
 })
 export default class TrackComponent extends Vue.with(TrackProps) {
   handleClickEvent (e: MouseEvent) {
-    if (!e.ctrlKey) {
+    if (e.ctrlKey) {
       this.$emit('click', { trackId: this.time.trackId, trackVariant: this.time.trackVariant })
+      e.stopPropagation()
     }
-  }
-
-  handleUpdateEvent (key: UpdateEventKey, value: string) {
-    this.$emit('value:update', { key, value })
   }
 
   get tracks () {

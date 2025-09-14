@@ -40,7 +40,7 @@ button {
   --btn-text-light: var(--text-light1);
   --btn-default: #ffffff;
   --btn-default-hover: #e7e7e7;
-  --btn-primary: #1d6ebe;
+  --btn-primary: var(--dark-blue1);
   --btn-primary-hover: #3f71a3;
   --btn-secondary: #787879;
   --btn-secondary-hover: #5f5f5f;

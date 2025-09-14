@@ -1,9 +1,9 @@
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'production' && process.env.TARGET === 'malina' ? '/laptimes/' : '/',
+  publicPath: '/',
   productionSourceMap: false,
   pwa: {
     name: 'Laptimes',
-    themeColor: '#1d6ebe',
+    themeColor: '#274db4',
     msTileColor: '#000000',
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'blue',

@@ -7,7 +7,7 @@ table {
 
 th {
   border-bottom: 1px solid var(--border-dark1);
-  background-color: #1d6ebe;
+  background-color: var(--dark-blue1);
   color: var(--text-light1);
   padding: 1rem 0.5rem;
 }
@@ -24,6 +24,7 @@ tr:nth-child(even) {
 tr:hover {
   color: var(--text-dark1);
   background-color: #93c4f5;
+  cursor: pointer;
 }
 
 td {

@@ -124,7 +124,7 @@ export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) 
     }
   }
 
-  chartColors = ['#d9ad96', '#8928c9', '#a7fa55', '#d67840', '#2388eb', '#1d6ebe', '#7cf7ca', '#7027b0',
+  chartColors = ['#d9ad96', '#8928c9', '#a7fa55', '#d67840', '#2388eb', '#274db4', '#7cf7ca', '#7027b0',
     '#e32d34', '#000000', '#57aee6', '#ffffff', '#e0ad92']
 
   mounted () {

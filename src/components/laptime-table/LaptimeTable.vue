@@ -178,9 +178,7 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   handleRowClick (e: MouseEvent, laptime: Laptime) {
-    if ((e.target as HTMLElement).tagName !== 'TD') return
     this.$dataStore.setEditLaptime(laptime.uid)
-    // this.$toast.info(laptime.notes || 'No comment')
   }
 
   displayColumn (column: LaptimeTableColumn) {

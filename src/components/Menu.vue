@@ -55,7 +55,6 @@
         size="8px"
       />
     </div>
-
     <div class="__menu">
       <Button
         v-if="isLocal()"
@@ -219,60 +218,36 @@ export default class Menu extends Vue {
 <style scoped lang="scss">
 .__menuWrapper {
   background-color: rgba(72, 72, 72, 0.7);
-  top: 0;
-  position: absolute;
   width: 100vw;
-  padding-top: 0.1rem;
-  z-index: 999;
   text-align: center;
-
-  &:hover {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-
-    .__connect {
-      display: flex;
-
-      button {
-        margin: 0;
-      }
-    }
-
-    .__menu {
-      display: initial;
-      height: initial;
-
-      > button {
-        padding: 8px 12px;
-        height: initial;
-        font-size: initial;
-        width: initial;
-        top: 0;
-        position: initial;
-      }
-    }
-  }
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.3rem;
+  gap: 1rem;
+  flex-direction: row-reverse;
+  padding: 0.5rem;
 
   .__menu {
-    height: 5px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 1;
+    padding-top: 0.6rem;
 
     .__selected {
       background-color: #242424;
     }
 
     .__highlight {
-      background-color: #1d6ebe;
-      box-shadow: 0px 0px 5px 2px #1d6ebe;
+      background-color: #274db4;
+      box-shadow: 0px 0px 5px 2px #274db4;
     }
 
     > button {
-      padding: 0;
-      height: 5px;
-      font-size: 0;
-      vertical-align: top;
-      width: 6rem;
-      top: -4px;
-      position: relative;
+      font-size: 1rem;
+      flex: 1;
+      padding: 0.75rem;
+      width: 10rem;
     }
   }
 
@@ -301,7 +276,7 @@ export default class Menu extends Vue {
   }
 
   .__connect {
-    display: none;
+    display: flex;
     justify-content: center;
 
     .__select{
@@ -317,34 +292,13 @@ export default class Menu extends Vue {
 
 @media only screen and (max-width: 700px) {
   .__menuWrapper {
-    position: initial;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
 
-    &:hover {
-      .__menu {
-        > button {
-          padding: 8px 12px;
-          height: initial;
-          font-size: 0.6rem;
-          width: initial;
-          top: 0;
-          position: initial;
-        }
-      }
-    }
-
     .__menu {
-      display: initial;
-      height: initial;
-
       > button {
         padding: 8px 12px;
-        height: initial;
         font-size: 0.6rem;
-        width: initial;
-        top: 0;
-        position: initial;
       }
     }
 

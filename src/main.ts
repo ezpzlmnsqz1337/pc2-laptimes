@@ -1,6 +1,5 @@
 import App from '@/App.vue'
 import Button from '@/components/ui/Button.vue'
-import EditableSelect from '@/components/ui/EditableSelect.vue'
 import Modal from '@/components/ui/Modal.vue'
 import RadioButtons from '@/components/ui/RadioButtons.vue'
 import { BrakingLine } from '@/constants/BrakingLine'
@@ -108,7 +107,7 @@ app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
 app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
 app.config.globalProperties.$lb = LightsBuilder.getInstance()
 app.config.globalProperties.$sb = StatisticsBuilder.getInstance()
-app.config.globalProperties.isLocal = () => ['localhost:8080', 'malina:3000'].includes(window.location.host)
+app.config.globalProperties.isLocal = () => ['localhost:8080', 'pc2laptimes.homelab.net'].includes(window.location.host)
 app.config.globalProperties.authorize = (pass: string) => pass === '3f83e9ad5be63bd5bf2fd009fffe6b7dd4066243975bc962edc37459c17e65b9'
 
 app.use(storePlugin)
@@ -118,7 +117,6 @@ app.use(PerfectScrollbar)
 app.component('Button', Button)
 // eslint-disable-next-line vue/multi-word-component-names
 app.component('Modal', Modal)
-app.component('EditableSelect', EditableSelect)
 app.component('RadioButtons', RadioButtons)
 app.component('VSelect', vSelect)
 app.component('PulseLoader', PulseLoader)

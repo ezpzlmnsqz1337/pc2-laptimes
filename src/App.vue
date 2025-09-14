@@ -126,7 +126,7 @@ export default class App extends Vue {
 
 :root {
   --hover: #188cff;
-  --active: #1d6ebe;
+  --active: #274db4;
   --text-light1: #ffffff;
   --text-light2: gray;
   --text-dark1: #242424;
@@ -140,12 +140,13 @@ export default class App extends Vue {
   --bg-light3: #707070;
   --border-light1: #ffffff;
   --border-dark1: #424242;
+  --dark-blue1: #274db4;
   --anchor: #2183df;
   --brake: #ff0000;
   --throttle: #00ff00;
   --clutch: #e4e43d;
   --vdp-hover-bg-color: #188cff;
-  --vdp-selected-bg-color: #1d6ebe;
+  --vdp-selected-bg-color: #274db4;
   --vdp-bg-color: var(--bg-dark2);
   --vdp-text-color: var(--text-dark1);
 }
