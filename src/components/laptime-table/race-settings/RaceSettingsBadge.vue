@@ -1,15 +1,12 @@
 <template>
   <div
     :class="getClass(type)"
+    class="__textContainer"
     @click="handleClickEvent($event)"
   >
-    <EditableSelect
-      :text="value"
-      :editable="editable"
-      :icon="getIcon(type)"
-      :options="getOptions(type)"
-      @value:update="handleUpdateEvent(type, $event.name)"
-    />
+    <div
+      :class="`fa fa-${getIcon(type)}`"
+    /><span>{{ value }}</span>
   </div>
 </template>
 
@@ -30,17 +27,14 @@ export class RaceSettingsBadgeProps {
 }
 
 @Options({
-  emits: ['click', 'value:update']
+  emits: ['click']
 })
 export default class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) {
   handleClickEvent (e: MouseEvent) {
-    if (!e.ctrlKey) {
+    if (e.ctrlKey) {
       this.$emit('click', { [this.type]: this.value })
+      e.stopPropagation()
     }
-  }
-
-  handleUpdateEvent (key: BadgeType, value: string) {
-    this.$emit('value:update', { key, value })
   }
 
   getClass (type: BadgeType) {
@@ -156,5 +150,15 @@ export default class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) 
 </script>
 
 <style scoped lang="scss">
+.__textContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+@media only screen and (max-width: 700px) {
+  .__textContainer {
+    justify-content: center;
+  }
+}
 </style>

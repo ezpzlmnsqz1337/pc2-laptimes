@@ -32,17 +32,13 @@ export class LaptimeProps {
 }
 
 @Options({
-  emits: ['click', 'value:update']
+  emits: ['click']
 })
 export default class LaptimeComponent extends Vue.with(LaptimeProps) {
   handleClickEvent (e: MouseEvent) {
     if (!e.ctrlKey) {
       this.$emit('click', { laptime: this.time.laptime })
     }
-  }
-
-  handleUpdateEvent (key: UpdateEventKey, value: string) {
-    this.$emit('value:update', { key, value })
   }
 }
 </script>

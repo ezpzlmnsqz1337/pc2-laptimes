@@ -5,13 +5,7 @@
     :alt="getCarName(time)"
   >
   <div @click="handleClickEvent($event)">
-    <EditableSelect
-      :editable="editable"
-      label="name"
-      :text="getCarName(time)"
-      :options="cars"
-      @value:update="handleUpdateEvent('carId', $event.uid)"
-    />
+    {{ getCarName(time) }}
   </div>
 </template>
 
@@ -36,17 +30,14 @@ export class CarProps {
 }
 
 @Options({
-  emits: ['click', 'value:update']
+  emits: ['click']
 })
 export default class CarComponent extends Vue.with(CarProps) {
   handleClickEvent (e: MouseEvent) {
-    if (!e.ctrlKey) {
+    if (e.ctrlKey) {
       this.$emit('click', { carId: this.time.carId })
+      e.stopPropagation()
     }
-  }
-
-  handleUpdateEvent (key: UpdateEventKey, value: string) {
-    this.$emit('value:update', { key, value })
   }
 
   get cars () {

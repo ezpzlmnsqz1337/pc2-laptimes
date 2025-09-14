@@ -1,6 +1,5 @@
 import LaptimeFilterComponent from '@/components/browse-times/LaptimeFilterComponent.vue'
 import Button from '@/components/ui/Button.vue'
-import EditableSelect from '@/components/ui/EditableSelect.vue'
 import RadioButtons from '@/components/ui/RadioButtons.vue'
 import SelectInput from '@/components/ui/SelectInput.vue'
 import { BrakingLine } from '@/constants/BrakingLine'
@@ -59,7 +58,6 @@ describe('LaptimeFilterComponent.vue', () => {
   }
 
   config.global.stubs = {
-    EditableSelect,
     SelectInput,
     Button,
     RadioButtons,

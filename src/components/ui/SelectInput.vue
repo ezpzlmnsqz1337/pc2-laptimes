@@ -39,12 +39,12 @@ export default class SelectInput extends Vue.with(SelectInputProps) {}
 
 .__selected {
   :deep(.vs__dropdown-toggle) {
-    border: 0.1rem solid #1d6ebe;
-    box-shadow: 0px 0px 5px 2px #1d6ebe;
+    border: 0.1rem solid #274db4;
+    box-shadow: 0px 0px 5px 2px #274db4;
   }
 
   :deep(span.vs__selected) {
-    color: #1d6ebe;
+    color: #274db4;
     font-weight: bold;
   }
 }

@@ -1,6 +1,5 @@
 import App from '@/App.vue'
 import Button from '@/components/ui/Button.vue'
-import EditableSelect from '@/components/ui/EditableSelect.vue'
 import Modal from '@/components/ui/Modal.vue'
 import RadioButtons from '@/components/ui/RadioButtons.vue'
 import { BrakingLine } from '@/constants/BrakingLine'
@@ -118,7 +117,6 @@ app.use(PerfectScrollbar)
 app.component('Button', Button)
 // eslint-disable-next-line vue/multi-word-component-names
 app.component('Modal', Modal)
-app.component('EditableSelect', EditableSelect)
 app.component('RadioButtons', RadioButtons)
 app.component('VSelect', vSelect)
 app.component('PulseLoader', PulseLoader)

@@ -30,17 +30,13 @@ export class DriverProps {
 }
 
 @Options({
-  emits: ['click', 'value:update']
+  emits: ['click']
 })
 export default class DriverComponent extends Vue.with(DriverProps) {
   handleClickEvent (e: MouseEvent) {
     if (!e.ctrlKey) {
       this.$emit('click', { driverId: this.time.driverId })
     }
-  }
-
-  handleUpdateEvent (key: UpdateEventKey, value: string) {
-    this.$emit('value:update', { key, value })
   }
 
   get drivers () {

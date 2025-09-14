@@ -21,9 +21,10 @@
           :name="`${name}Radio`"
           :value="v"
           type="radio"
+          :disabled="disabled"
           @change="$emit('changed', selected)"
         >
-        <div><label :for="`${v}${name}Radio`">{{ v ? v : 'any' }}</label></div>
+        <div><label :for="`${v}${name}Radio`">{{ v || 'any' }}</label></div>
       </Button>
     </div>
   </div>
@@ -58,6 +59,7 @@ export default class RadioButtons extends Vue.with(RadioButtonsProps) {
   }
 
   setValue (value: string | null) {
+    if (this.disabled) return
     this.selected = value
     this.$emit('changed', this.selected)
   }
@@ -96,13 +98,17 @@ button {
   }
 
   &.__selected {
-    background-color: #1d6ebe !important;
+    background-color: var(--dark-blue1) !important;
     font-weight: bold;
     color: var(--text-light1);
   }
 
   &:disabled {
     background-color: #8c8c8c !important;
+
+    label {
+      cursor: not-allowed;
+    }
 
     &.__selected {
       background-color: #265a8f !important;

@@ -41,6 +41,7 @@
           <input
             v-model="password"
             type="password"
+            @keypress.enter="login()"
           >
           <Button
             :type="ButtonType.PRIMARY"
