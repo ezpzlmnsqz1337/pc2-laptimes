@@ -64,6 +64,7 @@ class App extends Vue {
 
   mounted () {
     this.$dataStore.bindDb()
+    this.$dataStore.setupDbNotifications()
     this.refresh()
     this.handleUrl()
   }
@@ -88,6 +89,7 @@ class App extends Vue {
 
   beforeUnmount () {
     this.$rdb.removeListener(this.dataListener)
+    this.$dataStore.disconnectDbNotifications()
   }
 
   handleUrl () {

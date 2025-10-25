@@ -53,6 +53,7 @@ export interface LaptimeFilter {
   distinct?: Distinct
 }
 export const DB_URL = 'http://192.168.0.102:3000'
+export const WS_NOTIFICATION_URL = 'ws://192.168.0.102:3002'
 export const CARS_ENDPOINT = `${DB_URL}/cars`
 export const TRACKS_ENDPOINT = `${DB_URL}/tracks`
 export const DRIVERS_ENDPOINT = `${DB_URL}/drivers`
@@ -64,6 +65,7 @@ export interface DataStore {
   activeScreen: ScreenType
   autoSubmit: boolean
   editLaptime: string | null
+  dbNotificationWs: WebSocket | null
   cars: Car[]
   times: Laptime[]
   mytimes: Laptime[]
@@ -100,7 +102,17 @@ export interface DataStore {
   setEditLaptime(laptimeId: string | null): void
   setLastAddedLaptime(laptime: Laptime): void
   setWebsocketState(websocketState: WebsocketState): void
+
+  fetchTracks(): void
+  fetchCars(): void
+  fetchDrivers(): void
+  fetchTimes(): void
+
   bindDb(): void
+  setupDbNotifications(): void
+  disconnectDbNotifications(): void
+  broadcastDataChange(table: string): void
+  reloadData(table: string): void
 }
 
 export const dataStore: DataStore = {
@@ -108,6 +120,7 @@ export const dataStore: DataStore = {
   activeScreen: ScreenType.BROWSE_TIMES,
   autoSubmit: false,
   editLaptime: null,
+  dbNotificationWs: null,
   cars: [],
   times: [],
   mytimes: [],
@@ -165,6 +178,9 @@ export const dataStore: DataStore = {
       body: JSON.stringify(car)
     })
     console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('cars')
+    }
   },
   async addTrack (name: string) {
     const track = { uid: uuidv4(), track: name, variants: [] as string[], gameId: '' }
@@ -176,6 +192,9 @@ export const dataStore: DataStore = {
       body: JSON.stringify({ ...track, variants: JSON.stringify(track.variants) })
     })
     console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('tracks')
+    }
   },
   async addTrackVariant (trackId: string, variant: string) {
     if (!trackId || !variant) return
@@ -193,6 +212,7 @@ export const dataStore: DataStore = {
     })
     if (response.ok) {
       track.variants = updatedTrack.variants
+      this.broadcastDataChange('tracks')
     }
     console.log(response.statusText)
   },
@@ -206,6 +226,9 @@ export const dataStore: DataStore = {
       body: JSON.stringify(driver)
     })
     console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('drivers')
+    }
   },
   async addLaptime (laptime: Laptime) {
     const time = { ...laptime, uid: uuidv4(), dateString: new Date(laptime.date).toLocaleDateString('en-GB') }
@@ -222,6 +245,9 @@ export const dataStore: DataStore = {
       body: JSON.stringify(payload)
     })
     console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('times')
+    }
   },
   async updateLaptime (laptime: LaptimeUpdate) {
     if (!laptime || !laptime.uid) return
@@ -265,6 +291,7 @@ export const dataStore: DataStore = {
 
     this.times[index] = { ...this.times[index], ...sanitizedUpdate }
     console.log(response.statusText)
+    this.broadcastDataChange('times')
   },
   async deleteLaptime (laptimeId: string) {
     if (!laptimeId) return
@@ -273,6 +300,7 @@ export const dataStore: DataStore = {
     })
     if (response.ok) {
       this.times = this.times.filter(x => x.uid !== laptimeId)
+      this.broadcastDataChange('times')
     }
     console.log(response.statusText)
   },
@@ -288,6 +316,7 @@ export const dataStore: DataStore = {
     if (response.ok) {
       const car = this.getCarById(carId)
       if (car) car.gameId = gameId
+      this.broadcastDataChange('cars')
     }
     console.log(response.statusText)
   },
@@ -303,6 +332,7 @@ export const dataStore: DataStore = {
     if (response.ok) {
       const track = this.getTrackById(trackId)
       if (track) track.gameId = gameId
+      this.broadcastDataChange('tracks')
     }
     console.log(response.statusText)
   },
@@ -363,20 +393,122 @@ export const dataStore: DataStore = {
       return true
     })
   },
+  async fetchTracks () {
+    const response = await fetch(TRACKS_ENDPOINT)
+    const tracks = await response.json()
+    this.tracks = tracks.map((x: Track) => ({ ...x, variants: JSON.parse(x.variants as any) }))
+  },
+  async fetchCars () {
+    const response = await fetch(CARS_ENDPOINT)
+    this.cars = await response.json()
+  },
+  async fetchDrivers () {
+    const response = await fetch(DRIVERS_ENDPOINT)
+    this.drivers = await response.json()
+  },
+  async fetchTimes () {
+    const response = await fetch(TIMES_ENDPOINT)
+    const times = await response.json()
+    this.times = times.map((x: any) => ({ ...x, date: parseInt(x.date), brakingLine: x.brakingLine ? 'on' : 'off' }))
+  },
   bindDb () {
-    fetch(CARS_ENDPOINT).then(async response => {
-      this.cars = await response.json()
-    })
-    fetch(TRACKS_ENDPOINT).then(async response => {
-      const tracks = await response.json()
-      this.tracks = tracks.map((x: Track) => ({ ...x, variants: JSON.parse(x.variants as any) }))
-    })
-    fetch(DRIVERS_ENDPOINT).then(async response => {
-      this.drivers = await response.json()
-    })
-    fetch(TIMES_ENDPOINT).then(async response => {
-      const times = await response.json()
-      this.times = times.map((x: any) => ({ ...x, date: parseInt(x.date), brakingLine: x.brakingLine ? 'on' : 'off' }))
-    })
+    this.fetchTracks()
+    this.fetchCars()
+    this.fetchDrivers()
+    this.fetchTimes()
+  },
+  setupDbNotifications () {
+    if (this.dbNotificationWs) {
+      console.warn('DB notification WebSocket already connected')
+      return
+    }
+
+    try {
+      this.dbNotificationWs = new WebSocket(WS_NOTIFICATION_URL)
+
+      this.dbNotificationWs.onopen = () => {
+        console.log('Connected to database notification server')
+      }
+
+      this.dbNotificationWs.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data)
+          console.log('Database change notification:', message)
+
+          if (message.type === 'connected') {
+            console.log(message.message)
+            return
+          }
+
+          // Reload data for the changed table
+          if (message.table) {
+            this.reloadData(message.table)
+          }
+        } catch (error) {
+          console.error('Error parsing notification:', error)
+        }
+      }
+
+      this.dbNotificationWs.onerror = (error) => {
+        console.error('WebSocket error:', error)
+      }
+
+      this.dbNotificationWs.onclose = () => {
+        console.log('Disconnected from database notification server')
+        this.dbNotificationWs = null
+        // Auto-reconnect after 5 seconds
+        setTimeout(() => {
+          console.log('Attempting to reconnect to notification server...')
+          this.setupDbNotifications()
+        }, 5000)
+      }
+    } catch (error) {
+      console.error('Failed to connect to notification server:', error)
+    }
+  },
+  disconnectDbNotifications () {
+    if (this.dbNotificationWs) {
+      this.dbNotificationWs.close()
+      this.dbNotificationWs = null
+    }
+  },
+  broadcastDataChange (table: string) {
+    if (this.dbNotificationWs && this.dbNotificationWs.readyState === WebSocket.OPEN) {
+      const message = {
+        table,
+        operation: 'CHANGE',
+        timestamp: new Date().toISOString()
+      }
+      this.dbNotificationWs.send(JSON.stringify(message))
+      console.log('Broadcasted data change:', message)
+    }
+  },
+  async reloadData (table: string) {
+    console.log(`Reloading data for table: ${table}`)
+
+    try {
+      switch (table) {
+        case 'cars':
+          await this.fetchTracks()
+          console.log('Cars reloaded')
+          break
+        case 'tracks':
+          await this.fetchCars()
+          console.log('Tracks reloaded')
+          break
+        case 'drivers':
+          await this.fetchDrivers()
+          console.log('Drivers reloaded')
+          break
+        case 'times':
+          await this.fetchTimes()
+          console.log('Laptimes reloaded')
+          break
+        default:
+          console.log(`Unknown table: ${table}`)
+      }
+    } catch (error) {
+      console.error(`Failed to reload data for ${table}:`, error)
+    }
   }
 }

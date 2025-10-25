@@ -24,6 +24,8 @@ export const utilsStore: UtilsStore = {
 
     if (!response.ok) {
       console.log(response.statusText)
+    } else {
+      dataStore.broadcastDataChange('cars')
     }
   }
 }
