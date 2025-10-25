@@ -12,6 +12,7 @@ import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
 import { v4 as uuidv4 } from 'uuid'
+import eb from '@/eventBus'
 
 // const debug = process.env.NODE_ENV !== 'production'
 
@@ -53,7 +54,7 @@ export interface LaptimeFilter {
   distinct?: Distinct
 }
 export const DB_URL = 'http://192.168.0.102:3000'
-export const WS_NOTIFICATION_URL = 'ws://192.168.0.102:3002'
+export const WS_NOTIFICATION_URL = 'ws://localhost:3002'
 export const CARS_ENDPOINT = `${DB_URL}/cars`
 export const TRACKS_ENDPOINT = `${DB_URL}/tracks`
 export const DRIVERS_ENDPOINT = `${DB_URL}/drivers`
@@ -203,8 +204,8 @@ export const dataStore: DataStore = {
     const variants = track.variants ? [...track.variants] : []
     if (variants.includes(variant)) return
     const updatedTrack = { ...track, variants: [...variants, variant] }
-    const response = await fetch(`${TRACKS_ENDPOINT}/${trackId}`, {
-      method: 'PUT',
+    const response = await fetch(`${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`, {
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -295,7 +296,7 @@ export const dataStore: DataStore = {
   },
   async deleteLaptime (laptimeId: string) {
     if (!laptimeId) return
-    const response = await fetch(`${TIMES_ENDPOINT}/${laptimeId}`, {
+    const response = await fetch(`${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptimeId)}`, {
       method: 'DELETE'
     })
     if (response.ok) {
@@ -306,7 +307,7 @@ export const dataStore: DataStore = {
   },
   async linkCarToGameId (carId: string, gameId: string) {
     if (!carId || !gameId) return
-    const response = await fetch(`${CARS_ENDPOINT}/${carId}`, {
+    const response = await fetch(`${CARS_ENDPOINT}?uid=eq.${encodeURIComponent(carId)}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -322,7 +323,7 @@ export const dataStore: DataStore = {
   },
   async linkTrackToGameId (trackId: string, gameId: string) {
     if (!trackId || !gameId) return
-    const response = await fetch(`${TRACKS_ENDPOINT}/${trackId}`, {
+    const response = await fetch(`${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -481,6 +482,9 @@ export const dataStore: DataStore = {
       }
       this.dbNotificationWs.send(JSON.stringify(message))
       console.log('Broadcasted data change:', message)
+      setTimeout(() => {
+        this.reloadData(table)
+      }, 500)
     }
   },
   async reloadData (table: string) {
@@ -510,5 +514,6 @@ export const dataStore: DataStore = {
     } catch (error) {
       console.error(`Failed to reload data for ${table}:`, error)
     }
+    eb.emit('laptimes:change')
   }
 }

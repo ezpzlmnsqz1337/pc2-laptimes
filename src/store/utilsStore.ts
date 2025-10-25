@@ -14,12 +14,12 @@ export const utilsStore: UtilsStore = {
       return
     }
     car.imageUrl = imageUrl // Update the car's image URL in the store
-    const response = await fetch(`${CARS_ENDPOINT}/${carId}`, {
+    const response = await fetch(`${CARS_ENDPOINT}?uid=eq.${encodeURIComponent(carId)}`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ car })
+      body: JSON.stringify({ imageUrl })
     })
 
     if (!response.ok) {

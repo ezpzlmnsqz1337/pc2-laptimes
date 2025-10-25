@@ -8,7 +8,7 @@
           v-if="isLocal() && !editEnabled"
           class="__edit"
           :type="ButtonType.SECONDARY"
-          @click="showLogin = true"
+          @click="showLoginModal()"
         >
           <div
             class="fa fa-pen"
@@ -39,6 +39,7 @@
           #body
         >
           <input
+            ref="passwordInputRef"
             v-model="password"
             type="password"
             @keypress.enter="login()"
@@ -267,6 +268,11 @@ class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
   mounted () {
     this.password = ''
     this.passwordHash = ''
+  }
+
+  showLoginModal () {
+    this.showLogin = true
+    this.$nextTick(() => (this.$refs.passwordInputRef as HTMLInputElement).focus())
   }
 
   login () {
