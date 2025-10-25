@@ -1,0 +1,13 @@
+name: Run Tests on Merge
+'on':
+  push:
+    branches:
+      - main
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: npm ci && npm run build
+      - run: npm run test:unit
+

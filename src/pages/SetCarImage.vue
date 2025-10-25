@@ -21,11 +21,12 @@ import { Options, Vue } from 'vue-class-component'
     SetCarImageRow
   }
 })
-export default class SetCarImage extends Vue {
+class SetCarImage extends Vue {
   get cars () {
     return this.$dataStore.cars
   }
 }
+export default SetCarImage
 </script>
 
 <style scoped>

@@ -34,7 +34,7 @@ export class TrackProps {
 @Options({
   emits: ['click']
 })
-export default class TrackComponent extends Vue.with(TrackProps) {
+class TrackComponent extends Vue.with(TrackProps) {
   handleClickEvent (e: MouseEvent) {
     if (e.ctrlKey) {
       this.$emit('click', { trackId: this.time.trackId, trackVariant: this.time.trackVariant })
@@ -55,6 +55,7 @@ export default class TrackComponent extends Vue.with(TrackProps) {
     return this.$dataStore.getTrackVariants(trackId)
   }
 }
+export default TrackComponent
 </script>
 
 <style scoped lang="scss">

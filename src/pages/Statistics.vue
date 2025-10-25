@@ -120,7 +120,7 @@ import { Options, Vue } from 'vue-class-component'
     Leaderboards
   }
 })
-export default class Statistics extends Vue {
+class Statistics extends Vue {
   refreshing = false
 
   get activeScreen () {
@@ -201,6 +201,7 @@ export default class Statistics extends Vue {
     }, 500)
   }
 }
+export default Statistics
 </script>
 
 <style scoped lang="scss">

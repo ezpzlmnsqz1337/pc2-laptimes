@@ -54,7 +54,7 @@ class RacesDaysBarChartProps {
   components: { Bar },
   emits: ['click']
 })
-export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
+class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
   chartData = {
     labels: [] as string[],
     datasets: [] as any[]
@@ -200,4 +200,6 @@ export default class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) 
     }
   }
 }
+
+export default RacesDaysBarChart
 </script>

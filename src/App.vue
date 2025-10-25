@@ -36,7 +36,6 @@ import LaptimeDetailModal from '@/components/laptime-table/LaptimeDetailModal.vu
 import RealtimeData from '@/pages/RealtimeData.vue'
 import Statistics from '@/pages/Statistics.vue'
 import WebsocketTesting from '@/pages/WebsocketTesting.vue'
-import { unsubscribeAll } from '@/vuex-firestore-binding'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from '@/constants/ScreenType'
 import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
@@ -55,7 +54,7 @@ import { RaceState } from '@/constants/RaceState'
     // SetCarImage
   }
 })
-export default class App extends Vue {
+class App extends Vue {
   protected dataListener!: RealtimeDataListener
   lastRaceState = RaceState.MENU
 
@@ -89,7 +88,6 @@ export default class App extends Vue {
 
   beforeUnmount () {
     this.$rdb.removeListener(this.dataListener)
-    unsubscribeAll()
   }
 
   handleUrl () {
@@ -118,6 +116,8 @@ export default class App extends Vue {
     }, 1000)
   }
 }
+
+export default App
 </script>
 
 <style lang="scss">

@@ -125,8 +125,8 @@ import DriverComponent from '@/components/laptime-table/driver/DriverComponent.v
 import LaptimeComponent from '@/components/laptime-table/laptime/LaptimeComponent.vue'
 import RaceSettings from '@/components/laptime-table/race-settings/RaceSettings.vue'
 import TrackComponent from '@/components/laptime-table/track/TrackComponent.vue'
+import eb from '@/eventBus'
 import { LaptimeFilter } from '@/store/dataStore'
-import { Unsubscribe } from '@firebase/firestore'
 import { Options, prop, Vue } from 'vue-class-component'
 import LaptimeFilterComponent from '../browse-times/LaptimeFilterComponent.vue'
 
@@ -147,23 +147,22 @@ export class LaptimeTableProps {
     LaptimeComponent
   }
 })
-export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
+class LaptimeTable extends Vue.with(LaptimeTableProps) {
   loading = false
   times: Laptime[] = []
   maxRows = 50
-  laptimesUnsubscribe!: Unsubscribe
 
-  filterRef!: LaptimeFilterComponent
+  filterRef!: InstanceType<typeof LaptimeFilterComponent>
 
   created () {
     if (this.rows.length) {
       this.times = this.rows
     }
-    this.laptimesUnsubscribe = this.$dataStore.onLaptimesChange(() => setTimeout(() => this.loadData()))
+    eb.on('laptimes:change', () => this.loadData())
   }
 
-  unmounted () {
-    this.laptimesUnsubscribe()
+  unmounted (): void {
+    eb.off('laptimes:change', () => this.loadData())
   }
 
   getRowClass (laptime: Laptime) {
@@ -195,15 +194,18 @@ export default class LaptimeTable extends Vue.with(LaptimeTableProps) {
   }
 
   loadData (filter?: LaptimeFilter) {
-    if (this.rows.length > 0) return
-    if (!filter && this.filterRef) filter = this.filterRef.filter
-    this.loading = true
-    this.$nextTick(() => {
-      this.times = this.$dataStore.getTimes(filter).slice(-this.maxRows)
-      this.loading = false
+    setTimeout(() => {
+      if (this.rows.length > 0) return
+      if (!filter && this.filterRef) filter = this.filterRef.filter
+      this.loading = true
+      this.$nextTick(() => {
+        this.times = this.$dataStore.getTimes(filter).slice(0, this.maxRows)
+        this.loading = false
+      })
     })
   }
 }
+export default LaptimeTable
 </script>
 
 <style lang="scss" scoped>

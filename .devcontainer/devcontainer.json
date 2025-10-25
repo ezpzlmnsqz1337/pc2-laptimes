@@ -7,7 +7,7 @@
 	"features": {
 		"ghcr.io/devcontainers/features/node:1": {
 			"nodeGypDependencies": true,
-			"version": "16",
+			"version": "20",
 			"nvmVersion": "latest"
 		}
 	},
@@ -61,7 +61,7 @@
 	// "remoteUser": "root"
 
 	"postCreateCommand": {
-		"install": "yarn install --frozen-lockfile --ignore-engines",
+		"install": "npm ci",
 		"chmod-deploy": "chmod +x deploy.sh"
 	} 
 }

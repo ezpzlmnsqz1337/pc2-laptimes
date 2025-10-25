@@ -200,7 +200,7 @@ export class LaptimeDetailModalProps {
   },
   emits: ['close', 'changed']
 })
-export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
+class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
   buttonsFirstPanel!: LaptimeSettings[]
   buttonsSecondPanel!: LaptimeSettings[]
   showLogin = false
@@ -314,6 +314,8 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
     this.$toast.success('Laptime deleted successfully')
   }
 }
+
+export default LaptimeDetailModal
 </script>
 
 <style scoped lang="scss">

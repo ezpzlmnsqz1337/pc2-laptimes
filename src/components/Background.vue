@@ -19,7 +19,7 @@ import { Options, Vue } from 'vue-class-component'
 @Options({
   emits: ['close']
 })
-export default class Background extends Vue {
+class Background extends Vue {
   protected currentBgIndex = 0
 
   $refs!: any
@@ -37,6 +37,8 @@ export default class Background extends Vue {
     this.$refs[`background${this.currentBgIndex + 1}`].style.opacity = 1
   }
 }
+
+export default Background
 </script>
 
 <style scoped lang="scss">

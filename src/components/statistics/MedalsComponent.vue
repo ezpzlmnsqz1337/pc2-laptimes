@@ -5,60 +5,62 @@
     >
       <h2>Medals</h2>
       <table class="__medalsTable">
-        <tr>
-          <th>Driver</th><th>No. of races</th>
-          <th
-            v-for="place in 7"
-            :key="`place-heading-${place}`"
-          >
-            <span v-if="place === 1">{{ place }}st</span>
-            <span v-if="place === 2">{{ place }}nd</span>
-            <span v-if="place === 3">{{ place }}rd</span>
-            <span v-if="place > 3">{{ place }}th</span>
-          </th>
-          <th>Points</th><th>Rank</th>
-        </tr>
-        <tr
-          v-show="!medals.length"
-        >
-          <td
-            colspan="7"
-            class="__loading"
-          >
-            <PulseLoader
-              color="#188cff"
-              size="15px"
-            />
-          </td>
-        </tr>
-        <tr
-          v-for="m in medals"
-          :key="m.driverId"
-          class="__driver"
-        >
-          <td class="__name">
-            {{ getDriverName(m.driverId) }}
-          </td>
-          <td class="__totalRaces">
-            {{ getDriverTotalRaces(m.driverId) }}
-          </td>
-          <td
-            v-for="place in 7"
-            :key="`place-${place}`"
-            class="__place"
-          >
-            <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: place})">{{ m.places[place-1] }}</span>
-          </td>
-          <td class="__points">
-            <span>{{ $sb.calculatePoints(m) }}</span>
-          </td>
-          <td class="__rank">
-            <img
-              :src="getRank(m.driverId)"
-              alt="rank"
+        <tbody>
+          <tr>
+            <th>Driver</th><th>No. of races</th>
+            <th
+              v-for="place in 7"
+              :key="`place-heading-${place}`"
             >
-          </td>
-        </tr>
+              <span v-if="place === 1">{{ place }}st</span>
+              <span v-if="place === 2">{{ place }}nd</span>
+              <span v-if="place === 3">{{ place }}rd</span>
+              <span v-if="place > 3">{{ place }}th</span>
+            </th>
+            <th>Points</th><th>Rank</th>
+          </tr>
+          <tr
+            v-show="!medals.length"
+          >
+            <td
+              colspan="7"
+              class="__loading"
+            >
+              <PulseLoader
+                color="#188cff"
+                size="15px"
+              />
+            </td>
+          </tr>
+          <tr
+            v-for="m in medals"
+            :key="m.driverId"
+            class="__driver"
+          >
+            <td class="__name">
+              {{ getDriverName(m.driverId) }}
+            </td>
+            <td class="__totalRaces">
+              {{ getDriverTotalRaces(m.driverId) }}
+            </td>
+            <td
+              v-for="place in 7"
+              :key="`place-${place}`"
+              class="__place"
+            >
+              <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: place})">{{ m.places[place-1] }}</span>
+            </td>
+            <td class="__points">
+              <span>{{ $sb.calculatePoints(m) }}</span>
+            </td>
+            <td class="__rank">
+              <img
+                :src="getRank(m.driverId)"
+                alt="rank"
+              >
+            </td>
+          </tr>
+        </tbody>
       </table>
     </div>
   </div>
@@ -74,7 +76,7 @@ class MedalsProps {
   refresh = prop<Function>({ default: () => {} })
 }
 
-export default class MedalsComponent extends Vue.with(MedalsProps) {
+class MedalsComponent extends Vue.with(MedalsProps) {
   get medals () {
     return this.$statisticsStore.medals
   }
@@ -105,6 +107,8 @@ export default class MedalsComponent extends Vue.with(MedalsProps) {
     return this.$sb.getRank(driver, this.$statisticsStore.totalRaces, this.$statisticsStore.medals) as unknown as string
   }
 }
+
+export default MedalsComponent
 </script>
 
 <style scoped lang="scss">

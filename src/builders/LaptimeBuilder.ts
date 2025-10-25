@@ -32,9 +32,10 @@ export interface LaptimeComponents {
 }
 
 export default class LaptimeBuilder {
-  static instance: LaptimeBuilder
+  // eslint-disable-next-line no-use-before-define
+  private static instance?: LaptimeBuilder
 
-  static getInstance () {
+  static getInstance (): LaptimeBuilder {
     if (!LaptimeBuilder.instance) {
       LaptimeBuilder.instance = new LaptimeBuilder()
     }

@@ -32,7 +32,7 @@ export class DriverProps {
 @Options({
   emits: ['click']
 })
-export default class DriverComponent extends Vue.with(DriverProps) {
+class DriverComponent extends Vue.with(DriverProps) {
   handleClickEvent (e: MouseEvent) {
     if (!e.ctrlKey) {
       this.$emit('click', { driverId: this.time.driverId })
@@ -54,6 +54,7 @@ export default class DriverComponent extends Vue.with(DriverProps) {
     return this.$sb.getRank(driver, this.$statisticsStore.totalRaces, this.$statisticsStore.medals) as unknown as string
   }
 }
+export default DriverComponent
 </script>
 
 <style scoped lang="scss">

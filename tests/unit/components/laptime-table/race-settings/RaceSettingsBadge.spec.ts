@@ -5,6 +5,7 @@ import { ControlType } from '@/constants/ControlType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { config, shallowMount } from '@vue/test-utils'
+import { BadgeValue } from '@/components/laptime-table/race-settings/RaceSettingsBadge.vue'
 import vSelect from 'vue-select'
 
 describe('RaceSettingsBadge.vue', () => {
@@ -18,7 +19,7 @@ describe('RaceSettingsBadge.vue', () => {
       const values = getValues(type)
       for (const value of values) {
         const wrapper = shallowMount(RaceSettingsBadge, {
-          props: { type, value }
+          props: { type, value: value as BadgeValue }
         })
         await wrapper.trigger('click')
 

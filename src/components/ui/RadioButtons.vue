@@ -41,7 +41,7 @@ class RadioButtonsProps {
   disabled = prop<boolean>({ default: false })
 }
 
-export default class RadioButtons extends Vue.with(RadioButtonsProps) {
+class RadioButtons extends Vue.with(RadioButtonsProps) {
   selected: string | null = null
 
   $refs!: {
@@ -75,6 +75,7 @@ export default class RadioButtons extends Vue.with(RadioButtonsProps) {
     }
   }
 }
+export default RadioButtons
 </script>
 
 <style lang="scss" scoped>

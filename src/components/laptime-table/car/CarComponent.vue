@@ -32,7 +32,7 @@ export class CarProps {
 @Options({
   emits: ['click']
 })
-export default class CarComponent extends Vue.with(CarProps) {
+class CarComponent extends Vue.with(CarProps) {
   handleClickEvent (e: MouseEvent) {
     if (e.ctrlKey) {
       this.$emit('click', { carId: this.time.carId })
@@ -53,6 +53,7 @@ export default class CarComponent extends Vue.with(CarProps) {
     return car ? `images/${car.imageUrl}` : 'Loading...'
   }
 }
+export default CarComponent
 </script>
 
 <style scoped lang="scss">

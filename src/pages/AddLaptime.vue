@@ -296,7 +296,7 @@ import { Options, Vue } from 'vue-class-component'
     SelectInput
   }
 })
-export default class AddLaptime extends Vue {
+class AddLaptime extends Vue {
   protected dataListener!: RealtimeDataListener
 
   carId: string | null = null
@@ -555,6 +555,8 @@ export default class AddLaptime extends Vue {
     } as FailedAutoSubmitData)
   }
 }
+
+export default AddLaptime
 </script>
 
 <style lang="scss" scoped>

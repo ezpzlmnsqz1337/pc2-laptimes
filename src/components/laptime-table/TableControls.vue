@@ -36,8 +36,9 @@ export class TableControlsProps {
 @Options({
   emits: ['filter:toggle', 'share:click']
 })
-export default class TableControls extends Vue.with(TableControlsProps) {
+class TableControls extends Vue.with(TableControlsProps) {
 }
+export default TableControls
 </script>
 
 <style scoped lang="scss">

@@ -29,7 +29,8 @@ class SelectInputProps {
 @Options({
   emits: ['update:modelValue']
 })
-export default class SelectInput extends Vue.with(SelectInputProps) {}
+class SelectInput extends Vue.with(SelectInputProps) {}
+export default SelectInput
 </script>
 
 <style lang="scss" scoped>

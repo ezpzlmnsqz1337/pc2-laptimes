@@ -1,10 +1,10 @@
-FROM node:20 AS build
+FROM node:20-slim AS build
 
 WORKDIR /app
 
 COPY . /app
 
-RUN yarn install --frozen-lockfile --ignore-engines && yarn build
+RUN npm ci --ignore-engines && npm run build
 
 
 FROM nginx
