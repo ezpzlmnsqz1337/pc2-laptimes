@@ -355,6 +355,8 @@ export default LaptimeFilterComponent
   }
 
   :deep(.v3dp__popout){
+    --elem-disabled-color: var(--text-disabled);
+    color: var(--text-light);
     font-size: 1rem;
     bottom: 1rem;
   }

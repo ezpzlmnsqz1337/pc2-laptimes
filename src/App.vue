@@ -129,6 +129,7 @@ export default App
   --active: #274db4;
   --text-light1: #ffffff;
   --text-light2: gray;
+  --text-disabled: #939393;
   --text-dark1: #242424;
   --bg-dark1: #8b8b8b;
   --bg-dark2: #5d5d5d;
