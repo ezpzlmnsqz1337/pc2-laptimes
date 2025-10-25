@@ -376,7 +376,7 @@ export const dataStore: DataStore = {
     })
     fetch(TIMES_ENDPOINT).then(async response => {
       const times = await response.json()
-      this.times = times.map((x: any) => ({ ...x, brakingLine: x.brakingLine ? 'on' : 'off' }))
+      this.times = times.map((x: any) => ({ ...x, date: parseInt(x.date), brakingLine: x.brakingLine ? 'on' : 'off' }))
     })
   }
 }

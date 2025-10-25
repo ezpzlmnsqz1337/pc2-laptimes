@@ -88,6 +88,7 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
       },
       y: {
         stacked: true,
+        grid: { display: false },
         ticks: {
           color: '#ffffff',
           tickWidth: 30,
@@ -165,7 +166,7 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
     })
 
     this.chartData.datasets.forEach((x, index) => {
-      x.backgroundColor = this.chartColors[index]
+      x.backgroundColor = this.chartColors[index % this.chartColors.length]
     })
   }
 
