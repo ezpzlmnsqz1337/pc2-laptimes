@@ -1,11 +1,11 @@
 import RaceSettingsBadge from '@/components/laptime-table/race-settings/RaceSettingsBadge.vue'
 import { BadgeType } from '@/constants/BadgeType'
+import { BadgeValue } from '@/constants/BadgeValue'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { config, shallowMount } from '@vue/test-utils'
-import { BadgeValue } from '@/components/laptime-table/race-settings/RaceSettingsBadge.vue'
 import vSelect from 'vue-select'
 
 describe('RaceSettingsBadge.vue', () => {
@@ -21,7 +21,7 @@ describe('RaceSettingsBadge.vue', () => {
         const wrapper = shallowMount(RaceSettingsBadge, {
           props: { type, value: value as BadgeValue }
         })
-        await wrapper.trigger('click')
+        await wrapper.trigger('click', { ctrlKey: true })
 
         expect(wrapper.emitted()).toHaveProperty('click')
         expect(wrapper.emitted().click).toHaveLength(1)
