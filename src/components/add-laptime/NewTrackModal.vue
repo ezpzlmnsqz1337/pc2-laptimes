@@ -34,7 +34,7 @@ import { Options, Vue } from 'vue-class-component'
 @Options({
   emits: ['close']
 })
-export default class NewTrackModal extends Vue {
+class NewTrackModal extends Vue {
   newTrackName = ''
 
   addTrack () {
@@ -43,6 +43,7 @@ export default class NewTrackModal extends Vue {
     this.$emit('close')
   }
 }
+export default NewTrackModal
 </script>
 
 <style scoped lang="scss">

@@ -13,9 +13,10 @@ export interface Medals {
 }
 
 export default class StatisticsBuilder {
-  static instance: StatisticsBuilder
+  // eslint-disable-next-line no-use-before-define
+  private static instance?: StatisticsBuilder
 
-  static getInstance () {
+  static getInstance (): StatisticsBuilder {
     if (!StatisticsBuilder.instance) {
       StatisticsBuilder.instance = new StatisticsBuilder()
     }

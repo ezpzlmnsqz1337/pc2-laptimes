@@ -133,8 +133,8 @@ import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
 import { PacketType } from '@/constants/PacketType'
 import { Vue } from 'vue-class-component'
 
-export default class RealtimeData extends Vue {
-  protected realtimeDataListener!: RealtimeDataListener;
+class RealtimeData extends Vue {
+  protected realtimeDataListener!: RealtimeDataListener
   protected lightsUrl = 'http://malina:4500'
   protected lightsId = 'C82B96407FD3'
 
@@ -262,6 +262,8 @@ export default class RealtimeData extends Vue {
     return this.$ltb.dateToLaptime(d)
   }
 }
+
+export default RealtimeData
 </script>
 
 <style scoped lang="scss">

@@ -27,7 +27,7 @@ export class RaceSettingsProps {
   },
   emits: ['click', 'value:update']
 })
-export default class RaceSettings extends Vue.with(RaceSettingsProps) {
+class RaceSettings extends Vue.with(RaceSettingsProps) {
   settings = ['transmission', 'weather', 'brakingLine', 'controls']
 
   handleClickEvent (e: LaptimeFilter) {
@@ -38,7 +38,7 @@ export default class RaceSettings extends Vue.with(RaceSettingsProps) {
     this.$emit('value:update', { ...e, uid: this.time.uid })
   }
 }
-
+export default RaceSettings
 </script>
 
 <style scoped lang="scss">

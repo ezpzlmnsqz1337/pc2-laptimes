@@ -50,7 +50,7 @@ import { PacketType } from '@/constants/PacketType'
 import { RaceState } from '@/constants/RaceState'
 import { Vue } from 'vue-class-component'
 
-export default class WebsocketTesting extends Vue {
+class WebsocketTesting extends Vue {
   sendRaceInfo (car: string, track: string, variant: string, driver: string, laptimeS: number) {
     this.$realtimeDataStore.setValues({
       carName: car,
@@ -83,6 +83,8 @@ export default class WebsocketTesting extends Vue {
     this.$realtimeDataStore.setValues({ raceState })
   }
 }
+
+export default WebsocketTesting
 </script>
 
 <style scoped>

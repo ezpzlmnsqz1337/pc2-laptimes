@@ -34,7 +34,8 @@ import { Options, Vue } from 'vue-class-component'
 @Options({
   emits: ['close']
 })
-export default class Modal extends Vue {}
+class Modal extends Vue {}
+export default Modal
 </script>
 
 <style lang="scss">

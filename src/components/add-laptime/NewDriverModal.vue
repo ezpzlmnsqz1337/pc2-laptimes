@@ -34,7 +34,7 @@ import { Options, Vue } from 'vue-class-component'
 @Options({
   emits: ['close']
 })
-export default class NewDriverModal extends Vue {
+class NewDriverModal extends Vue {
   newDriverName = ''
 
   addDriver () {
@@ -43,6 +43,7 @@ export default class NewDriverModal extends Vue {
     this.$emit('close')
   }
 }
+export default NewDriverModal
 </script>
 
 <style scoped lang="scss">

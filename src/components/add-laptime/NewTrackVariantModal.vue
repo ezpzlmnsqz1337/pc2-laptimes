@@ -38,7 +38,7 @@ class NewTrakcVariantModalProps {
 @Options({
   emits: ['close']
 })
-export default class NewTrakcVariantModal extends Vue.with(NewTrakcVariantModalProps) {
+class NewTrakcVariantModal extends Vue.with(NewTrakcVariantModalProps) {
   newTrackVariantName = ''
 
   addTrackVariant () {
@@ -47,6 +47,7 @@ export default class NewTrakcVariantModal extends Vue.with(NewTrakcVariantModalP
     this.$emit('close')
   }
 }
+export default NewTrakcVariantModal
 </script>
 
 <style scoped lang="scss">

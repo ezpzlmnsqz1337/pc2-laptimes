@@ -12,13 +12,12 @@
 
 <script lang="ts">
 import { BadgeType } from '@/constants/BadgeType'
+import { BadgeValue } from '@/constants/BadgeValue'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { Options, prop, Vue } from 'vue-class-component'
-
-type BadgeValue = TransmissionType | BrakingLine | ControlType | WeatherType
 
 export class RaceSettingsBadgeProps {
   type = prop<BadgeType>({ required: true })
@@ -29,7 +28,7 @@ export class RaceSettingsBadgeProps {
 @Options({
   emits: ['click']
 })
-export default class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) {
+class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) {
   handleClickEvent (e: MouseEvent) {
     if (e.ctrlKey) {
       this.$emit('click', { [this.type]: this.value })
@@ -147,6 +146,8 @@ export default class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) 
     }
   }
 }
+
+export default RaceSettingsBadge
 </script>
 
 <style scoped lang="scss">

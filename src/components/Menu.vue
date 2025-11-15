@@ -111,7 +111,7 @@ import { ScreenType } from '@/constants/ScreenType'
 import { WebsocketState } from '@/constants/WebsocketState'
 import { Vue } from 'vue-class-component'
 
-export default class Menu extends Vue {
+class Menu extends Vue {
   connecting = false
   host = 'wallpc'
   wsHosts = ['wallpc', 'deskpc']
@@ -213,6 +213,7 @@ export default class Menu extends Vue {
     }
   }
 }
+export default Menu
 </script>
 
 <style scoped lang="scss">

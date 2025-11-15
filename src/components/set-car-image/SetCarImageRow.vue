@@ -21,15 +21,15 @@
 </template>
 
 <script lang="ts">
-import { Car } from '@/assets/db/cars'
-import { carImages } from '@/assets/db/images'
+import { Car } from '@/constants/Car'
+import { carImages } from '@/constants/CarImages'
 import { prop, Vue } from 'vue-class-component'
 
 class SetCarImageRowProps {
-  car = prop<Car>({ default: null });
+  car = prop<Car>({ default: null })
 }
 
-export default class SetCarImageRow extends Vue.with(SetCarImageRowProps) {
+class SetCarImageRow extends Vue.with(SetCarImageRowProps) {
   images = carImages
   imageUrl = ''
 
@@ -37,6 +37,8 @@ export default class SetCarImageRow extends Vue.with(SetCarImageRowProps) {
     this.$utilsStore.setCarImage(carId, imageUrl)
   }
 }
+
+export default SetCarImageRow
 </script>
 
 <style scoped lang="scss">

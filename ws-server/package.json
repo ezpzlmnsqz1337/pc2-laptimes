@@ -1,0 +1,14 @@
+{
+  "name": "pc2-laptimes-ws-server",
+  "version": "1.0.0",
+  "description": "WebSocket server for real-time database change notifications",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  }
+}

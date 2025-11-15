@@ -34,7 +34,7 @@ import { Options, Vue } from 'vue-class-component'
 @Options({
   emits: ['close']
 })
-export default class NewCarModal extends Vue {
+class NewCarModal extends Vue {
   newCarName = ''
 
   addCar () {
@@ -43,6 +43,7 @@ export default class NewCarModal extends Vue {
     this.$emit('close')
   }
 }
+export default NewCarModal
 </script>
 
 <style scoped lang="scss">

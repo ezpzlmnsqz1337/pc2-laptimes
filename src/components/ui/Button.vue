@@ -19,7 +19,7 @@ class ButtonProps {
   disabled = prop<boolean>({ default: false })
 }
 
-export default class Button extends Vue.with(ButtonProps) {
+class Button extends Vue.with(ButtonProps) {
   btnClass () {
     return {
       __primary: this.type === ButtonType.PRIMARY,
@@ -31,6 +31,7 @@ export default class Button extends Vue.with(ButtonProps) {
     }
   }
 }
+export default Button
 </script>
 
 <style lang="scss" scoped>

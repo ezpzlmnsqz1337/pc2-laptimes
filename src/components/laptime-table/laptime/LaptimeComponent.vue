@@ -34,13 +34,14 @@ export class LaptimeProps {
 @Options({
   emits: ['click']
 })
-export default class LaptimeComponent extends Vue.with(LaptimeProps) {
+class LaptimeComponent extends Vue.with(LaptimeProps) {
   handleClickEvent (e: MouseEvent) {
     if (!e.ctrlKey) {
       this.$emit('click', { laptime: this.time.laptime })
     }
   }
 }
+export default LaptimeComponent
 </script>
 
 <style scoped lang="scss">

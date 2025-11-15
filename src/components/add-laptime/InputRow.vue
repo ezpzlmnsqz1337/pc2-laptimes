@@ -57,8 +57,9 @@ class InputRowProps {
 @Options({
   emits: ['set', 'link', 'add']
 })
-export default class InputRow extends Vue.with(InputRowProps) {
+class InputRow extends Vue.with(InputRowProps) {
 }
+export default InputRow
 </script>
 
 <style scoped>

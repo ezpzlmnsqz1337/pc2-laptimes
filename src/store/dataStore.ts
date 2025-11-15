@@ -1,5 +1,5 @@
-import { Car } from '@/assets/db/cars'
-import { Track } from '@/assets/db/tracks'
+import { Car } from '@/constants/Car'
+import { Track } from '@/constants/Track'
 import LaptimeBuilder, { Laptime } from '@/builders/LaptimeBuilder'
 import { Driver } from '@/builders/StatisticsBuilder'
 import { BrakingLine } from '@/constants/BrakingLine'
@@ -11,10 +11,9 @@ import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
-import { db } from '@/firebase'
-import { bindFirestoreCollection } from '@/vuex-firestore-binding'
-import { arrayUnion, collection, deleteDoc, doc, onSnapshot, setDoc, Unsubscribe, updateDoc } from 'firebase/firestore'
 import { v4 as uuidv4 } from 'uuid'
+import eb from '@/eventBus'
+import { objectToCamel, objectToSnake } from 'ts-case-convert'
 
 // const debug = process.env.NODE_ENV !== 'production'
 
@@ -55,14 +54,23 @@ export interface LaptimeFilter {
   date?: Date | null
   distinct?: Distinct
 }
+export const DB_URL = 'http://192.168.0.102:3000'
+export const WS_NOTIFICATION_URL = 'ws://192.168.0.102:3002'
+export const CARS_ENDPOINT = `${DB_URL}/cars`
+export const TRACKS_ENDPOINT = `${DB_URL}/tracks`
+export const DRIVERS_ENDPOINT = `${DB_URL}/drivers`
+export const TIMES_ENDPOINT = `${DB_URL}/times`
+export const FAILED_AUTO_SUBMIT_ENDPOINT = `${DB_URL}/failedAutoSubmitData`
 
 export interface DataStore {
   websocketState: WebsocketState
   activeScreen: ScreenType
   autoSubmit: boolean
   editLaptime: string | null
+  dbNotificationWs: WebSocket | null
   cars: Car[]
   times: Laptime[]
+  mytimes: Laptime[]
   tracks: Track[]
   drivers: Driver[]
   lastAddedLaptime: Laptime | null
@@ -74,30 +82,39 @@ export interface DataStore {
   getTimeById(id: string): Laptime | undefined
   getDriverById(id: string): Driver | undefined
   getDriverByName(name: string): Driver | undefined
-  getTimesForDriver (driverId: string): Laptime[]
-  getTimes (filter?: LaptimeFilter): Laptime[]
-  getTracksTimes (tracks: Track[]): Laptime[]
-  getDistinctTimes (laptimes: Laptime[]): Laptime[]
+  getTimesForDriver(driverId: string): Laptime[]
+  getTimes(filter?: LaptimeFilter): Laptime[]
+  getTracksTimes(tracks: Track[]): Laptime[]
+  getDistinctTimes(laptimes: Laptime[]): Laptime[]
   toggleAutoSubmit(): void
-  onLaptimesChange(cb: Function): Unsubscribe
 
-  addCar (name: string): void
-  addTrack (name: string): void
-  addTrackVariant (trackId: string, variant: string): void
-  addDriver (name: string): void
-  addLaptime (laptime: Laptime): void
-  storeFailedAutoSubmitData (data: FailedAutoSubmitData): void
+  addCar(name: string): void
+  addTrack(name: string): void
+  addTrackVariant(trackId: string, variant: string): void
+  addDriver(name: string): void
+  addLaptime(laptime: Laptime): void
+  storeFailedAutoSubmitData(data: FailedAutoSubmitData): void
 
-  linkCarToGameId (carId: string, gameId: string): void
-  linkTrackToGameId (trackId: string, gameId: string): void
-  updateLaptime (laptime: LaptimeUpdate): void
-  deleteLaptime (laptimeId: string): void
+  linkCarToGameId(carId: string, gameId: string): void
+  linkTrackToGameId(trackId: string, gameId: string): void
+  updateLaptime(laptime: LaptimeUpdate): void
+  deleteLaptime(laptimeId: string): void
 
-  showScreen (screen: ScreenType): void
+  showScreen(screen: ScreenType): void
   setEditLaptime(laptimeId: string | null): void
-  setLastAddedLaptime (laptime: Laptime): void
-  setWebsocketState (websocketState: WebsocketState): void
-  bindDb (): void
+  setLastAddedLaptime(laptime: Laptime): void
+  setWebsocketState(websocketState: WebsocketState): void
+
+  fetchTracks(): void
+  fetchCars(): void
+  fetchDrivers(): void
+  fetchTimes(): void
+
+  bindDb(): void
+  setupDbNotifications(): void
+  disconnectDbNotifications(): void
+  broadcastDataChange(table: string): void
+  reloadData(table: string): void
 }
 
 export const dataStore: DataStore = {
@@ -105,8 +122,10 @@ export const dataStore: DataStore = {
   activeScreen: ScreenType.BROWSE_TIMES,
   autoSubmit: false,
   editLaptime: null,
+  dbNotificationWs: null,
   cars: [],
   times: [],
+  mytimes: [],
   tracks: [],
   drivers: [],
   lastAddedLaptime: null,
@@ -151,58 +170,185 @@ export const dataStore: DataStore = {
   toggleAutoSubmit () {
     this.autoSubmit = !this.autoSubmit
   },
-  onLaptimesChange (callback: Function): Unsubscribe {
-    return onSnapshot(collection(db, 'times'), () => callback())
-  },
   async addCar (name: string) {
-    const car = { uid: uuidv4(), name }
-    const docRef = doc(db, 'cars', car.uid)
-    await setDoc(docRef, car)
+    const car = { uid: uuidv4(), name, imageUrl: '', gameId: '' }
+    const response = await fetch(`${CARS_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake(car))
+    })
+    console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('cars')
+    }
   },
   async addTrack (name: string) {
-    const t = { uid: uuidv4(), track: name, variants: [] }
-    const docRef = doc(db, 'tracks', t.uid)
-    await setDoc(docRef, t)
+    const track = { uid: uuidv4(), track: name, variants: [] as string[], gameId: '' }
+    const response = await fetch(`${TRACKS_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake({ ...track, variants: JSON.stringify(track.variants) }))
+    })
+    console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('tracks')
+    }
   },
   async addTrackVariant (trackId: string, variant: string) {
-    const docRef = doc(db, 'tracks', trackId)
-    await updateDoc(docRef, { variants: arrayUnion(variant) })
+    if (!trackId || !variant) return
+    const track = this.getTrackById(trackId)
+    if (!track) return
+    const variants = track.variants ? [...track.variants] : []
+    if (variants.includes(variant)) return
+    const updatedTrack = { ...track, variants: [...variants, variant] }
+    const response = await fetch(`${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake({ ...updatedTrack, variants: JSON.stringify(updatedTrack.variants) }))
+    })
+    if (response.ok) {
+      track.variants = updatedTrack.variants
+      this.broadcastDataChange('tracks')
+    }
+    console.log(response.statusText)
   },
   async addDriver (name: string) {
     const driver = { uid: uuidv4(), name }
-    const docRef = doc(db, 'drivers', driver.uid)
-    await setDoc(docRef, driver)
+    const response = await fetch(`${DRIVERS_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake(driver))
+    })
+    console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('drivers')
+    }
   },
   async addLaptime (laptime: Laptime) {
     const time = { ...laptime, uid: uuidv4(), dateString: new Date(laptime.date).toLocaleDateString('en-GB') }
-    const docRef = doc(db, 'times', time.uid)
     this.setLastAddedLaptime(time)
-    await setDoc(docRef, time)
+    const payload = {
+      ...time,
+      brakingLine: time.brakingLine === BrakingLine.ON
+    }
+    const response = await fetch(`${TIMES_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake(payload))
+    })
+    console.log(response.statusText)
+    if (response.ok) {
+      this.broadcastDataChange('times')
+    }
   },
   async updateLaptime (laptime: LaptimeUpdate) {
     if (!laptime || !laptime.uid) return
-    const docRef = doc(db, 'times', laptime.uid)
-    await setDoc(docRef, laptime, { merge: true })
+
+    const payload: Record<string, any> = { ...this.getTimeById(laptime.uid), ...laptime }
+    delete payload.uid
+    if (payload.brakingLine !== undefined) {
+      payload.brakingLine = payload.brakingLine === BrakingLine.ON
+    }
+    if (payload.date !== undefined) {
+      payload.dateString = new Date(parseInt(payload.date)).toLocaleDateString('en-GB')
+    }
+    const response = await fetch(`${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptime.uid)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake(payload))
+    })
+    if (!response.ok) {
+      console.log(response.statusText)
+      return
+    }
+
+    const index = this.times.findIndex(x => x.uid === laptime.uid)
+    if (index === -1) {
+      console.log(response.statusText)
+      return
+    }
+
+    const sanitizedUpdate = Object.fromEntries(
+      Object.entries(laptime).filter(([key, value]) => key !== 'uid' && value !== undefined)
+    ) as Record<string, any>
+
+    if (payload.dateString !== undefined) {
+      sanitizedUpdate.dateString = payload.dateString
+    }
+    if (payload.brakingLine !== undefined) {
+      sanitizedUpdate.brakingLine = (laptime.brakingLine as BrakingLine) ?? this.times[index].brakingLine
+    }
+
+    this.times[index] = { ...this.times[index], ...sanitizedUpdate }
+    console.log(response.statusText)
+    this.broadcastDataChange('times')
   },
   async deleteLaptime (laptimeId: string) {
-    const docRef = doc(db, 'times', laptimeId)
-    await deleteDoc(docRef)
+    if (!laptimeId) return
+    const response = await fetch(`${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptimeId)}`, {
+      method: 'DELETE'
+    })
+    if (response.ok) {
+      this.times = this.times.filter(x => x.uid !== laptimeId)
+      this.broadcastDataChange('times')
+    }
+    console.log(response.statusText)
   },
   async linkCarToGameId (carId: string, gameId: string) {
     if (!carId || !gameId) return
-    const docRef = doc(db, 'cars', carId)
-    await updateDoc(docRef, { gameId })
+    const response = await fetch(`${CARS_ENDPOINT}?uid=eq.${encodeURIComponent(carId)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake({ gameId }))
+    })
+    if (response.ok) {
+      const car = this.getCarById(carId)
+      if (car) car.gameId = gameId
+      this.broadcastDataChange('cars')
+    }
+    console.log(response.statusText)
   },
   async linkTrackToGameId (trackId: string, gameId: string) {
     if (!trackId || !gameId) return
-    const docRef = doc(db, 'tracks', trackId)
-    await updateDoc(docRef, { gameId })
+    const response = await fetch(`${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake({ gameId }))
+    })
+    if (response.ok) {
+      const track = this.getTrackById(trackId)
+      if (track) track.gameId = gameId
+      this.broadcastDataChange('tracks')
+    }
+    console.log(response.statusText)
   },
   async storeFailedAutoSubmitData (data: FailedAutoSubmitData) {
     if (!data) return
     const failedData = { uid: uuidv4(), ...data, dateString: new Date().toLocaleDateString('en-GB') }
-    const docRef = doc(db, 'failedAutoSubmitData', failedData.uid)
-    await setDoc(docRef, failedData)
+    const response = await fetch(`${FAILED_AUTO_SUBMIT_ENDPOINT}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(objectToSnake(failedData))
+    })
+    console.log(response.statusText)
   },
   getTimesForDriver (driverId: string) {
     if (!driverId) return []
@@ -224,51 +370,161 @@ export const dataStore: DataStore = {
     if (!filter) return this.times
 
     const ltb = LaptimeBuilder.getInstance()
+    const { distinct, date, ...rest } = filter
 
-    const filterKeys = Object.keys(filter).filter(x => x !== 'distinct')
+    const normalizedDate = date ? new Date(date).toLocaleDateString('en-GB') : null
+    const activeFilters = Object.entries(rest).filter(([, value]) => value)
 
-    const times = this.times.filter((time: any) => {
-      for (const key of filterKeys) {
-        let filterValue = (filter as any)[key]
-        if (!filterValue) continue
+    const times = this.times
+      .filter((time: any) => {
+        if (normalizedDate && time.dateString !== normalizedDate) return false
 
-        let timeValue = time[key]
+        return activeFilters.every(([key, value]) => time[key] === value)
+      })
+      .sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
 
-        if (key === 'date') {
-          timeValue = time.dateString
-          filterValue = new Date(filterValue).toLocaleDateString('en-GB')
-        }
-        if (timeValue !== filterValue) {
-          return false
-        }
-      }
-      return true
-    }).sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
-
-    return filter.distinct === Distinct.YES ? this.getDistinctTimes(times) : times
+    return distinct === Distinct.YES ? this.getDistinctTimes(times) : times
   },
   getDistinctTimes (laptimes: Laptime[]) {
-    const times: Laptime[] = []
-    const drivers: string[] = []
-    const cars: string[] = []
-    const tracks: string[] = []
-    const trackVariants: string[] = []
-    laptimes.forEach((l: Laptime) => {
-      // filter duplicate times
-      if (drivers.includes(l.driverId) && cars.includes(l.carId) && tracks.includes(l.trackId) && trackVariants.includes(l.trackVariant)) return
-      times.push(l)
-      if (!drivers.includes(l.driverId)) drivers.push(l.driverId)
-      if (!cars.includes(l.carId)) cars.push(l.carId)
-      if (!tracks.includes(l.trackId)) tracks.push(l.trackId)
-      if (!trackVariants.includes(l.trackVariant)) trackVariants.push(l.trackVariant)
-    })
+    const seenKeys = new Set<string>()
 
-    return times
+    return laptimes.filter((l: Laptime) => {
+      const key = `${l.driverId}|${l.carId}|${l.trackId}|${l.trackVariant ?? ''}`
+      if (seenKeys.has(key)) return false
+      seenKeys.add(key)
+      return true
+    })
+  },
+  async fetchTracks () {
+    const response = await fetch(TRACKS_ENDPOINT)
+    const tracks = await response.json()
+    this.tracks = tracks.map((x: Track) => {
+      const camelCased = objectToCamel(x) as Track
+      // PostgREST returns JSONB as already-parsed objects, not strings
+      return {
+        ...camelCased,
+        variants: camelCased.variants
+      }
+    })
+  },
+  async fetchCars () {
+    const response = await fetch(CARS_ENDPOINT)
+    const cars = await response.json()
+    this.cars = cars.map((x: Car) => objectToCamel(x) as Car)
+  },
+  async fetchDrivers () {
+    const response = await fetch(DRIVERS_ENDPOINT)
+    const drivers = await response.json()
+    this.drivers = drivers.map((x: Driver) => objectToCamel(x) as Driver)
+  },
+  async fetchTimes () {
+    const response = await fetch(TIMES_ENDPOINT)
+    const times = await response.json()
+    this.times = times.map((x: any) => {
+      const camelCased = objectToCamel(x) as any
+      return { ...camelCased, date: parseInt(camelCased.date), brakingLine: camelCased.brakingLine ? 'on' : 'off' }
+    })
   },
   bindDb () {
-    bindFirestoreCollection(this, 'cars', collection(db, 'cars'))
-    bindFirestoreCollection(this, 'tracks', collection(db, 'tracks'))
-    bindFirestoreCollection(this, 'drivers', collection(db, 'drivers'))
-    bindFirestoreCollection(this, 'times', collection(db, 'times'))
+    this.fetchTracks()
+    this.fetchCars()
+    this.fetchDrivers()
+    this.fetchTimes()
+  },
+  setupDbNotifications () {
+    if (this.dbNotificationWs) {
+      console.warn('DB notification WebSocket already connected')
+      return
+    }
+
+    try {
+      this.dbNotificationWs = new WebSocket(WS_NOTIFICATION_URL)
+
+      this.dbNotificationWs.onopen = () => {
+        console.log('Connected to database notification server')
+      }
+
+      this.dbNotificationWs.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data)
+
+          if (message.type === 'connected') {
+            console.log(message.message)
+            return
+          }
+
+          // Reload data for the changed table
+          if (message.table) {
+            this.reloadData(message.table)
+          }
+        } catch (error) {
+          console.error('Error parsing notification:', error)
+        }
+      }
+
+      this.dbNotificationWs.onerror = (error) => {
+        console.error('WebSocket error:', error)
+      }
+
+      this.dbNotificationWs.onclose = () => {
+        console.log('Disconnected from database notification server')
+        this.dbNotificationWs = null
+        // Auto-reconnect after 5 seconds
+        setTimeout(() => {
+          console.log('Attempting to reconnect to notification server...')
+          this.setupDbNotifications()
+        }, 5000)
+      }
+    } catch (error) {
+      console.error('Failed to connect to notification server:', error)
+    }
+  },
+  disconnectDbNotifications () {
+    if (this.dbNotificationWs) {
+      this.dbNotificationWs.close()
+      this.dbNotificationWs = null
+    }
+  },
+  broadcastDataChange (table: string) {
+    if (this.dbNotificationWs && this.dbNotificationWs.readyState === WebSocket.OPEN) {
+      const message = {
+        table,
+        operation: 'CHANGE',
+        timestamp: new Date().toISOString()
+      }
+      this.dbNotificationWs.send(JSON.stringify(message))
+      setTimeout(() => {
+        this.reloadData(table)
+      }, 500)
+    }
+  },
+  async reloadData (table: string) {
+    console.log(`Reloading data for table: ${table}`)
+
+    try {
+      switch (table) {
+        case 'cars':
+          await this.fetchTracks()
+          console.log('Cars reloaded')
+          break
+        case 'tracks':
+          await this.fetchCars()
+          console.log('Tracks reloaded')
+          break
+        case 'drivers':
+          await this.fetchDrivers()
+          console.log('Drivers reloaded')
+          break
+        case 'times':
+          await this.fetchTimes()
+          console.log('Laptimes reloaded')
+          break
+        default:
+          console.log(`Unknown table: ${table}`)
+      }
+    } catch (error) {
+      console.error(`Failed to reload data for ${table}:`, error)
+    }
+    eb.emit('laptimes:change')
   }
 }

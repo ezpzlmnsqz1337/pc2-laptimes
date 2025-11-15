@@ -40,12 +40,12 @@ import { Options, Vue } from 'vue-class-component'
     TableControls
   }
 })
-export default class BrowseTimes extends Vue {
+class BrowseTimes extends Vue {
   showFilter = true
 
   $refs!: {
-    tableRef: LaptimeTable,
-    filterRef: LaptimeFilterComponent
+    tableRef: InstanceType<typeof LaptimeTable>,
+    filterRef: InstanceType<typeof LaptimeFilterComponent>
   }
 
   get times () {
@@ -115,6 +115,8 @@ export default class BrowseTimes extends Vue {
     this.showFilter = !this.showFilter
   }
 }
+
+export default BrowseTimes
 </script>
 
 <style lang="scss" scoped>

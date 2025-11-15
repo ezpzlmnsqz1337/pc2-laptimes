@@ -8,7 +8,7 @@
           v-if="isLocal() && !editEnabled"
           class="__edit"
           :type="ButtonType.SECONDARY"
-          @click="showLogin = true"
+          @click="showLoginModal()"
         >
           <div
             class="fa fa-pen"
@@ -39,6 +39,7 @@
           #body
         >
           <input
+            ref="passwordInputRef"
             v-model="password"
             type="password"
             @keypress.enter="login()"
@@ -200,7 +201,7 @@ export class LaptimeDetailModalProps {
   },
   emits: ['close', 'changed']
 })
-export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
+class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
   buttonsFirstPanel!: LaptimeSettings[]
   buttonsSecondPanel!: LaptimeSettings[]
   showLogin = false
@@ -269,6 +270,11 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
     this.passwordHash = ''
   }
 
+  showLoginModal () {
+    this.showLogin = true
+    this.$nextTick(() => (this.$refs.passwordInputRef as HTMLInputElement).focus())
+  }
+
   login () {
     this.passwordHash = sha256(this.password).toString()
     this.password = ''
@@ -304,7 +310,7 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
   }
 
   updateLaptime (e: any, time: Laptime) {
-    if (!this.isLocal()) return
+    if (!this.isLocal() || !this.editEnabled) return
     this.$dataStore.updateLaptime({ uid: time.uid, ...e })
   }
 
@@ -314,6 +320,8 @@ export default class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps
     this.$toast.success('Laptime deleted successfully')
   }
 }
+
+export default LaptimeDetailModal
 </script>
 
 <style scoped lang="scss">

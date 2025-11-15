@@ -111,7 +111,7 @@ class LeaderboardsProps {
     LaptimeTable
   }
 })
-export default class Leaderboards extends Vue.with(LeaderboardsProps) {
+class Leaderboards extends Vue.with(LeaderboardsProps) {
   displayColumns = ['rank', 'driver', 'laptime', 'car', 'settings']
   showItems = 5
 
@@ -171,6 +171,8 @@ export default class Leaderboards extends Vue.with(LeaderboardsProps) {
     this.refresh()
   }
 }
+
+export default Leaderboards
 </script>
 
 <style lang="scss" scoped>

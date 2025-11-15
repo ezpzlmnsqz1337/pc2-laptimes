@@ -182,10 +182,10 @@ class LaptimeFilterComponentProps {
   },
   emits: ['filter:changed', 'filter:close']
 })
-export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterComponentProps) {
+class LaptimeFilterComponent extends Vue.with(LaptimeFilterComponentProps) {
   randomizing = false
   buttons!: LaptimeFilterButtons[]
-  showMoreFilters = false;
+  showMoreFilters = false
 
   filter: LaptimeFilter = {
     carId: null,
@@ -306,6 +306,8 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
     })
   }
 }
+
+export default LaptimeFilterComponent
 </script>
 
 <style lang="scss" scoped>
@@ -353,6 +355,8 @@ export default class LaptimeFilterComponent extends Vue.with(LaptimeFilterCompon
   }
 
   :deep(.v3dp__popout){
+    --elem-disabled-color: var(--text-disabled);
+    color: var(--text-light);
     font-size: 1rem;
     bottom: 1rem;
   }

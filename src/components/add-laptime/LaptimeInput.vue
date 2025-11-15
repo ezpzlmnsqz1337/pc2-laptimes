@@ -60,7 +60,7 @@ export class LaptimeInputProps {
 @Options({
   emits: ['changed']
 })
-export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
+class LaptimeInput extends Vue.with(LaptimeInputProps) {
   minutes: string = ''
   seconds: string = ''
   milliseconds: string = ''
@@ -125,6 +125,7 @@ export default class LaptimeInput extends Vue.with(LaptimeInputProps) {
     this.laptimeError = !this.laptime || this.laptime.match(/^\d{1,2}:\d{2}.\d{3}$/) === null
   }
 }
+export default LaptimeInput
 </script>
 
 <style lang="scss" scoped>

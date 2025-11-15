@@ -1,0 +1,10 @@
+node_modules
+.git
+.gitignore
+*.md
+.vscode
+tests
+*.log
+.env
+dist
+ws-server/node_modules

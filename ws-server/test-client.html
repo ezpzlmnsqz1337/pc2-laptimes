@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Notification Test Client</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .connected {
+            background: #d4edda;
+            color: #155724;
+        }
+        .disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .connecting {
+            background: #fff3cd;
+            color: #856404;
+        }
+        #messages {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            background: #fafafa;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid #007bff;
+            background: white;
+        }
+        .message.notification {
+            border-left-color: #28a745;
+        }
+        .message.error {
+            border-left-color: #dc3545;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        input {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 WebSocket Notification Test Client</h1>
+        
+        <div>
+            <input type="text" id="wsUrl" value="ws://192.168.0.102:3002" placeholder="WebSocket URL">
+            <button class="btn-primary" onclick="connect()">Connect</button>
+            <button class="btn-danger" onclick="disconnect()">Disconnect</button>
+            <button class="btn-secondary" onclick="clearMessages()">Clear</button>
+        </div>
+
+        <div id="status" class="status disconnected">
+            Status: Disconnected
+        </div>
+
+        <h3>Messages</h3>
+        <div id="messages"></div>
+
+        <div style="margin-top: 20px; padding: 10px; background: #e7f3ff; border-radius: 4px;">
+            <strong>How to test:</strong>
+            <ol>
+                <li>Click "Connect" to establish WebSocket connection</li>
+                <li>Open your PC2 Laptimes app in another tab/window</li>
+                <li>Add, update, or delete a laptime, car, track, or driver</li>
+                <li>Watch this page for real-time notifications from other clients</li>
+            </ol>
+            <p><strong>Or send a test message:</strong></p>
+            <button class="btn-primary" onclick="sendTestMessage()">Send Test Message</button>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let messageCount = 0;
+
+        function addMessage(message, type = 'info') {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            messageDiv.innerHTML = `
+                <span class="timestamp">[${timestamp}]</span><br>
+                ${typeof message === 'object' ? JSON.stringify(message, null, 2) : message}
+            `;
+            
+            messagesDiv.insertBefore(messageDiv, messagesDiv.firstChild);
+            messageCount++;
+            
+            // Keep only last 100 messages
+            if (messageCount > 100) {
+                messagesDiv.removeChild(messagesDiv.lastChild);
+            }
+        }
+
+        function updateStatus(status, className) {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = `Status: ${status}`;
+            statusDiv.className = `status ${className}`;
+        }
+
+        function connect() {
+            const url = document.getElementById('wsUrl').value;
+            
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                addMessage('Already connected!', 'error');
+                return;
+            }
+
+            updateStatus('Connecting...', 'connecting');
+            addMessage(`Connecting to ${url}...`);
+
+            try {
+                ws = new WebSocket(url);
+
+                ws.onopen = () => {
+                    updateStatus('Connected', 'connected');
+                    addMessage('✅ Connected to WebSocket server', 'notification');
+                };
+
+                ws.onmessage = (event) => {
+                    try {
+                        const data = JSON.parse(event.data);
+                        addMessage(data, 'notification');
+                    } catch (e) {
+                        addMessage(event.data, 'notification');
+                    }
+                };
+
+                ws.onerror = (error) => {
+                    addMessage('❌ WebSocket error occurred', 'error');
+                    console.error('WebSocket error:', error);
+                };
+
+                ws.onclose = () => {
+                    updateStatus('Disconnected', 'disconnected');
+                    addMessage('🔌 Disconnected from server', 'error');
+                };
+            } catch (error) {
+                updateStatus('Error', 'disconnected');
+                addMessage(`❌ Failed to connect: ${error.message}`, 'error');
+            }
+        }
+
+        function disconnect() {
+            if (ws) {
+                ws.close();
+                ws = null;
+                updateStatus('Disconnected', 'disconnected');
+                addMessage('Manually disconnected');
+            }
+        }
+
+        function clearMessages() {
+            document.getElementById('messages').innerHTML = '';
+            messageCount = 0;
+        }
+
+        function sendTestMessage() {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                addMessage('❌ Not connected! Click "Connect" first.', 'error');
+                return;
+            }
+
+            const testMessage = {
+                table: 'times',
+                operation: 'CHANGE',
+                timestamp: new Date().toISOString()
+            };
+
+            ws.send(JSON.stringify(testMessage));
+            addMessage('📤 Sent test message: ' + JSON.stringify(testMessage));
+        }
+
+        // Auto-connect on page load
+        window.onload = () => {
+            addMessage('Page loaded. Click "Connect" to start.');
+        };
+    </script>
+</body>
+</html>
