@@ -7,13 +7,10 @@ COPY . /app
 RUN npm ci --ignore-engines && npm run build
 
 
-FROM nginx
+FROM nginx:alpine
 
 # Install Node.js for the WebSocket server
-RUN apt-get update && \
-    apt-get install -y nodejs npm && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache nodejs npm
 
 # Copy the built web app
 COPY --from=build /app/dist /usr/share/nginx/html

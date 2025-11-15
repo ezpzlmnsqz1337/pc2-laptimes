@@ -310,7 +310,7 @@ class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
   }
 
   updateLaptime (e: any, time: Laptime) {
-    if (!this.isLocal()) return
+    if (!this.isLocal() || !this.editEnabled) return
     this.$dataStore.updateLaptime({ uid: time.uid, ...e })
   }
 
