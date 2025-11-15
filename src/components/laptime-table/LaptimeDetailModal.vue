@@ -30,6 +30,7 @@
     <template #body>
       <Modal
         v-show="showLogin"
+        class="__authorizeModal"
         @close="$emit('close')"
       >
         <template #header>
@@ -326,15 +327,8 @@ export default LaptimeDetailModal
 
 <style scoped lang="scss">
 .__authorizeModal {
-    width: 50%;
-
-    .__header {
-      position: relative;
-
-    .__edit {
-      position: absolute;
-      right: 0;
-    }
+ :deep(.__modalContainer) {
+    width: fit-content;
   }
 }
 
