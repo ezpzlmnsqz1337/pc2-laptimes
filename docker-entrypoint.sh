@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Start the WebSocket server in the background
 echo "Starting WebSocket server..."

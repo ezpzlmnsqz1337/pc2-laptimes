@@ -64,9 +64,9 @@ scp -r deployment/create-pod.sh $DESTINATION:/home/hosting/workspace/create-pc2-
 ssh $DESTINATION 'bash /home/hosting/workspace/create-pc2-pod.sh'
 echo ""
 
-# Cleanup old images and volumes
-echo "🧹 Cleaning up old images and unused volumes..."
-ssh $DESTINATION 'podman image prune -f && podman volume prune -f'
+# Cleanup old images only (keep volumes for database persistence)
+echo "🧹 Cleaning up old images..."
+ssh $DESTINATION 'podman image prune -f'
 echo "✅ Cleanup complete!"
 echo ""
 
