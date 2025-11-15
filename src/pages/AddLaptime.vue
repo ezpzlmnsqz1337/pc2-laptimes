@@ -261,7 +261,7 @@
 </template>
 
 <script lang="ts">
-import { Track } from '@/assets/db/tracks'
+import { Track } from '@/constants/Track'
 import { Laptime } from '@/builders/LaptimeBuilder'
 import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
 import InputRow from '@/components/add-laptime/InputRow.vue'

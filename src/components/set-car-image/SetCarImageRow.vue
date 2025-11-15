@@ -21,8 +21,8 @@
 </template>
 
 <script lang="ts">
-import { Car } from '@/assets/db/cars'
-import { carImages } from '@/assets/db/images'
+import { Car } from '@/constants/Car'
+import { carImages } from '@/constants/CarImages'
 import { prop, Vue } from 'vue-class-component'
 
 class SetCarImageRowProps {

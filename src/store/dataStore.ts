@@ -1,5 +1,5 @@
-import { Car } from '@/assets/db/cars'
-import { Track } from '@/assets/db/tracks'
+import { Car } from '@/constants/Car'
+import { Track } from '@/constants/Track'
 import LaptimeBuilder, { Laptime } from '@/builders/LaptimeBuilder'
 import { Driver } from '@/builders/StatisticsBuilder'
 import { BrakingLine } from '@/constants/BrakingLine'
@@ -13,6 +13,7 @@ import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
 import { v4 as uuidv4 } from 'uuid'
 import eb from '@/eventBus'
+import { objectToCamel, objectToSnake } from 'ts-case-convert'
 
 // const debug = process.env.NODE_ENV !== 'production'
 
@@ -54,7 +55,7 @@ export interface LaptimeFilter {
   distinct?: Distinct
 }
 export const DB_URL = 'http://192.168.0.102:3000'
-export const WS_NOTIFICATION_URL = 'ws://localhost:3002'
+export const WS_NOTIFICATION_URL = 'ws://192.168.0.102:3002'
 export const CARS_ENDPOINT = `${DB_URL}/cars`
 export const TRACKS_ENDPOINT = `${DB_URL}/tracks`
 export const DRIVERS_ENDPOINT = `${DB_URL}/drivers`
@@ -176,7 +177,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(car)
+      body: JSON.stringify(objectToSnake(car))
     })
     console.log(response.statusText)
     if (response.ok) {
@@ -190,7 +191,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ ...track, variants: JSON.stringify(track.variants) })
+      body: JSON.stringify(objectToSnake({ ...track, variants: JSON.stringify(track.variants) }))
     })
     console.log(response.statusText)
     if (response.ok) {
@@ -209,7 +210,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ ...updatedTrack, variants: JSON.stringify(updatedTrack.variants) })
+      body: JSON.stringify(objectToSnake({ ...updatedTrack, variants: JSON.stringify(updatedTrack.variants) }))
     })
     if (response.ok) {
       track.variants = updatedTrack.variants
@@ -218,13 +219,13 @@ export const dataStore: DataStore = {
     console.log(response.statusText)
   },
   async addDriver (name: string) {
-    const driver = { uid: uuidv4(), name, game: '' }
+    const driver = { uid: uuidv4(), name }
     const response = await fetch(`${DRIVERS_ENDPOINT}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(driver)
+      body: JSON.stringify(objectToSnake(driver))
     })
     console.log(response.statusText)
     if (response.ok) {
@@ -243,7 +244,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(objectToSnake(payload))
     })
     console.log(response.statusText)
     if (response.ok) {
@@ -266,7 +267,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(objectToSnake(payload))
     })
     if (!response.ok) {
       console.log(response.statusText)
@@ -312,7 +313,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ gameId })
+      body: JSON.stringify(objectToSnake({ gameId }))
     })
     if (response.ok) {
       const car = this.getCarById(carId)
@@ -328,7 +329,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ gameId })
+      body: JSON.stringify(objectToSnake({ gameId }))
     })
     if (response.ok) {
       const track = this.getTrackById(trackId)
@@ -345,7 +346,7 @@ export const dataStore: DataStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(failedData)
+      body: JSON.stringify(objectToSnake(failedData))
     })
     console.log(response.statusText)
   },
@@ -397,20 +398,32 @@ export const dataStore: DataStore = {
   async fetchTracks () {
     const response = await fetch(TRACKS_ENDPOINT)
     const tracks = await response.json()
-    this.tracks = tracks.map((x: Track) => ({ ...x, variants: JSON.parse(x.variants as any) }))
+    this.tracks = tracks.map((x: Track) => {
+      const camelCased = objectToCamel(x) as Track
+      // PostgREST returns JSONB as already-parsed objects, not strings
+      return {
+        ...camelCased,
+        variants: camelCased.variants
+      }
+    })
   },
   async fetchCars () {
     const response = await fetch(CARS_ENDPOINT)
-    this.cars = await response.json()
+    const cars = await response.json()
+    this.cars = cars.map((x: Car) => objectToCamel(x) as Car)
   },
   async fetchDrivers () {
     const response = await fetch(DRIVERS_ENDPOINT)
-    this.drivers = await response.json()
+    const drivers = await response.json()
+    this.drivers = drivers.map((x: Driver) => objectToCamel(x) as Driver)
   },
   async fetchTimes () {
     const response = await fetch(TIMES_ENDPOINT)
     const times = await response.json()
-    this.times = times.map((x: any) => ({ ...x, date: parseInt(x.date), brakingLine: x.brakingLine ? 'on' : 'off' }))
+    this.times = times.map((x: any) => {
+      const camelCased = objectToCamel(x) as any
+      return { ...camelCased, date: parseInt(camelCased.date), brakingLine: camelCased.brakingLine ? 'on' : 'off' }
+    })
   },
   bindDb () {
     this.fetchTracks()
@@ -434,7 +447,6 @@ export const dataStore: DataStore = {
       this.dbNotificationWs.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data)
-          console.log('Database change notification:', message)
 
           if (message.type === 'connected') {
             console.log(message.message)
@@ -481,7 +493,6 @@ export const dataStore: DataStore = {
         timestamp: new Date().toISOString()
       }
       this.dbNotificationWs.send(JSON.stringify(message))
-      console.log('Broadcasted data change:', message)
       setTimeout(() => {
         this.reloadData(table)
       }, 500)

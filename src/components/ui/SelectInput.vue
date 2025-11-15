@@ -3,7 +3,7 @@
     class="__fullWidth"
     :model-value="modelValue"
     :placeholder="placeholder"
-    :options="options"
+    :options="sortedOptions"
     :reduce="reduce"
     :class="{__selected: modelValue}"
     :label="label"
@@ -29,7 +29,16 @@ class SelectInputProps {
 @Options({
   emits: ['update:modelValue']
 })
-class SelectInput extends Vue.with(SelectInputProps) {}
+class SelectInput extends Vue.with(SelectInputProps) {
+  get sortedOptions () {
+    if (!this.options || !Array.isArray(this.options)) return this.options
+    return [...this.options].sort((a, b) => {
+      const aVal = this.label && typeof a === 'object' ? a[this.label] : a
+      const bVal = this.label && typeof b === 'object' ? b[this.label] : b
+      return String(aVal).localeCompare(String(bVal))
+    })
+  }
+}
 export default SelectInput
 </script>
 

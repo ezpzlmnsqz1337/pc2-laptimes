@@ -1,4 +1,5 @@
 import { CARS_ENDPOINT, dataStore } from '@/store/dataStore'
+import { objectToSnake } from 'ts-case-convert'
 
 export interface UtilsStore {
   setCarImage(carId: string, imageUrl: string): void;
@@ -19,7 +20,7 @@ export const utilsStore: UtilsStore = {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ imageUrl })
+      body: JSON.stringify(objectToSnake({ imageUrl }))
     })
 
     if (!response.ok) {
