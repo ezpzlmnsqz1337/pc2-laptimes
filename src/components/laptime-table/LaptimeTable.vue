@@ -200,6 +200,17 @@ class LaptimeTable extends Vue.with(LaptimeTableProps) {
       this.loading = true
       this.$nextTick(() => {
         this.times = this.$dataStore.getTimes(filter).slice(0, this.maxRows)
+        // show last laptime even if distinct filter is on and better laptime exists
+        const lastLaptime = this.$dataStore.lastAddedLaptime
+        if (lastLaptime) {
+          const lastLaptimeInList = this.times.find(t => t.uid === lastLaptime.uid)
+          const isRelevant = lastLaptime.carId === filter?.carId &&
+            lastLaptime.trackId === filter?.trackId &&
+            lastLaptime.trackVariant === filter?.trackVariant
+          if (!lastLaptimeInList && isRelevant) {
+            this.times.push(lastLaptime)
+          }
+        }
         this.loading = false
       })
     })

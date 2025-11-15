@@ -75,28 +75,29 @@ td div:hover {
     width: 4.5rem;
 }
 
-tr:nth-child(3) .__driver > div {
+tr:nth-child(3) .__driver > div,
+tr:nth-child(4) .__driver > div,
+tr:nth-child(5) .__driver > div {
   box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
-  color: gold;
+  border-radius: 0.5rem;
+  padding: 0.2rem 1rem;
   background-color: var(--bg-dark3);
-  padding: 0.2rem;
-  border: 0.1rem solid gold;
+  border: 0.1rem solid transparent;
+}
+
+tr:nth-child(3) .__driver > div {
+  color: gold;
+  border-color: gold;
 }
 
 tr:nth-child(4) .__driver > div {
-  box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   color: silver;
-  background-color: var(--bg-dark3);
-  padding: 0.2rem;
-  border: 0.1rem solid silver;
+  border-color: silver;
 }
 
 tr:nth-child(5) .__driver > div {
-  box-shadow: 0.2rem 0.2rem 0.5rem 0.2rem #555454;
   color: #cd7f32;
-  background-color: var(--bg-dark3);
-  padding: 0.2rem;
-  border: 0.1rem solid #cd7f32;
+  border-color: #cd7f32;
 }
 
 tr.__hasNotes {
