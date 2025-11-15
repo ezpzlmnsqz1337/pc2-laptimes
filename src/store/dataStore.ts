@@ -424,6 +424,28 @@ export const dataStore: DataStore = {
       const camelCased = objectToCamel(x) as any
       return { ...camelCased, date: parseInt(camelCased.date), brakingLine: camelCased.brakingLine ? 'on' : 'off' }
     })
+    // make races
+    const races: any = []
+    let found = false
+    for (const t1 of this.times) {
+      found = false
+      for (const t2 of this.times) {
+        if (t1.uid !== t2.uid && // not the same time
+           t1.driverId !== t2.driverId && // not the same driver
+           t1.trackId === t2.trackId && // same track
+           t1.trackVariant === t2.trackVariant // same track variant
+        ) {
+          if (Math.abs(t1.date - t2.date) <= 5 * 60 * 1000) {
+            // within 5 minutes
+            races.push({ uid: uuidv4(), times: [t1, t2] })
+            found = true
+            break
+          }
+        }
+      }
+      if (!found) races.push({ uid: uuidv4(), times: [t1] })
+    }
+    console.log(races)
   },
   bindDb () {
     this.fetchTracks()
