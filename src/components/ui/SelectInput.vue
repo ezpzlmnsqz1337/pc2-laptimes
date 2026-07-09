@@ -23,6 +23,7 @@ class SelectInputProps {
   label = prop<string>({ default: '' })
   clearable = prop<boolean>({ default: true })
   disabled = prop<boolean>({ default: false })
+  sortOptions = prop<boolean>({ default: true })
   reduce = prop<(o: any) => string>({ default: (o: any) => o })
 }
 
@@ -31,6 +32,7 @@ class SelectInputProps {
 })
 class SelectInput extends Vue.with(SelectInputProps) {
   get sortedOptions () {
+    if (!this.sortOptions) return this.options
     if (!this.options || !Array.isArray(this.options)) return this.options
     return [...this.options].sort((a, b) => {
       const aVal = this.label && typeof a === 'object' ? a[this.label] : a

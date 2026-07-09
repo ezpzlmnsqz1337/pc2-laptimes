@@ -9,6 +9,9 @@
       <BrowseTimes v-if="activeScreen === ScreenType.BROWSE_TIMES" />
     </keep-alive>
     <keep-alive>
+      <Races v-if="activeScreen === ScreenType.RACES" />
+    </keep-alive>
+    <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
     </keep-alive>
     <keep-alive>
@@ -29,6 +32,7 @@
 <script lang="ts">
 import AddLaptime from '@/pages/AddLaptime.vue'
 import BrowseTimes from '@/pages/BrowseTimes.vue'
+import Races from '@/pages/Races.vue'
 // import SetCarImage from '@/components/SetCarImage'
 import Background from '@/components/Background.vue'
 import Menu from '@/components/Menu.vue'
@@ -47,6 +51,7 @@ import { RaceState } from '@/constants/RaceState'
     Menu,
     AddLaptime,
     BrowseTimes,
+    Races,
     RealtimeData,
     WebsocketTesting,
     Statistics,
@@ -104,6 +109,9 @@ class App extends Vue {
           break
         case ScreenType.BROWSE_TIMES:
           this.$dataStore.showScreen(ScreenType.BROWSE_TIMES)
+          break
+        case ScreenType.RACES:
+          this.$dataStore.showScreen(ScreenType.RACES)
           break
         default:
           console.error('Unknown page: ', page)

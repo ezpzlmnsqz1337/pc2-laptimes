@@ -307,6 +307,21 @@ npm run deploy:homelab
 6. **Date pickers**: Use `vue3-datepicker` component
 7. **Scrollbars**: Use `vue3-perfect-scrollbar` for custom scrollable areas
 
+### Races Feature (MVP)
+- **Goal**: Show race sessions and winner per session (winner is fastest laptime in session).
+- **Session detection rule**:
+  - same `trackId`
+  - same `trackVariant`
+  - laptimes added within 5 minutes (`RACE_GROUP_WINDOW_MS` in `dataStore`)
+- **Performance approach**: Build race sessions once during times fetch/reload and cache them in store state. Do not perform pairwise comparison per page open.
+- **Filtering**: Races page supports filtering by driver and includes a toggle for showing/hiding solo sessions.
+- **Known limitations**:
+  - grouping is heuristic and may misclassify manual entries
+  - race identity is derived from grouped laptimes (not persisted as DB rows)
+  - same driver appearing twice inside one 5-minute window starts a new session in MVP
+- **UI implementation rule**: Reuse existing components and styling conventions (`Button.vue`, `SelectInput.vue`, existing table styles, existing page layout patterns).
+- **Future optimization path**: Add a PostgreSQL view with window functions to pre-group race sessions server-side and expose it via PostgREST when data volume or complexity requires it.
+
 ### File Modifications
 - **Don't modify shim files** unless adding new third-party library types
 - **SQL files in assets**: Reference only, not executed by app directly

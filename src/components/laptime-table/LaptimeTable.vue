@@ -151,18 +151,20 @@ class LaptimeTable extends Vue.with(LaptimeTableProps) {
   loading = false
   times: Laptime[] = []
   maxRows = 50
+  private laptimesChangeHandler = () => this.loadData()
 
   filterRef!: InstanceType<typeof LaptimeFilterComponent>
 
   created () {
     if (this.rows.length) {
       this.times = this.rows
+      return
     }
-    eb.on('laptimes:change', () => this.loadData())
+    eb.on('laptimes:change', this.laptimesChangeHandler)
   }
 
   unmounted (): void {
-    eb.off('laptimes:change', () => this.loadData())
+    eb.off('laptimes:change', this.laptimesChangeHandler)
   }
 
   getRowClass (laptime: Laptime) {

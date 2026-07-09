@@ -230,11 +230,11 @@ export default Leaderboards
 }
 
 @media only screen and (max-width: 1024px) {
-  .__filter :deep button {
+  .__filter :deep(button) {
     font-size: 0.5rem !important;
   }
 
-  .__filter :deep label {
+  .__filter :deep(label) {
     font-size: 0.5rem !important;
   }
 }
