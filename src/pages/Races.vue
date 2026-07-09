@@ -38,8 +38,10 @@
             <th>Driver</th>
             <th>Total races</th>
             <th>Won races</th>
+            <th>Win rate</th>
             <th>Most won track</th>
             <th>Most won car</th>
+            <th>Details</th>
           </tr>
         </thead>
         <tbody>
@@ -51,31 +53,107 @@
               <span class="__noLaptimesFound">No races found.</span>
             </td>
           </tr>
-          <tr
+          <template
             v-for="row in driverTotals"
             :key="row.driverId"
           >
-            <td class="__rank">
-              <img
-                :src="row.rank"
-                alt="rank"
-              >
-            </td>
-            <td class="__driver">
-              {{ row.driverName }}
-            </td>
-            <td>{{ row.totalRaces }}</td>
-            <td>{{ row.wonRaces }}</td>
-            <td>{{ row.mostWonTrackLabel }}</td>
-            <td class="__carCell">
-              <img
-                v-if="row.mostWonCarImage"
-                :src="row.mostWonCarImage"
-                :alt="row.mostWonCarLabel"
-              >
-              <div>{{ row.mostWonCarLabel }}</div>
-            </td>
-          </tr>
+            <tr>
+              <td class="__rank">
+                <img
+                  :src="row.rank"
+                  alt="rank"
+                >
+              </td>
+              <td class="__driver">
+                <a
+                  href="#"
+                  @click.prevent="showDriverRaces(row.driverId)"
+                >
+                  {{ row.driverName }}
+                </a>
+              </td>
+              <td>{{ row.totalRaces }}</td>
+              <td>{{ row.wonRaces }}</td>
+              <td>{{ row.winRateLabel }}</td>
+              <td>{{ row.mostWonTrackLabel }}</td>
+              <td class="__carCell">
+                <img
+                  v-if="row.mostWonCarImage"
+                  :src="row.mostWonCarImage"
+                  :alt="row.mostWonCarLabel"
+                >
+                <div>{{ row.mostWonCarLabel }}</div>
+              </td>
+              <td>
+                <Button
+                  :type="ButtonType.SECONDARY"
+                  @click.stop="toggleExpanded(row.driverId)"
+                >
+                  {{ isExpanded(row.driverId) ? 'Hide' : 'Show' }}
+                </Button>
+              </td>
+            </tr>
+
+            <tr
+              v-if="isExpanded(row.driverId)"
+              class="__detailsRow"
+            >
+              <td colspan="999">
+                <div class="__detailsGrid">
+                  <div class="__detailsBlock">
+                    <h4>Top 5 won tracks</h4>
+                    <ul>
+                      <li
+                        v-for="track in row.topWonTracks"
+                        :key="`track-${row.driverId}-${track.id}`"
+                      >
+                        {{ track.label }} - {{ track.count }}
+                      </li>
+                      <li v-if="!row.topWonTracks.length">
+                        -
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="__detailsBlock">
+                    <h4>Top 5 won cars</h4>
+                    <ul>
+                      <li
+                        v-for="car in row.topWonCars"
+                        :key="`car-${row.driverId}-${car.id}`"
+                        class="__carDetailItem"
+                      >
+                        <img
+                          v-if="car.imageUrl"
+                          :src="car.imageUrl"
+                          :alt="car.label"
+                        >
+                        <span>{{ car.label }} - {{ car.count }}</span>
+                      </li>
+                      <li v-if="!row.topWonCars.length">
+                        -
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="__detailsBlock">
+                    <h4>Head to head</h4>
+                    <ul>
+                      <li
+                        v-for="record in row.headToHead"
+                        :key="`h2h-${row.driverId}-${record.opponentId}`"
+                      >
+                        {{ row.driverName }} vs {{ record.opponentName }} - {{ record.wins }}:{{ record.losses }}
+                      </li>
+                      <li v-if="!row.headToHead.length">
+                        -
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
@@ -86,12 +164,14 @@
     >
       <div class="__controls">
         <SelectInput
-          v-model="selectedDriverId"
+          :model-value="selectedDriverId"
           class="__driverSelect"
           :options="drivers"
           label="name"
           placeholder="Filter by driver"
+          :clearable="true"
           :reduce="driverToId"
+          @update:model-value="setDriverFilter($event)"
         />
         <Button
           :type="ButtonType.SECONDARY"
@@ -178,15 +258,33 @@ interface CountedOption {
   count: number
 }
 
+interface DetailCountItem {
+  id: string
+  label: string
+  count: number
+  imageUrl?: string
+}
+
+interface HeadToHeadItem {
+  opponentId: string
+  opponentName: string
+  wins: number
+  losses: number
+}
+
 interface DriverTotalRow {
   driverId: string
   driverName: string
   rank: string
   totalRaces: number
   wonRaces: number
+  winRateLabel: string
   mostWonTrackLabel: string
   mostWonCarLabel: string
   mostWonCarImage: string
+  topWonTracks: DetailCountItem[]
+  topWonCars: DetailCountItem[]
+  headToHead: HeadToHeadItem[]
 }
 
 @Options({
@@ -200,12 +298,19 @@ class Races extends Vue {
   activeSection = RacesSectionType.TOTAL
   selectedDriverId: string | null = null
   includeSolo = false
+  expandedDriverId: string | null = null
   displayColumns = ['rank', 'driver', 'laptime', 'car', 'settings']
   selectedTrackId: string | null = null
   selectedTrackVariant: string | null = null
 
   get drivers () {
     return this.$dataStore.drivers
+  }
+
+  get allRaces () {
+    return this.$dataStore.getRaces({
+      includeSolo: this.includeSolo
+    })
   }
 
   get baseRaces () {
@@ -262,8 +367,8 @@ class Races extends Vue {
   }
 
   get driverTotals (): DriverTotalRow[] {
-    const winners = this.baseRaces.filter(r => r.winnerDriverId)
-    const totalByDriver = this.baseRaces.reduce((acc, race) => {
+    const winners = this.allRaces.filter(r => r.winnerDriverId)
+    const totalByDriver = this.allRaces.reduce((acc, race) => {
       for (const t of race.times) {
         acc[t.driverId] = (acc[t.driverId] || 0) + 1
       }
@@ -293,7 +398,9 @@ class Races extends Vue {
       return acc
     }, {} as Record<string, Record<string, number>>)
 
-    const medals = this.buildRaceMedals(this.baseRaces)
+    const headToHeadByDriver = this.buildHeadToHead(this.allRaces)
+
+    const medals = this.buildRaceMedals(this.allRaces)
     const totalRaces = Object.keys(totalByDriver).map(driverId => {
       return {
         driver: this.$dataStore.getDriverById(driverId)!,
@@ -314,20 +421,54 @@ class Races extends Vue {
         const bestCarId = this.maxByCount(wonCars)
         const bestCar = bestCarId ? this.$dataStore.getCarById(bestCarId) : null
         const bestCarImage = bestCar?.imageUrl ? `images/${bestCar.imageUrl}` : ''
+        const totalRacesForDriver = totalByDriver[driverId]
+        const wonRacesForDriver = winsByDriver[driverId] || 0
+        const winRate = totalRacesForDriver > 0
+          ? (wonRacesForDriver / totalRacesForDriver) * 100
+          : 0
+
+        const topWonTracks = this.topCounts(
+          wonTracks,
+          (trackId) => this.$dataStore.getTrackById(trackId)?.track || 'Unknown',
+          5
+        )
+
+        const topWonCars = this.topCounts(
+          wonCars,
+          (carId) => this.$dataStore.getCarById(carId)?.name || 'Unknown',
+          5,
+          (carId) => {
+            const car = this.$dataStore.getCarById(carId)
+            return car?.imageUrl ? `images/${car.imageUrl}` : ''
+          }
+        )
+
+        const headToHead = Object.entries(headToHeadByDriver[driverId] || {})
+          .map(([opponentId, score]) => ({
+            opponentId,
+            opponentName: this.$dataStore.getDriverById(opponentId)?.name || 'Unknown',
+            wins: score.wins,
+            losses: score.losses
+          }))
+          .sort((a, b) => b.wins - a.wins || b.losses - a.losses || a.opponentName.localeCompare(b.opponentName))
 
         return {
           driverId,
           driverName: driver?.name || 'Unknown',
           rank: driver ? sb.getRank(driver, totalRaces as any, medals) as unknown as string : '',
-          totalRaces: totalByDriver[driverId],
-          wonRaces: winsByDriver[driverId] || 0,
+          totalRaces: totalRacesForDriver,
+          wonRaces: wonRacesForDriver,
+          winRateLabel: `${winRate.toFixed(1)}%`,
           mostWonTrackLabel: bestTrackId
             ? `${this.$dataStore.getTrackById(bestTrackId)?.track || 'Unknown'} (${wonTracks[bestTrackId]})`
             : '-',
           mostWonCarLabel: bestCarId
             ? `${this.$dataStore.getCarById(bestCarId)?.name || 'Unknown'} (${wonCars[bestCarId]})`
             : '-',
-          mostWonCarImage: bestCarImage
+          mostWonCarImage: bestCarImage,
+          topWonTracks,
+          topWonCars,
+          headToHead
         }
       })
       .sort((a, b) => b.wonRaces - a.wonRaces || b.totalRaces - a.totalRaces || a.driverName.localeCompare(b.driverName))
@@ -347,10 +488,31 @@ class Races extends Vue {
 
   showSection (section: RacesSectionType) {
     this.activeSection = section
+    if (section !== RacesSectionType.TOTAL) {
+      this.expandedDriverId = null
+    }
+  }
+
+  isExpanded (driverId: string) {
+    return this.expandedDriverId === driverId
+  }
+
+  toggleExpanded (driverId: string) {
+    this.expandedDriverId = this.expandedDriverId === driverId ? null : driverId
+  }
+
+  showDriverRaces (driverId: string) {
+    this.showSection(RacesSectionType.LIST)
+    this.setDriverFilter(driverId)
   }
 
   toggleIncludeSolo () {
     this.includeSolo = !this.includeSolo
+    this.ensureTrackAndVariantSelection()
+  }
+
+  setDriverFilter (driverId: string | null) {
+    this.selectedDriverId = driverId
     this.ensureTrackAndVariantSelection()
   }
 
@@ -394,6 +556,53 @@ class Races extends Vue {
     const entries = Object.entries(data)
     if (!entries.length) return ''
     return entries.sort((a, b) => b[1] - a[1])[0][0]
+  }
+
+  topCounts (
+    data: Record<string, number>,
+    resolveLabel: (id: string) => string,
+    max: number,
+    resolveImage?: (id: string) => string
+  ): DetailCountItem[] {
+    return Object.entries(data)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, max)
+      .map(([id, count]) => ({
+        id,
+        label: resolveLabel(id),
+        count,
+        imageUrl: resolveImage ? resolveImage(id) : ''
+      }))
+  }
+
+  buildHeadToHead (races: Race[]) {
+    const result = {} as Record<string, Record<string, { wins: number, losses: number }>>
+
+    races.forEach((race) => {
+      if (!race.winnerDriverId) return
+
+      const participants = Array.from(new Set(race.times.map(x => x.driverId)))
+      if (participants.length < 2) return
+
+      participants.forEach((driverId) => {
+        participants
+          .filter(opponentId => opponentId !== driverId)
+          .forEach((opponentId) => {
+            if (!result[driverId]) result[driverId] = {}
+            if (!result[driverId][opponentId]) {
+              result[driverId][opponentId] = { wins: 0, losses: 0 }
+            }
+
+            if (race.winnerDriverId === driverId) {
+              result[driverId][opponentId].wins += 1
+            } else if (race.winnerDriverId === opponentId) {
+              result[driverId][opponentId].losses += 1
+            }
+          })
+      })
+    })
+
+    return result
   }
 
   buildRaceMedals (races: Race[]): Medals[] {
@@ -495,6 +704,37 @@ h3 {
   text-align: center;
 }
 
+.__totalSection tbody td > div:hover {
+  cursor: default;
+  color: inherit;
+}
+
+.__totalSection tbody tr:nth-child(odd):hover {
+  color: var(--text-light1);
+  background-color: var(--bg-dark1);
+  cursor: default;
+}
+
+.__totalSection tbody tr:nth-child(even):hover {
+  color: var(--text-dark1);
+  background-color: var(--bg-light1);
+  cursor: default;
+}
+
+.__totalSection .__detailsBlock:hover {
+  color: var(--text-dark1);
+  cursor: default;
+}
+
+.__totalSection td.__driver a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.__totalSection td.__driver a:hover {
+  color: var(--hover);
+}
+
 .__totalSection th:nth-child(2),
 .__totalSection td.__driver {
   width: var(--races-driver-column-width);
@@ -513,6 +753,42 @@ h3 {
 .__carCell img {
   width: 6rem;
   margin-bottom: 0.3rem;
+}
+
+.__detailsRow td {
+  text-align: left;
+}
+
+.__detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 0.8rem;
+  background-color: rgba(72, 72, 72, 0.35);
+}
+
+.__detailsBlock h4 {
+  margin-top: 0;
+  margin-bottom: 0.4rem;
+}
+
+.__detailsBlock ul {
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.__detailsBlock li {
+  margin-bottom: 0.25rem;
+}
+
+.__carDetailItem {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.__carDetailItem img {
+  width: 2.2rem;
 }
 
 .__empty {
@@ -595,6 +871,10 @@ h3 {
   .__raceMeta {
     flex-direction: column;
     gap: 0.2rem;
+  }
+
+  .__detailsGrid {
+    grid-template-columns: 1fr;
   }
 }
 </style>
