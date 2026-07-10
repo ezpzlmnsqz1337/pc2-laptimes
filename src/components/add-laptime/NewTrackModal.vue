@@ -53,7 +53,7 @@ export default NewTrackModal
 }
 
 .__modalInput {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-8xl);
   width: 100%;
 }
 </style>

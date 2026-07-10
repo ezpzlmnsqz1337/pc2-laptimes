@@ -23,6 +23,7 @@ class SelectInputProps {
   label = prop<string>({ default: '' })
   clearable = prop<boolean>({ default: true })
   disabled = prop<boolean>({ default: false })
+  sortOptions = prop<boolean>({ default: true })
   reduce = prop<(o: any) => string>({ default: (o: any) => o })
 }
 
@@ -31,6 +32,7 @@ class SelectInputProps {
 })
 class SelectInput extends Vue.with(SelectInputProps) {
   get sortedOptions () {
+    if (!this.sortOptions) return this.options
     if (!this.options || !Array.isArray(this.options)) return this.options
     return [...this.options].sort((a, b) => {
       const aVal = this.label && typeof a === 'object' ? a[this.label] : a
@@ -49,12 +51,12 @@ export default SelectInput
 
 .__selected {
   :deep(.vs__dropdown-toggle) {
-    border: 0.1rem solid #274db4;
-    box-shadow: 0px 0px 5px 2px #274db4;
+    border: 0.1rem solid var(--dark-blue1);
+    box-shadow: 0px 0px 5px 2px var(--dark-blue1);
   }
 
   :deep(span.vs__selected) {
-    color: #274db4;
+    color: var(--dark-blue1);
     font-weight: bold;
   }
 }

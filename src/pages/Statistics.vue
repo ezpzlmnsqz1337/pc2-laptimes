@@ -206,31 +206,31 @@ export default Statistics
 
 <style scoped lang="scss">
 .__statistics {
-  padding: 3rem 1rem 1rem;
-  padding-bottom: 6rem;
+  padding: var(--space-11xl) var(--space-8xl) var(--space-8xl);
+  padding-bottom: var(--space-13xl);
 }
 
 .__menu {
   text-align: center;
   .__selected {
-    background-color: #242424 !important;
+    background-color: var(--state-selected-bg) !important;
   }
 }
 
 .__controls {
-  margin-top: 2rem;
+  margin-top: var(--space-10xl);
   text-align: center;
 }
 
 .__controls .fa {
-  margin-right: 0.3rem;
+  margin-right: var(--space-lg);
 }
 
 .__racesPerDaySection {
-  padding: 1rem;
+  padding: var(--space-8xl);
 
   > .__chart {
-    background-color: rgba(72, 72, 72, 0.7);
+    background-color: var(--surface-overlay-strong);
   }
 }
 
@@ -240,23 +240,23 @@ export default Statistics
 
 .__loading {
   background-color: transparent !important;
-  margin-top: 5rem;
+  margin-top: var(--space-12xl);
 }
 
 .__trackCarMatrixSection {
-  padding-top: 1rem;
+  padding-top: var(--space-8xl);
 }
 
 @media only screen and (max-width: 700px) {
   .__statistics {
-    padding: 1rem;
+    padding: var(--space-8xl);
   }
 
   .__controls {
-    margin-top: 1rem;
+    margin-top: var(--space-8xl);
 
-      > button {
-      font-size: 0.6rem;
+    > button {
+      font-size: var(--font-size-xs);
     }
   }
 }

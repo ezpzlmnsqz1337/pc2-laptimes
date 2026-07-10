@@ -182,9 +182,9 @@ export default Leaderboards
   position: fixed;
   bottom: 0;
   width: 100vw;
-  margin-left: -1rem;
+  margin-left: var(--space-neg-8xl);
   z-index: 999;
-  background-color: rgba(72, 72, 72, 0.7);
+  background-color: var(--surface-overlay-strong);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -193,12 +193,12 @@ export default Leaderboards
   .__item {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: var(--space-8xl);
     text-align: center;
   }
 
   .__header {
-    margin-bottom: 0.3rem;
+    margin-bottom: var(--space-lg);
   }
 }
 
@@ -211,8 +211,8 @@ export default Leaderboards
   .__item {
     padding-left: 10vw;
     padding-right: 10vw;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding-top: var(--space-10xl);
+    padding-bottom: var(--space-10xl);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -230,12 +230,12 @@ export default Leaderboards
 }
 
 @media only screen and (max-width: 1024px) {
-  .__filter :deep button {
-    font-size: 0.5rem !important;
+  .__filter :deep(button) {
+    font-size: var(--font-size-2xs) !important;
   }
 
-  .__filter :deep label {
-    font-size: 0.5rem !important;
+  .__filter :deep(label) {
+    font-size: var(--font-size-2xs) !important;
   }
 }
 
@@ -245,7 +245,7 @@ export default Leaderboards
   }
 
   .__trackCarMatrix .__item {
-      padding: 0 0 1rem 0;
+      padding-bottom: var(--space-8xl);
   }
 
   .__carImage > img{

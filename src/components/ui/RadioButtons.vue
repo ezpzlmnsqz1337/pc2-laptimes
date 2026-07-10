@@ -95,7 +95,7 @@ label {
 
 button {
   &:hover {
-    background-color: #005db9 !important;
+    background-color: var(--interactive-hover-strong) !important;
   }
 
   &.__selected {
@@ -105,14 +105,14 @@ button {
   }
 
   &:disabled {
-    background-color: #8c8c8c !important;
+    background-color: var(--interactive-disabled-bg) !important;
 
     label {
       cursor: not-allowed;
     }
 
     &.__selected {
-      background-color: #265a8f !important;
+      background-color: var(--interactive-selected-disabled) !important;
       font-weight: bold;
       color: var(--text-light1);
     }

@@ -39,20 +39,20 @@ button {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   --btn-text-dark: var(--text-dark1);
   --btn-text-light: var(--text-light1);
-  --btn-default: #ffffff;
-  --btn-default-hover: #e7e7e7;
+  --btn-default: var(--bg-light1);
+  --btn-default-hover: var(--btn-default-hover-bg);
   --btn-primary: var(--dark-blue1);
-  --btn-primary-hover: #3f71a3;
-  --btn-secondary: #787879;
-  --btn-secondary-hover: #5f5f5f;
-  --btn-success: #2ab135;
-  --btn-success-hover: #0e8b19;
-  --btn-danger: #e02c2c;
-  --btn-danger-hover: #c71818;
-  --btn-warning: #fffb26;
-  --btn-warning-hover: #94881a;
-  --btn-disabled: #a0a0a0;
-  --btn-disabled-text: #cacaca;
+  --btn-primary-hover: var(--btn-primary-hover-bg);
+  --btn-secondary: var(--btn-secondary-bg);
+  --btn-secondary-hover: var(--btn-secondary-hover-bg);
+  --btn-success: var(--btn-success-bg);
+  --btn-success-hover: var(--btn-success-hover-bg);
+  --btn-danger: var(--btn-danger-bg);
+  --btn-danger-hover: var(--btn-danger-hover-bg);
+  --btn-warning: var(--btn-warning-bg);
+  --btn-warning-hover: var(--btn-warning-hover-bg);
+  --btn-disabled: var(--btn-disabled-bg);
+  --btn-disabled-text: var(--btn-disabled-text-color);
 }
 
 button {
@@ -60,11 +60,11 @@ button {
   background-color: var(--btn-default);
   color: var(--btn-text-dark);
   transition: background-color 0.1s;
-  margin: 0.1rem;
-  padding: 0.5rem 0.8rem;
+  margin: var(--space-2xs);
+  padding: var(--space-2xl) var(--space-5xl);
 
   &:deep(.fa) {
-    margin-right: 0.3rem;
+    margin-right: var(--space-lg);
   }
 
   &:disabled, &:disabled:hover {

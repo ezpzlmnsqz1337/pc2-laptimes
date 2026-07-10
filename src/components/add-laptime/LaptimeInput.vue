@@ -137,59 +137,59 @@ export default LaptimeInput
     width: 100%;
     text-align: right;
     border: none;
-    padding-right: 0.3rem;
+    padding-right: var(--space-lg);
   }
 
   .__seconds {
     width: 3.1rem;
     border: none;
     text-align: center;
-    padding-left: 0.3rem;
-    padding-right: 0.3rem;
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
   }
 
   .__milliseconds {
     width: 100%;
     border: none;
-    padding-left: 0.3rem;
+    padding-left: var(--space-lg);
   }
 
   .__colon, .__dot {
-    background-color: white;
+    background-color: var(--bg-light1);
     color: var(--text-dark1);
-    font-size: 2rem;
-    padding-top: 0.15rem;
+    font-size: var(--font-size-xl);
+    padding-top: var(--space-sm);
     border: none;
   }
 
   input {
-    font-size: 2rem;
+    font-size: var(--font-size-xl);
 
     &:focus {
       outline: 0;
     }
 
     &:disabled {
-      background-color: #ffffff;
+      background-color: var(--bg-light1);
     }
   }
 
   &.__error {
     .__minutes {
-      border: 0.15rem solid red;
-      color: red;
+      border: 0.15rem solid var(--status-error);
+      color: var(--status-error);
       border-right: none;
     }
     .__seconds,  .__colon,  .__dot {
-      border: 0.15rem solid red;
-      color: red;
+      border: 0.15rem solid var(--status-error);
+      color: var(--status-error);
       border-right: none;
       border-left: none;
     }
 
     .__milliseconds {
-      border: 0.15rem solid red;
-      color: red;
+      border: 0.15rem solid var(--status-error);
+      color: var(--status-error);
       border-left: none;
     }
   }

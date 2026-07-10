@@ -78,11 +78,11 @@ export default Background
   }
 
   .__laptimes {
-    padding: 1rem;
+    padding: var(--space-8xl);
   }
 
   .__menu button {
-    font-size: 0.6rem;
+    font-size: var(--font-size-xs);
   }
 }
 </style>

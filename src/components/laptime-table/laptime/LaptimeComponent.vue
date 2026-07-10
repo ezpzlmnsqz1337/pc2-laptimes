@@ -50,7 +50,12 @@ export default LaptimeComponent
   justify-content: space-between;
   flex-direction: row;
   gap: 1rem;
-  padding: 0 1rem;
+  padding: 0 var(--space-8xl);
+}
+
+.__losing {
+  white-space: nowrap;
+  color: #c20000;
 }
 
 @media only screen and (max-width: 1300px) {

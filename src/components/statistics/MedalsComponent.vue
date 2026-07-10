@@ -112,12 +112,14 @@ export default MedalsComponent
 </script>
 
 <style scoped lang="scss">
+@import '../../assets/css/table.scss';
+
 .__medals {
   display: flex;
   flex-direction: row;
   justify-content: center;
   .__item {
-    padding: 1rem;
+    padding: var(--space-8xl);
     text-align: center;
   }
 }
@@ -129,7 +131,7 @@ export default MedalsComponent
 
 .__totalRacesTable, .__medalsTable {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: var(--space-10xl);
 }
 
 .__totalRacesTable td{
@@ -138,12 +140,12 @@ export default MedalsComponent
 
 .__medalsTable .__rank {
   padding: 0;
-  padding-right: 0.5rem;
+  padding-right: var(--space-2xl);
 
   img {
     width: 5rem;
-    margin-top: 0.2rem;
-    box-shadow: 0.2rem 0.2rem 0.3rem 0.2rem #333333;
+    margin-top: var(--space-sm);
+    box-shadow: 0.2rem 0.2rem 0.3rem 0.2rem var(--shadow-dark);
   }
 }
 
@@ -154,7 +156,7 @@ export default MedalsComponent
   }
 
   .__totalRacesTable, .__medalsTable {
-    font-size: 1rem !important;
+    font-size: var(--font-size-base) !important;
   }
 
   .__medals .__item {
@@ -172,7 +174,7 @@ export default MedalsComponent
   }
 
   .__totalRacesTable, .__medalsTable {
-    font-size: 0.8rem !important;
+    font-size: var(--font-size-compact) !important;
   }
 }
 </style>

@@ -357,11 +357,11 @@ export default LaptimeDetailModal
   textarea {
     width: 100%;
     background-color: var(--bg-light1);
-    padding: 0.5rem;
-    border: 0.1rem solid black;
+    padding: var(--space-2xl);
+    border: 0.1rem solid var(--border-dark1);
 
     &:disabled {
-      background-color: #f8f8f8;
+      background-color: var(--surface-muted);
     }
   }
 
@@ -384,7 +384,7 @@ export default LaptimeDetailModal
   .__wrapper {
     flex-direction: column;
     width: 100%;
-    padding: 1rem;
+    padding: var(--space-8xl);
 
     .__firstPanel, .__secondPanel {
       max-width: 100%;

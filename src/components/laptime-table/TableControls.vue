@@ -59,7 +59,7 @@ export default TableControls
 
 @media only screen and (max-width: 700px) {
   .__tableControls button {
-    font-size: 0.6rem;
+    font-size: var(--font-size-xs);
   }
 }
 </style>

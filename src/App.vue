@@ -9,6 +9,9 @@
       <BrowseTimes v-if="activeScreen === ScreenType.BROWSE_TIMES" />
     </keep-alive>
     <keep-alive>
+      <Races v-if="activeScreen === ScreenType.RACES" />
+    </keep-alive>
+    <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
     </keep-alive>
     <keep-alive>
@@ -29,6 +32,7 @@
 <script lang="ts">
 import AddLaptime from '@/pages/AddLaptime.vue'
 import BrowseTimes from '@/pages/BrowseTimes.vue'
+import Races from '@/pages/Races.vue'
 // import SetCarImage from '@/components/SetCarImage'
 import Background from '@/components/Background.vue'
 import Menu from '@/components/Menu.vue'
@@ -47,6 +51,7 @@ import { RaceState } from '@/constants/RaceState'
     Menu,
     AddLaptime,
     BrowseTimes,
+    Races,
     RealtimeData,
     WebsocketTesting,
     Statistics,
@@ -105,6 +110,9 @@ class App extends Vue {
         case ScreenType.BROWSE_TIMES:
           this.$dataStore.showScreen(ScreenType.BROWSE_TIMES)
           break
+        case ScreenType.RACES:
+          this.$dataStore.showScreen(ScreenType.RACES)
+          break
         default:
           console.error('Unknown page: ', page)
       }
@@ -127,6 +135,33 @@ export default App
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 
 :root {
+  --font-size-root: 1em;
+  --font-size-root-lg: 1.6em;
+  --font-size-2xs: 0.5rem;
+  --font-size-xs: 0.6rem;
+  --font-size-sm: 0.7rem;
+  --font-size-compact: 0.8rem;
+  --font-size-base: 1rem;
+  --font-size-md: 1.1rem;
+  --font-size-lg: 1.3rem;
+  --font-size-xl: 2rem;
+  --font-size-display: 5rem;
+  --space-3xs: 0.03rem;
+  --space-2xs: 0.1rem;
+  --space-sm: 0.2rem;
+  --space-lg: 0.3rem;
+  --space-2xl: 0.5rem;
+  --space-5xl: 0.75rem;
+  --space-8xl: 1rem;
+  --space-9xl: 1.5rem;
+  --space-10xl: 2rem;
+  --space-11xl: 3rem;
+  --space-12xl: 5rem;
+  --space-13xl: 6rem;
+  --space-neg-2xs: -0.1rem;
+  --space-neg-8xl: -1rem;
+  --space-btn-mobile-y: 8px;
+  --space-btn-mobile-x: 12px;
   --hover: #188cff;
   --active: #274db4;
   --text-light1: #ffffff;
@@ -148,6 +183,42 @@ export default App
   --brake: #ff0000;
   --throttle: #00ff00;
   --clutch: #e4e43d;
+  --status-error: #ff0000;
+  --status-warning: #ffff00;
+  --status-success: #059711;
+  --status-orange: orange;
+  --medal-gold: gold;
+  --medal-silver: silver;
+  --medal-bronze: #cd7f32;
+  --state-selected-bg: #242424;
+  --surface-muted: #f8f8f8;
+  --surface-overlay-strong: rgba(72, 72, 72, 0.7);
+  --surface-overlay-soft: rgba(72, 72, 72, 0.35);
+  --overlay-backdrop: rgba(0, 0, 0, 0.5);
+  --shadow-overlay: rgba(0, 0, 0, 0.33);
+  --shadow-dark: #333333;
+  --telemetry-surface-bg: rgba(46, 46, 46, 0.809);
+  --telemetry-surface-border: rgba(0, 0, 0, 0.464);
+  --telemetry-player1-border: rgb(15, 0, 255);
+  --telemetry-player2-border: rgb(0, 131, 17);
+  --telemetry-rpm-fill: #1a27db;
+  --text-shadow-strong: #080808;
+  --accent-blink: #3a9ee0;
+  --interactive-hover-strong: #005db9;
+  --interactive-disabled-bg: #8c8c8c;
+  --interactive-selected-disabled: #265a8f;
+  --btn-default-hover-bg: #e7e7e7;
+  --btn-primary-hover-bg: #3f71a3;
+  --btn-secondary-bg: #787879;
+  --btn-secondary-hover-bg: #5f5f5f;
+  --btn-success-bg: #2ab135;
+  --btn-success-hover-bg: #0e8b19;
+  --btn-danger-bg: #e02c2c;
+  --btn-danger-hover-bg: #c71818;
+  --btn-warning-bg: #fffb26;
+  --btn-warning-hover-bg: #94881a;
+  --btn-disabled-bg: #a0a0a0;
+  --btn-disabled-text-color: #cacaca;
   --vdp-hover-bg-color: #188cff;
   --vdp-selected-bg-color: #274db4;
   --vdp-bg-color: var(--bg-dark2);
@@ -159,7 +230,7 @@ export default App
 }
 
 html {
-  font-size: 1em;
+  font-size: var(--font-size-root);
 }
 
 body {
@@ -169,7 +240,7 @@ body {
 }
 
 h2 {
-  margin-top: 0.5rem;
+  margin-top: var(--space-2xl);
 }
 
 #app {
@@ -177,7 +248,7 @@ h2 {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-light1);
-  font-size: 0.7rem;
+  font-size: var(--font-size-sm);
   margin-top: 0;
 }
 
@@ -185,7 +256,7 @@ input[type=text],
 input[type=password],
 input[type=email],
 input[type=number] {
-  padding: 0.5rem;
+  padding: var(--space-2xl);
   border-radius: 0;
 }
 
@@ -202,7 +273,7 @@ input[type=number] {
 }
 
 select {
-  padding: 0.5rem;
+  padding: var(--space-2xl);
 }
 
 a {
@@ -210,19 +281,19 @@ a {
 }
 
 .__red {
-  color: red;
+  color: var(--status-error);
 }
 
 .__yellow {
-  color: yellow;
+  color: var(--status-warning);
 }
 
 .__green {
-  color: rgb(28, 197, 28);
+  color: var(--status-success);
 }
 
 .__orange {
-  color: orange;
+  color: var(--status-orange);
 }
 
 .__appWrapper {
@@ -242,10 +313,10 @@ a {
 
 .fa.fa-steering_wheel {
   display: block;
-  margin-top: 0.1rem;
+  margin-top: var(--space-2xs);
   width: 0.8rem;
   height: 0.8rem;
-  margin-left: -0.1rem;
+  margin-left: var(--space-neg-2xs);
   background-image: url('assets/icons/steering_wheel.svg');
   background-size: 0.8rem;
   background-position: 50% 50%;
@@ -267,7 +338,7 @@ a {
 
 @media only screen and (min-width: 1600px) {
   html {
-    font-size: 1.6em;
+    font-size: var(--font-size-root-lg);
   }
 }
 

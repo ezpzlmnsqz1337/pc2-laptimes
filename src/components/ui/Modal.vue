@@ -46,7 +46,7 @@ export default Modal
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--overlay-backdrop);
   display: table;
   transition: opacity 0.3s ease;
 }
@@ -60,10 +60,10 @@ export default Modal
   min-width: 22rem;
   max-width: 90vw;
   max-height: 90vh;
-  margin: 0px auto;
-  padding: 1rem;
+  margin: 0 auto;
+  padding: var(--space-8xl);
   background-color: var(--bg-dark4);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  box-shadow: 0 2px 8px var(--shadow-overlay);
   transition: all 0.3s ease;
   font-family: Helvetica, Arial, sans-serif;
   overflow-y: scroll;
