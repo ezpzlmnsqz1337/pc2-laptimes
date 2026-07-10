@@ -1,0 +1,256 @@
+table {
+  width: 100%;
+  overflow: hidden;
+  border-spacing: 0;
+  font-size: var(--font-size-base);
+
+  th {
+    border-bottom: 1px solid var(--border-dark1);
+    background-color: var(--dark-blue1);
+    color: var(--text-light1);
+    padding: var(--space-8xl) var(--space-2xl);
+  }
+
+  tr {
+    &:nth-child(odd) {
+      background-color: var(--bg-dark1);
+    }
+
+    &:nth-child(even) {
+      color: var(--text-dark1);
+      background-color: var(--bg-light1);
+    }
+
+    &:hover {
+      color: var(--text-dark1);
+      background-color: var(--hover);
+      cursor: pointer;
+    }
+
+    &:nth-child(3) .__driver > div,
+    &:nth-child(4) .__driver > div,
+    &:nth-child(5) .__driver > div {
+      box-shadow: var(--space-sm) var(--space-sm) var(--space-2xl) var(--space-sm) var(--shadow-dark);
+      border-radius: var(--space-2xl);
+      padding: var(--space-sm) var(--space-8xl);
+      background-color: var(--bg-dark3);
+      border: 0.1rem solid transparent;
+    }
+
+    &:nth-child(3) .__driver > div {
+      color: var(--medal-gold);
+      border-color: var(--medal-gold);
+    }
+
+    &:nth-child(4) .__driver > div {
+      color: var(--medal-silver);
+      border-color: var(--medal-silver);
+    }
+
+    &:nth-child(5) .__driver > div {
+      color: var(--medal-bronze);
+      border-color: var(--medal-bronze);
+    }
+
+    &.__hasNotes {
+      opacity: 1;
+      background-size: var(--space-8xl) var(--space-8xl);
+      background-image: repeating-linear-gradient(
+        135deg,
+        rgba(188, 189, 205, 0.2) 0,
+        rgba(188, 189, 205, 0.3) 1px,
+        rgba(230, 230, 247, 0) 50%,
+        rgba(230, 230, 247, 0) 30%
+      );
+    }
+  }
+
+  td {
+    padding: var(--space-2xl);
+
+    div:hover {
+      cursor: pointer;
+      color: var(--hover);
+    }
+  }
+}
+
+.__loading {
+  background-color: var(--bg-dark1);
+  padding: var(--space-10xl) 0;
+}
+
+.__noLaptimesFound {
+  color: var(--text-light1);
+}
+
+.__id,
+.__driver {
+  position: relative;
+  font-weight: bold;
+}
+
+.__comment {
+  position: absolute;
+  top: var(--space-8xl);
+  padding: var(--space-2xl) var(--space-2xl) var(--space-2xl) 0;
+  width: 100%;
+}
+
+.__car .__textContainer,
+.__track .__textContainer,
+.__driver .__textContainer {
+  justify-content: center !important;
+}
+
+.__car > img {
+  width: 8rem;
+}
+
+.__driver {
+  > div {
+    padding: var(--space-sm);
+  }
+
+  img {
+    margin: var(--space-lg);
+    width: 4.5rem;
+  }
+}
+
+.__weatherSunny {
+  background-color: var(--status-warning);
+  color: var(--text-dark1);
+}
+
+.__weatherRainy {
+  background-color: var(--dark-blue1);
+  color: var(--text-light1);
+}
+
+.__weatherSnow {
+  background-color: var(--surface-muted);
+  color: var(--text-dark1);
+}
+
+.__brakingLineOff {
+  background-color: var(--status-error);
+  color: var(--text-light1);
+}
+
+.__brakingLineOn {
+  background-color: var(--status-success);
+  color: var(--text-light1);
+}
+
+.__transmissionAutomatic {
+  background-color: var(--status-success);
+  color: var(--text-light1);
+}
+
+.__transmissionSequential {
+  background-color: var(--dark-blue1);
+  color: var(--text-light1);
+}
+
+.__transmissionHPattern {
+  background-color: var(--status-orange);
+  color: var(--text-light1);
+}
+
+.__controlsKeyboard {
+  background-color: var(--status-success);
+  color: var(--text-light1);
+}
+
+.__controlsGamepad {
+  background-color: var(--active);
+  color: var(--text-light1);
+}
+
+.__controlsSteeringWheel {
+  background-color: var(--bg-dark3);
+  color: var(--text-light1);
+}
+
+.__settings {
+  width: 9rem;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  > div {
+    box-shadow: var(--space-sm) var(--space-sm) var(--space-2xl) var(--space-sm) var(--shadow-dark);
+    padding: var(--space-lg) var(--space-5xl);
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-sm);
+    min-width: 6rem;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  table {
+    font-size: var(--font-size-2xs);
+
+    th {
+      padding: var(--space-8xl) var(--space-sm);
+    }
+
+    td {
+      padding: var(--space-sm);
+    }
+  }
+
+  .__comment {
+    top: var(--space-2xl);
+    width: 75%;
+  }
+
+  .__settings {
+    width: 6rem;
+    padding-right: var(--space-lg);
+
+    > div {
+      padding: var(--space-sm) var(--space-lg);
+      margin-bottom: var(--space-lg);
+      font-size: var(--font-size-2xs);
+    }
+  }
+}
+
+@media only screen and (max-width: 700px) {
+  .__comment {
+    top: var(--space-2xl);
+    padding: var(--space-sm) var(--space-sm) var(--space-sm) 0;
+    width: 100%;
+  }
+
+  .__settings {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    > div {
+      padding: var(--space-sm) var(--space-lg);
+      margin-bottom: var(--space-lg);
+      font-size: var(--font-size-2xs);
+      min-width: 1.3rem;
+      width: 1.3rem;
+    }
+
+    span {
+      display: none;
+    }
+  }
+
+  .__car > img {
+    width: 4rem;
+  }
+
+  .__driver img {
+    margin: var(--space-2xs);
+    width: 3rem;
+  }
+}

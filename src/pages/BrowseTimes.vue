@@ -122,11 +122,11 @@ export default BrowseTimes
 <style lang="scss" scoped>
 .__laptimeTable {
   width: 100%;
-  padding: 1rem;
+  padding: var(--space-8xl);
 }
 
 .__browseTimes {
-  padding: 3rem 1rem 1rem;
+  padding: var(--space-11xl) var(--space-8xl) var(--space-8xl);
   margin: 0 auto;
   text-align: center;
   display: flex;
@@ -146,7 +146,7 @@ export default BrowseTimes
 
 @media only screen and (max-width: 700px) {
   .__browseTimes {
-    padding: 1rem;
+    padding: var(--space-8xl);
   }
 }
 </style>

@@ -268,11 +268,11 @@ export default RealtimeData
 
 <style scoped lang="scss">
 .__realtimeData {
-  padding: 2rem 1rem;
+  padding: var(--space-10xl) var(--space-8xl);
 }
 
 .__topContent {
-  padding: 1rem;
+  padding: var(--space-8xl);
   display: flex;
   justify-content: space-around;
 }
@@ -285,17 +285,17 @@ export default RealtimeData
 
     > div {
       width: 15rem;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      background-color: rgba(46, 46, 46, 0.809);
-      border: 0.3rem solid rgba(0, 0, 0, 0.464);
+      padding: var(--space-8xl);
+      margin-bottom: var(--space-8xl);
+      background-color: var(--telemetry-surface-bg);
+      border: 0.3rem solid var(--telemetry-surface-border);
 
       &.__player1 {
-        border: 0.3rem solid rgb(15, 0, 255);
+        border: 0.3rem solid var(--telemetry-player1-border);
       }
 
       &.__player2 {
-        border: 0.3rem solid rgb(0, 131, 17);
+        border: 0.3rem solid var(--telemetry-player2-border);
       }
     }
   }
@@ -311,7 +311,7 @@ export default RealtimeData
 
 @media only screen and (max-width: 700px) {
   .__realtimeData {
-    padding: 1rem;
+    padding: var(--space-8xl);
   }
 }
 
@@ -319,13 +319,13 @@ export default RealtimeData
   width: 80vw;
   height: 60vh;
   margin: 0 auto;
-  padding: 1rem;
+  padding: var(--space-8xl);
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(46, 46, 46, 0.809);
+  background-color: var(--telemetry-surface-bg);
   border-radius: 50% 50% 5rem 5rem;
-  border: 0.3rem solid rgba(0, 0, 0, 0.464);
+  border: 0.3rem solid var(--telemetry-surface-border);
 }
 
 .__controls > div {
@@ -335,7 +335,7 @@ export default RealtimeData
 }
 
 .__speedometer {
-  font-size: 5rem;
+  font-size: var(--font-size-display);
   text-align: center;
 }
 
@@ -366,14 +366,14 @@ export default RealtimeData
     position: relative;
     width: 100%;
     height: 1.3rem;
-    margin-top: 0.03rem;
-    margin-left: 0.03rem;
+    margin-top: var(--space-3xs);
+    margin-left: var(--space-3xs);
   }
 }
 
 .__brake, .__throttle, .__clutch {
   text-align: center;
-  padding: 1rem;
+  padding: var(--space-8xl);
 }
 
 .__brake > .__verticalDial > .__filler {
@@ -401,25 +401,25 @@ export default RealtimeData
       height: 3.8rem;
       max-width: 29.75rem;
       width: 100%;
-      background-color: #1a27db;
+      background-color: var(--telemetry-rpm-fill);
     }
   }
 }
 
 .__rpmValue {
   position: absolute;
-  text-shadow: 0 0 0.5rem #080808;
+  text-shadow: 0 0 0.5rem var(--text-shadow-strong);
   width: 30rem;
   text-align: center;
   font-weight: bold;
-  font-size: 2rem;
+  font-size: var(--font-size-xl);
   z-index: 10;
   line-height: 4rem;
 }
 
 .__heading {
   font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
+  font-size: var(--font-size-md);
+  margin-bottom: var(--space-8xl);
 }
 </style>

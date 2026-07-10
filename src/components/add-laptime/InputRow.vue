@@ -64,9 +64,9 @@ export default InputRow
 
 <style scoped>
 .__heading {
-  margin-bottom: 0.5rem;
+  margin-bottom: var(--space-2xl);
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: var(--font-size-md);
 }
 
 .__label {
@@ -75,7 +75,7 @@ export default InputRow
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  font-size: 1rem;
+  font-size: var(--font-size-base);
 
   button {
     margin: 0;
@@ -92,12 +92,12 @@ export default InputRow
 }
 
 .__inputRow {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-8xl);
 }
 
 .__borderBottom {
-  padding-bottom: 1rem;
-  border-bottom: 0.1rem solid white;
+  padding-bottom: var(--space-8xl);
+  border-bottom: 0.1rem solid var(--border-light1);
 }
 
 @media only screen and (max-width: 700px) {

@@ -225,36 +225,36 @@ export default Menu
 
 <style scoped lang="scss">
 .__menuWrapper {
-  background-color: rgba(72, 72, 72, 0.7);
+  background-color: var(--surface-overlay-strong);
   width: 100vw;
   text-align: center;
   display: flex;
   align-items: center;
-  margin-bottom: 0.3rem;
+  margin-bottom: var(--space-lg);
   gap: 1rem;
   flex-direction: row-reverse;
-  padding: 0.5rem;
+  padding: var(--space-2xl);
 
   .__menu {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     flex: 1;
-    padding-top: 0.6rem;
+    padding-top: var(--space-2xl);
 
     .__selected {
-      background-color: #242424;
+      background-color: var(--state-selected-bg);
     }
 
     .__highlight {
-      background-color: #274db4;
-      box-shadow: 0px 0px 5px 2px #274db4;
+      background-color: var(--dark-blue1);
+      box-shadow: 0px 0px 5px 2px var(--dark-blue1);
     }
 
     > button {
-      font-size: 1rem;
+      font-size: var(--font-size-base);
       flex: 1;
-      padding: 0.75rem;
+      padding: var(--space-5xl);
       width: 10rem;
     }
   }
@@ -263,7 +263,7 @@ export default Menu
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 0.3rem;
+    margin-bottom: var(--space-lg);
     gap: 0.1rem;
     flex-direction: column;
   }
@@ -276,11 +276,11 @@ export default Menu
   }
 
   .__notConnected {
-    color: red;
+    color: var(--status-error);
   }
 
   .__connected {
-    color: rgb(28, 197, 28);
+    color: var(--status-success);
   }
 
   .__connect {
@@ -293,20 +293,20 @@ export default Menu
   }
 
   .__disconnect button{
-    font-size: 0.6rem;
-    padding: 0.4rem 0.3rem;
+    font-size: var(--font-size-xs);
+    padding: var(--space-2xl) var(--space-lg);
   }
 }
 
 @media only screen and (max-width: 700px) {
   .__menuWrapper {
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-top: var(--space-2xl);
+    padding-bottom: var(--space-2xl);
 
     .__menu {
       > button {
-        padding: 8px 12px;
-        font-size: 0.6rem;
+        padding: var(--space-btn-mobile-y) var(--space-btn-mobile-x);
+        font-size: var(--font-size-xs);
       }
     }
 

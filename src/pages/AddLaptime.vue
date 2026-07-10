@@ -561,7 +561,7 @@ export default AddLaptime
 
 <style lang="scss" scoped>
 .__addLaptime {
-  padding: 2rem 0 1rem;
+  padding: var(--space-10xl) 0 var(--space-8xl);
 
   .__heading {
     text-align: center;
@@ -590,8 +590,8 @@ export default AddLaptime
 
   .__raceState {
     text-transform: uppercase;
-    font-size: 1.3rem;
-    padding: 0 0 0 1rem;
+    font-size: var(--font-size-lg);
+    padding-left: var(--space-8xl);
   }
 
   :deep(.__input) {
@@ -600,7 +600,7 @@ export default AddLaptime
 
   .__submit {
     width: 90%;
-    font-size: 2rem;
+    font-size: var(--font-size-xl);
     margin: 0 auto;
   }
 
@@ -615,12 +615,12 @@ export default AddLaptime
   }
 
   @media only screen and (max-width: 700px) {
-    padding: 1rem 0;
+    padding: var(--space-8xl) 0;
 
     .__timeWrapper {
       flex-direction: column;
       width: 100%;
-      padding: 1rem;
+      padding: var(--space-8xl);
     }
 
     .__submit {
@@ -647,8 +647,8 @@ export default AddLaptime
   textarea {
     width: 100%;
     background-color: var(--bg-light1);
-    padding: 0.5rem;
-    border: 0.1rem solid black;
+    padding: var(--space-2xl);
+    border: 0.1rem solid var(--border-dark1);
   }
 
   .__lg textarea {
@@ -658,13 +658,13 @@ export default AddLaptime
   .__autoSubmit {
     display: flex;
     align-items: center;
-    padding: 0 0.5rem;
+    padding: 0 var(--space-2xl);
 
     input[type=checkbox] {
       width: 1.7rem;
       height: 1.7rem;
       display: inline-block;
-      margin: 0.5rem;
+      margin: var(--space-2xl);
     }
   }
 }

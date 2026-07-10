@@ -1,5 +1,8 @@
 <template>
-  <div @click="handleClickEvent($event)">
+  <div
+    class="__driverContent"
+    @click="handleClickEvent($event)"
+  >
     <div>{{ getDriverName(time) }}</div>
     <img
       :src="getRank(time.driverId)"
@@ -58,5 +61,20 @@ export default DriverComponent
 </script>
 
 <style scoped lang="scss">
+.__driverContent {
+  padding: var(--space-sm);
+}
+
+img {
+  margin: var(--space-lg);
+  width: 4.5rem;
+}
+
+@media only screen and (max-width: 700px) {
+  img {
+    margin: var(--space-2xs);
+    width: 3rem;
+  }
+}
 
 </style>

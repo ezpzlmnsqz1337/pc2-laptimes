@@ -155,11 +155,88 @@ export default RaceSettingsBadge
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: var(--space-sm) var(--space-sm) var(--space-2xl) var(--space-sm) var(--shadow-dark);
+  padding: var(--space-lg) var(--space-5xl);
+  margin-bottom: var(--space-lg);
+  font-size: var(--font-size-sm);
+  min-width: 6rem;
+}
+
+.__weatherSunny {
+  background-color: var(--status-warning);
+  color: var(--text-dark1);
+}
+
+.__weatherRainy {
+  background-color: var(--dark-blue1);
+  color: var(--text-light1);
+}
+
+.__weatherSnow {
+  background-color: var(--surface-muted);
+  color: var(--text-dark1);
+}
+
+.__brakingLineOff {
+  background-color: var(--status-error);
+  color: var(--text-light1);
+}
+
+.__brakingLineOn {
+  background-color: var(--status-success);
+  color: var(--text-light1);
+}
+
+.__transmissionAutomatic {
+  background-color: var(--status-success);
+  color: var(--text-light1);
+}
+
+.__transmissionSequential {
+  background-color: var(--dark-blue1);
+  color: var(--text-light1);
+}
+
+.__transmissionHPattern {
+  background-color: var(--status-orange);
+  color: var(--text-light1);
+}
+
+.__controlsKeyboard {
+  background-color: var(--status-success);
+  color: var(--text-light1);
+}
+
+.__controlsGamepad {
+  background-color: var(--active);
+  color: var(--text-light1);
+}
+
+.__controlsSteeringWheel {
+  background-color: var(--bg-dark3);
+  color: var(--text-light1);
+}
+
+@media only screen and (max-width: 1024px) {
+  .__textContainer {
+    padding: var(--space-sm) var(--space-lg);
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-2xs);
+  }
 }
 
 @media only screen and (max-width: 700px) {
   .__textContainer {
     justify-content: center;
+    padding: var(--space-sm) var(--space-lg);
+    margin-bottom: var(--space-lg);
+    font-size: var(--font-size-2xs);
+    min-width: 1.3rem;
+    width: 1.3rem;
+  }
+
+  .__textContainer span {
+    display: none;
   }
 }
 </style>

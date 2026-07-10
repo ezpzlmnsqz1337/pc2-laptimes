@@ -222,9 +222,9 @@ export default LaptimeTable
 </script>
 
 <style lang="scss" scoped>
-@import '../../assets/css/table.css';
+@import '../../assets/css/table.scss';
 .__lastAddedLaptime {
-  --blink-color: #3a9ee0;
+  --blink-color: var(--accent-blink);
   animation: blink 1s 10;
 }
 

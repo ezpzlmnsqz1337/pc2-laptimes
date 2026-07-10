@@ -14,6 +14,7 @@ import { WebsocketState } from '@/constants/WebsocketState'
 import { v4 as uuidv4 } from 'uuid'
 import eb from '@/eventBus'
 import { objectToCamel, objectToSnake } from 'ts-case-convert'
+import { buildDriverRaceTotals, DriverRaceTotalRow } from './raceStats'
 
 // const debug = process.env.NODE_ENV !== 'production'
 
@@ -157,6 +158,10 @@ export interface DataStore {
   cars: Car[]
   times: Laptime[]
   races: Race[]
+  raceTotals: {
+    includeSolo: DriverRaceTotalRow[]
+    excludeSolo: DriverRaceTotalRow[]
+  }
   mytimes: Laptime[]
   tracks: Track[]
   drivers: Driver[]
@@ -172,8 +177,10 @@ export interface DataStore {
   getTimesForDriver(driverId: string): Laptime[]
   getTimes(filter?: LaptimeFilter): Laptime[]
   getRaces(filter?: RaceFilter): Race[]
+  getRaceTotals(includeSolo?: boolean): DriverRaceTotalRow[]
   getTracksTimes(tracks: Track[]): Laptime[]
   getDistinctTimes(laptimes: Laptime[]): Laptime[]
+  refreshRaceTotals(): void
   toggleAutoSubmit(): void
 
   addCar(name: string): void
@@ -214,6 +221,10 @@ export const dataStore: DataStore = {
   cars: [],
   times: [],
   races: [],
+  raceTotals: {
+    includeSolo: [],
+    excludeSolo: []
+  },
   mytimes: [],
   tracks: [],
   drivers: [],
@@ -382,6 +393,7 @@ export const dataStore: DataStore = {
 
     this.times[index] = { ...this.times[index], ...sanitizedUpdate }
     this.races = buildRacesFromTimes(this.times)
+    this.refreshRaceTotals()
     console.log(response.statusText)
     this.broadcastDataChange('times')
   },
@@ -393,6 +405,7 @@ export const dataStore: DataStore = {
     if (response.ok) {
       this.times = this.times.filter(x => x.uid !== laptimeId)
       this.races = buildRacesFromTimes(this.times)
+      this.refreshRaceTotals()
       this.broadcastDataChange('times')
     }
     console.log(response.statusText)
@@ -485,6 +498,27 @@ export const dataStore: DataStore = {
       .filter(x => !driverId || x.times.some(t => t.driverId === driverId))
       .sort((a, b) => b.startDate - a.startDate)
   },
+  getRaceTotals (includeSolo = false) {
+    return includeSolo ? this.raceTotals.includeSolo : this.raceTotals.excludeSolo
+  },
+  refreshRaceTotals () {
+    const ltb = LaptimeBuilder.getInstance()
+    const buildTotalsFor = (includeSolo: boolean) => {
+      const races = includeSolo ? this.races : this.races.filter(x => x.times.length > 1)
+      return buildDriverRaceTotals({
+        races,
+        resolveDriver: (driverId) => this.getDriverById(driverId),
+        resolveTrackName: (trackId) => this.getTrackById(trackId)?.track || 'Unknown',
+        resolveCar: (carId) => this.getCarById(carId),
+        compareLaptimes: (left, right) => ltb.compareLaptimes(left, right)
+      })
+    }
+
+    this.raceTotals = {
+      includeSolo: buildTotalsFor(true),
+      excludeSolo: buildTotalsFor(false)
+    }
+  },
   getDistinctTimes (laptimes: Laptime[]) {
     const seenKeys = new Set<string>()
 
@@ -506,16 +540,19 @@ export const dataStore: DataStore = {
         variants: camelCased.variants
       }
     })
+    this.refreshRaceTotals()
   },
   async fetchCars () {
     const response = await fetch(CARS_ENDPOINT)
     const cars = await response.json()
     this.cars = cars.map((x: Car) => objectToCamel(x) as Car)
+    this.refreshRaceTotals()
   },
   async fetchDrivers () {
     const response = await fetch(DRIVERS_ENDPOINT)
     const drivers = await response.json()
     this.drivers = drivers.map((x: Driver) => objectToCamel(x) as Driver)
+    this.refreshRaceTotals()
   },
   async fetchTimes () {
     const response = await fetch(TIMES_ENDPOINT)
@@ -525,6 +562,7 @@ export const dataStore: DataStore = {
       return { ...camelCased, date: parseInt(camelCased.date), brakingLine: camelCased.brakingLine ? 'on' : 'off' }
     })
     this.races = buildRacesFromTimes(this.times)
+    this.refreshRaceTotals()
   },
   bindDb () {
     this.fetchTracks()

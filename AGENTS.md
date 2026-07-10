@@ -67,6 +67,9 @@ deployment/          # Kubernetes/Podman deployment scripts
 - **Interfaces over types**: Prefer interfaces for object shapes
 - **Enums for constants**: Use const enums in `src/constants/` for related values
 - **Shim files**: Type declarations for third-party libs without types are in `src/shims-*.d.ts`
+- **Avoid magic numbers/strings**: Prefer named constants and enums for domain values
+- **Boolean naming**: Prefer `is*` / `has*` naming for boolean flags
+- **Function scope discipline**: Keep functions focused and avoid flag-argument branching where practical
 
 ### Vue Components
 - **File naming**: PascalCase for components (e.g., `LaptimeTable.vue`, `NewCarModal.vue`)
@@ -87,6 +90,40 @@ deployment/          # Kubernetes/Podman deployment scripts
 - **State management**: Use the custom store via `inject('store')` or props
 - **Event bus**: Available at `src/eventBus.ts` for cross-component communication
 - **Props typing**: Always type component props explicitly
+
+### CSS/SCSS Standards (Enforced)
+- **No hardcoded design tokens in component styles**: avoid hardcoded colors, spacing, and typography sizes in `.vue` style blocks.
+- **Use CSS variables**: use shared tokens from `:root` in `src/App.vue` for:
+  - colors (`--text-*`, `--bg-*`, `--status-*`, etc.)
+  - spacing (`--space-*`)
+  - typography (`--font-size-*`)
+- **Prefer consolidated spacing tokens**: use existing spacing tokens first and avoid adding new one-off spacing values unless there is a strong reuse case.
+- **Prefer relative units**: use `rem`, `%`, `vw/vh` where applicable (avoid fixed `px` for typography/spacing unless justified).
+- **Keep styles component-scoped and reusable**: avoid inline styles and avoid over-coupled selectors.
+- **Avoid unnecessary `!important`** unless overriding third-party library styles and there is no cleaner option.
+- **When editing existing code**: if nearby violations are found, proactively suggest or apply low-risk improvements.
+
+### Style/Type Audit Commands
+Use `rg` for quick quality checks before/after style changes:
+
+```bash
+# Hardcoded colors in Vue styles/templates/scripts (review context before changing)
+rg -n --glob 'src/**/*.vue' '#([0-9a-fA-F]{3,8})\b|rgba?\(|hsla?\(|\b(white|black|gray|grey|red|green|blue|yellow|orange|purple|pink|brown)\b'
+
+# Hardcoded spacing/font-size declarations in Vue style blocks
+rg -n --glob 'src/**/*.vue' '(padding(-[a-z]+)?|margin(-[a-z]+)?|font-size)\s*:\s*[^;]*[0-9](rem|px|em|%)'
+
+# Inline style usage in Vue templates (generally avoid)
+rg -n --glob 'src/**/*.vue' 'style\s*='
+
+# any-usage hotspots in TS/Vue scripts
+rg -n --glob 'src/**/*.{ts,vue}' '\bany\b'
+```
+
+### Reference Guides
+- CSS best practices: https://github.com/andredesousa/css-best-practices
+- Front-end style standards: https://github.com/Ferie/Front-end-coding-standards/blob/master/Styles/styles.md
+- TypeScript best practices: https://github.com/andredesousa/typescript-best-practices
 
 ### State Management
 - **Store structure**: Modular stores in `src/store/`
@@ -406,5 +443,5 @@ npm run dev                # Start WebSocket server locally
 
 ---
 
-**Last Updated**: November 15, 2025  
+**Last Updated**: July 10, 2026  
 **Maintainer**: Feel free to update this file as the project evolves!

@@ -89,6 +89,6 @@ export default WebsocketTesting
 
 <style scoped>
 .__websocketTesting {
-  padding: 2rem 1rem;
+  padding: var(--space-10xl) var(--space-8xl);
 }
 </style>

@@ -57,5 +57,14 @@ export default CarComponent
 </script>
 
 <style scoped lang="scss">
+img {
+  width: 8rem;
+}
+
+@media only screen and (max-width: 700px) {
+  img {
+    width: 4rem;
+  }
+}
 
 </style>

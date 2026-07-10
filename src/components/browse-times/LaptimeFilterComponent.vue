@@ -312,7 +312,7 @@ export default LaptimeFilterComponent
 
 <style lang="scss" scoped>
 .__filterWrapper {
-  padding: 1rem;
+  padding: var(--space-8xl);
 
   .__hideFilter {
     position: relative;
@@ -324,7 +324,7 @@ export default LaptimeFilterComponent
 
   .__moreFilters,
   .__distinctFilter {
-    margin-top: 0.7rem;
+    margin-top: var(--space-5xl);
 
     &.__hidden {
       visibility: hidden;
@@ -337,27 +337,27 @@ export default LaptimeFilterComponent
 
   .__datePickerClearBtn {
     :deep(button) {
-      padding: 0.75rem 0.9rem;
+      padding: var(--space-5xl) var(--space-8xl);
     }
   }
 
   :deep(.__heading) {
-    font-size: 0.7rem;
+    font-size: var(--font-size-sm);
     font-weight: normal;
   }
 
   :deep(.__datepicker) {
     text-align: center;
-    font-size: 1rem;
+    font-size: var(--font-size-base);
     display: block;
     width: 100%;
-    border: 1px solid white;
+    border: 1px solid var(--border-light1);
   }
 
   :deep(.v3dp__popout){
     --elem-disabled-color: var(--text-disabled);
-    color: var(--text-light);
-    font-size: 1rem;
+    color: var(--text-light1);
+    font-size: var(--font-size-base);
     bottom: 1rem;
   }
 
@@ -367,7 +367,7 @@ export default LaptimeFilterComponent
   }
 
   :deep(.__inputRow) {
-    margin-bottom: 0.7rem;
+    margin-bottom: var(--space-5xl);
   }
 }
 
@@ -375,7 +375,7 @@ export default LaptimeFilterComponent
   .__filterWrapper {
     .__datePickerClearBtn {
       :deep(button) {
-        padding: 0.5rem 0.9rem;
+        padding: var(--space-2xl) var(--space-8xl);
       }
     }
   }
@@ -385,10 +385,10 @@ export default LaptimeFilterComponent
   .__filterWrapper {
     padding: 0;
     width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-8xl);
 
     .__hideFilter button {
-      font-size: 0.6rem;
+      font-size: var(--font-size-xs);
     }
   }
 }
