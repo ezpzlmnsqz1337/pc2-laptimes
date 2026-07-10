@@ -70,6 +70,15 @@ ssh $DESTINATION 'podman image prune -f'
 echo "✅ Cleanup complete!"
 echo ""
 
+# Cleanup local build artifacts on the podman VM (WSL podman-machine-default backend)
+echo "🧽 Cleaning local Podman VM artifacts..."
+rm -f pc2-laptimes.tar
+podman rmi -f pc2-laptimes:latest > /dev/null 2>&1 || true
+podman image prune -a -f > /dev/null 2>&1 || true
+podman builder prune -a -f > /dev/null 2>&1 || true
+echo "✅ Local Podman cleanup complete!"
+echo ""
+
 # End timer and display
 END_TIME=$(date +%s)
 DURATION=$((END_TIME - START_TIME))
