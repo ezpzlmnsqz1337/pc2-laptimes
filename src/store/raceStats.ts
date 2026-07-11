@@ -15,11 +15,18 @@ export interface DetailCountItem {
   imageUrl?: string
 }
 
+export interface YearlyHeadToHeadItem {
+  year: number
+  wins: number
+  losses: number
+}
+
 export interface HeadToHeadItem {
   opponentId: string
   opponentName: string
   wins: number
   losses: number
+  yearlyRecords: YearlyHeadToHeadItem[]
 }
 
 export interface DriverRaceTotalRow {
@@ -68,28 +75,59 @@ function topCounts (
     }))
 }
 
+interface HeadToHeadScore {
+  wins: number
+  losses: number
+  yearlyRecords: Record<number, { wins: number, losses: number }>
+}
+
+function getRaceYear (race: RaceStatsLike) {
+  const firstTime = race.times[0]
+  return new Date(firstTime?.date || 0).getFullYear()
+}
+
+function getOrCreateHeadToHeadScore (
+  result: Record<string, Record<string, HeadToHeadScore>>,
+  driverId: string,
+  opponentId: string
+) {
+  if (!result[driverId]) result[driverId] = {}
+  if (!result[driverId][opponentId]) {
+    result[driverId][opponentId] = {
+      wins: 0,
+      losses: 0,
+      yearlyRecords: {}
+    }
+  }
+
+  return result[driverId][opponentId]
+}
+
 function buildHeadToHead (races: RaceStatsLike[]) {
-  const result = {} as Record<string, Record<string, { wins: number, losses: number }>>
+  const result = {} as Record<string, Record<string, HeadToHeadScore>>
 
   races.forEach((race) => {
     if (!race.winnerDriverId) return
 
     const participants = Array.from(new Set(race.times.map(x => x.driverId)))
     if (participants.length < 2) return
+    const raceYear = getRaceYear(race)
 
     participants.forEach((driverId) => {
       participants
         .filter(opponentId => opponentId !== driverId)
         .forEach((opponentId) => {
-          if (!result[driverId]) result[driverId] = {}
-          if (!result[driverId][opponentId]) {
-            result[driverId][opponentId] = { wins: 0, losses: 0 }
+          const score = getOrCreateHeadToHeadScore(result, driverId, opponentId)
+          if (!score.yearlyRecords[raceYear]) {
+            score.yearlyRecords[raceYear] = { wins: 0, losses: 0 }
           }
 
           if (race.winnerDriverId === driverId) {
-            result[driverId][opponentId].wins += 1
+            score.wins += 1
+            score.yearlyRecords[raceYear].wins += 1
           } else if (race.winnerDriverId === opponentId) {
-            result[driverId][opponentId].losses += 1
+            score.losses += 1
+            score.yearlyRecords[raceYear].losses += 1
           }
         })
     })
@@ -207,7 +245,14 @@ export function buildDriverRaceTotals ({
           opponentId,
           opponentName: resolveDriver(opponentId)?.name || 'Unknown',
           wins: score.wins,
-          losses: score.losses
+          losses: score.losses,
+          yearlyRecords: Object.entries(score.yearlyRecords)
+            .map(([year, yearlyScore]) => ({
+              year: parseInt(year),
+              wins: yearlyScore.wins,
+              losses: yearlyScore.losses
+            }))
+            .sort((a, b) => b.year - a.year)
         }))
         .sort((a, b) => b.wins - a.wins || b.losses - a.losses || a.opponentName.localeCompare(b.opponentName))
 

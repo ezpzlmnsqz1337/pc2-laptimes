@@ -104,27 +104,48 @@
                 </ul>
               </div>
 
-              <div class="__detailsBlock">
+              <div class="__detailsBlock __detailsBlockFullWidth">
                 <h4>Head to head</h4>
-                <ul>
-                  <li
-                    v-for="record in row.headToHead"
-                    :key="`h2h-${row.driverId}-${record.opponentId}`"
-                    :class="getHeadToHeadClass(record)"
-                  >
-                    <span class="__h2hIconWrapper">
-                      <span
-                        class="fa __h2hIcon"
-                        :class="getHeadToHeadIconClass(record)"
-                        aria-hidden="true"
-                      />
-                    </span>
-                    {{ row.driverName }} vs {{ record.opponentName }} - {{ record.wins }}:{{ record.losses }}
-                  </li>
-                  <li v-if="!row.headToHead.length">
-                    -
-                  </li>
-                </ul>
+                <table
+                  v-if="row.headToHead.length"
+                  class="__h2hTable"
+                >
+                  <thead>
+                    <tr>
+                      <th>Opponent</th>
+                      <th>Total</th>
+                      <th
+                        v-for="year in getHeadToHeadYears(row)"
+                        :key="`h2h-header-${row.driverId}-${year}`"
+                      >
+                        {{ year }}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="record in row.headToHead"
+                      :key="`h2h-${row.driverId}-${record.opponentId}`"
+                    >
+                      <td class="__h2hOpponentCell">
+                        {{ record.opponentName }}
+                      </td>
+                      <td :class="['__h2hScoreCell', getHeadToHeadClass(record)]">
+                        {{ record.wins }}:{{ record.losses }}
+                      </td>
+                      <td
+                        v-for="year in getHeadToHeadYears(row)"
+                        :key="`h2h-cell-${row.driverId}-${record.opponentId}-${year}`"
+                        :class="['__h2hScoreCell', getHeadToHeadClass(getYearRecord(record, year))]"
+                      >
+                        {{ formatHeadToHeadScore(getYearRecord(record, year)) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div v-else>
+                  -
+                </div>
               </div>
             </div>
           </td>
@@ -136,7 +157,7 @@
 
 <script lang="ts">
 import { ButtonType } from '@/constants/ButtonType'
-import { DriverRaceTotalRow } from '@/store/raceStats'
+import { DriverRaceTotalRow, HeadToHeadItem, YearlyHeadToHeadItem } from '@/store/raceStats'
 import { Options, Vue } from 'vue-class-component'
 
 @Options({
@@ -169,16 +190,26 @@ class RaceTotalsTable extends Vue {
     this.expandedDriverId = this.expandedDriverId === driverId ? null : driverId
   }
 
-  getHeadToHeadClass (record: { wins: number, losses: number }) {
+  getHeadToHeadYears (row: DriverRaceTotalRow) {
+    return Array.from(new Set(
+      row.headToHead.flatMap(record => record.yearlyRecords.map(yearRecord => yearRecord.year))
+    )).sort((a, b) => b - a)
+  }
+
+  getYearRecord (record: HeadToHeadItem, year: number) {
+    return record.yearlyRecords.find(yearRecord => yearRecord.year === year)
+  }
+
+  formatHeadToHeadScore (record?: YearlyHeadToHeadItem) {
+    if (!record) return '-'
+    return `${record.wins}:${record.losses}`
+  }
+
+  getHeadToHeadClass (record?: { wins: number, losses: number }) {
+    if (!record) return '__h2hEmpty'
     if (record.wins > record.losses) return '__h2hWin'
     if (record.wins < record.losses) return '__h2hLoss'
     return '__h2hEven'
-  }
-
-  getHeadToHeadIconClass (record: { wins: number, losses: number }) {
-    if (record.wins > record.losses) return 'fa-check'
-    if (record.wins < record.losses) return 'fa-times'
-    return 'fa-minus'
   }
 }
 
@@ -257,7 +288,7 @@ table {
 
 .__detailsGrid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-8xl);
   padding: var(--space-5xl);
   background-color: var(--surface-overlay-soft);
@@ -284,6 +315,83 @@ table {
   }
 }
 
+.__detailsBlockFullWidth {
+  grid-column: 1 / -1;
+}
+
+.__h2hTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  thead th {
+    padding: var(--space-5xl) var(--space-9xl);
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+
+  tbody td {
+    padding: var(--space-5xl) var(--space-9xl);
+    text-align: center;
+    vertical-align: middle;
+    line-height: 1.4;
+  }
+
+  th:first-child,
+  td:first-child {
+    text-align: left;
+  }
+
+  thead th:first-child {
+    text-align: center;
+  }
+
+  thead th {
+    border-bottom: 1px solid var(--table-border, var(--bg-light2));
+  }
+
+  tbody tr:hover {
+    background-color: transparent;
+  }
+
+  tbody tr:nth-child(odd) {
+    color: var(--text-light1);
+    background-color: var(--bg-dark1);
+  }
+
+  tbody tr:nth-child(even) {
+    color: var(--text-dark1);
+    background-color: var(--bg-light1);
+  }
+}
+
+.__h2hOpponentCell {
+  min-width: 11rem;
+  text-align: center !important;
+  font-weight: bold;
+}
+
+.__h2hScoreCell {
+  min-width: 5.5rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  border-radius: var(--space-md);
+  color: inherit;
+}
+
+.__h2hWin {
+  background-color: rgba(5, 151, 17, 0.18);
+}
+
+.__h2hLoss {
+  background-color: rgba(255, 0, 0, 0.16);
+}
+
+.__h2hEven {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .__carDetailItem {
   list-style-type: disc;
 
@@ -291,46 +399,6 @@ table {
     width: 2.2rem;
     margin-right: var(--space-lg);
     vertical-align: middle;
-  }
-}
-
-.__h2hIcon {
-  font-size: var(--font-size-xs);
-  line-height: 1;
-  color: var(--text-light1);
-}
-
-.__h2hIconWrapper {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 0.9rem;
-  height: 0.9rem;
-  border-radius: 50%;
-  background-color: var(--bg-light2);
-}
-
-.__h2hWin {
-  color: inherit;
-
-  .__h2hIconWrapper {
-    background-color: var(--status-success);
-  }
-}
-
-.__h2hLoss {
-  color: inherit;
-
-  .__h2hIconWrapper {
-    background-color: var(--status-error);
-  }
-}
-
-.__h2hEven {
-  color: inherit;
-
-  .__h2hIconWrapper {
-    background-color: var(--text-disabled);
   }
 }
 
@@ -345,15 +413,6 @@ table {
 
   .__detailsGrid {
     grid-template-columns: 1fr;
-  }
-
-  .__h2hIcon {
-    font-size: var(--font-size-2xs);
-  }
-
-  .__h2hIconWrapper {
-    width: 0.8rem;
-    height: 0.8rem;
   }
 }
 </style>
