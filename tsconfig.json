@@ -4,7 +4,7 @@
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "experimentalDecorators": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -13,14 +13,13 @@
     "useDefineForClassFields": false,
     "sourceMap": true,
     "allowJs": true,
-    "baseUrl": ".",
     "types": [
       "webpack-env",
-      "jest"
+      "vitest/globals"
     ],
     "paths": {
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     },
     "lib": [

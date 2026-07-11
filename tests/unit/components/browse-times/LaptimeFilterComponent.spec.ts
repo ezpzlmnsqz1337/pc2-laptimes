@@ -12,8 +12,15 @@ import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { dataStore } from '@/store/dataStore'
 import { config, shallowMount } from '@vue/test-utils'
+import { describe, expect, it, vi } from 'vitest'
 import vSelect from 'vue-select'
 import Datepicker from 'vue3-datepicker'
+
+vi.mock('@/constants/Rank', () => ({
+  Rank: {
+    UNRANKED: 'unranked'
+  }
+}))
 
 const dummyFilter : any = {
   carId: 'carId1',

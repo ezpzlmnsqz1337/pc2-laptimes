@@ -6,6 +6,7 @@ import { ControlType } from '@/constants/ControlType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { config, shallowMount } from '@vue/test-utils'
+import { describe, expect, it, vi } from 'vitest'
 import vSelect from 'vue-select'
 
 describe('RaceSettingsBadge.vue', () => {
@@ -35,7 +36,7 @@ describe('RaceSettingsBadge.vue', () => {
     const type = BadgeType.TRANSMISSION
     const value = TransmissionType.AUTOMATIC
 
-    const getClassSpy = jest.fn()
+    const getClassSpy = vi.fn()
     // @ts-ignore
     RaceSettingsBadge.methods!.getClass = getClassSpy
 

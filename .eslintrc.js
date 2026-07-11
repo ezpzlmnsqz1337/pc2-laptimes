@@ -22,15 +22,5 @@ module.exports = {
     'vue/no-v-html': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error'
-  },
-  overrides: [
-    {
-      files: [
-        'tests/unit/**/*.spec.{j,t}s?(x)'
-      ],
-      env: {
-        jest: true
-      }
-    }
-  ]
+  }
 }
