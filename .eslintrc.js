@@ -7,8 +7,11 @@ module.exports = {
 
   extends: [
     'plugin:vue/vue3-recommended',
-    '@vue/standard',
-    '@vue/typescript'
+    '@vue/standard'
+  ],
+
+  plugins: [
+    '@typescript-eslint'
   ],
 
   parserOptions: {
@@ -22,5 +25,12 @@ module.exports = {
     'vue/no-v-html': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error'
-  }
+  },
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      parser: '@typescript-eslint/parser',
+      plugins: ['@typescript-eslint']
+    }
+  ]
 }
