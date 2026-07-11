@@ -1,6 +1,9 @@
 import { Car } from '@/constants/Car'
 import { Track } from '@/constants/Track'
 import LaptimeBuilder, { Laptime } from '@/builders/LaptimeBuilder'
+import RaceBuilder from '@/builders/RaceBuilder'
+import type { Race } from '@/builders/RaceBuilder'
+import RaceStatisticsBuilder, { DriverRaceTotalRow } from '@/builders/RaceStatisticsBuilder'
 import { Driver } from '@/builders/StatisticsBuilder'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
@@ -14,7 +17,9 @@ import { WebsocketState } from '@/constants/WebsocketState'
 import { v4 as uuidv4 } from 'uuid'
 import eb from '@/eventBus'
 import { objectToCamel, objectToSnake } from 'ts-case-convert'
-import { buildDriverRaceTotals, DriverRaceTotalRow } from './raceStats'
+
+export { RACE_GROUP_WINDOW_MS } from '@/builders/RaceBuilder'
+export type { Race } from '@/builders/RaceBuilder'
 
 // const debug = process.env.NODE_ENV !== 'production'
 
@@ -62,91 +67,10 @@ export const TRACKS_ENDPOINT = `${DB_URL}/tracks`
 export const DRIVERS_ENDPOINT = `${DB_URL}/drivers`
 export const TIMES_ENDPOINT = `${DB_URL}/times`
 export const FAILED_AUTO_SUBMIT_ENDPOINT = `${DB_URL}/failedAutoSubmitData`
-export const RACE_GROUP_WINDOW_MS = 5 * 60 * 1000
-
-export interface Race {
-  uid: string
-  trackId: string
-  trackVariant: string
-  startDate: number
-  endDate: number
-  times: Laptime[]
-  winnerDriverId: string | null
-}
 
 export interface RaceFilter {
   driverId?: string | null
   includeSolo?: boolean
-}
-
-function buildRaceUid (times: Laptime[]) {
-  const sortedTimeIds = [...times].map(x => x.uid).sort()
-    .join('|')
-  const first = times[0]
-  return `${first.trackId}|${first.trackVariant || ''}|${first.date}|${sortedTimeIds}`
-}
-
-function toRace (times: Laptime[], ltb: LaptimeBuilder): Race {
-  const ranked = [...times].sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
-  const first = times[0]
-  const last = times[times.length - 1]
-
-  return {
-    uid: buildRaceUid(times),
-    trackId: first.trackId,
-    trackVariant: first.trackVariant,
-    startDate: first.date,
-    endDate: last.date,
-    times,
-    winnerDriverId: ranked.length > 1 ? ranked[0].driverId : null
-  }
-}
-
-function canAppendToRace (session: Laptime[], candidate: Laptime) {
-  if (session.length <= 0) return true
-  const first = session[0]
-
-  if (first.trackId !== candidate.trackId) return false
-  if (first.trackVariant !== candidate.trackVariant) return false
-  if ((candidate.date - first.date) > RACE_GROUP_WINDOW_MS) return false
-  if (session.some(x => x.driverId === candidate.driverId)) return false
-
-  return true
-}
-
-function buildRacesFromTimes (times: Laptime[]): Race[] {
-  if (!times.length) return []
-
-  const sorted = [...times].sort((a, b) => {
-    return a.trackId.localeCompare(b.trackId) ||
-      (a.trackVariant || '').localeCompare(b.trackVariant || '') ||
-      a.date - b.date
-  })
-
-  const ltb = LaptimeBuilder.getInstance()
-  const races: Race[] = []
-  let session: Laptime[] = []
-
-  for (const time of sorted) {
-    if (session.length <= 0) {
-      session = [time]
-      continue
-    }
-
-    if (canAppendToRace(session, time)) {
-      session.push(time)
-      continue
-    }
-
-    races.push(toRace(session, ltb))
-    session = [time]
-  }
-
-  if (session.length > 0) {
-    races.push(toRace(session, ltb))
-  }
-
-  return races
 }
 
 export interface DataStore {
@@ -392,7 +316,7 @@ export const dataStore: DataStore = {
     }
 
     this.times[index] = { ...this.times[index], ...sanitizedUpdate }
-    this.races = buildRacesFromTimes(this.times)
+    this.races = RaceBuilder.buildRacesFromTimes(this.times)
     this.refreshRaceTotals()
     console.log(response.statusText)
     this.broadcastDataChange('times')
@@ -404,7 +328,7 @@ export const dataStore: DataStore = {
     })
     if (response.ok) {
       this.times = this.times.filter(x => x.uid !== laptimeId)
-      this.races = buildRacesFromTimes(this.times)
+      this.races = RaceBuilder.buildRacesFromTimes(this.times)
       this.refreshRaceTotals()
       this.broadcastDataChange('times')
     }
@@ -505,7 +429,7 @@ export const dataStore: DataStore = {
     const ltb = LaptimeBuilder.getInstance()
     const buildTotalsFor = (includeSolo: boolean) => {
       const races = includeSolo ? this.races : this.races.filter(x => x.times.length > 1)
-      return buildDriverRaceTotals({
+      return RaceStatisticsBuilder.buildDriverRaceTotals({
         races,
         resolveDriver: (driverId) => this.getDriverById(driverId),
         resolveTrackName: (trackId) => this.getTrackById(trackId)?.track || 'Unknown',
@@ -561,7 +485,7 @@ export const dataStore: DataStore = {
       const camelCased = objectToCamel(x) as any
       return { ...camelCased, date: parseInt(camelCased.date), brakingLine: camelCased.brakingLine ? 'on' : 'off' }
     })
-    this.races = buildRacesFromTimes(this.times)
+    this.races = RaceBuilder.buildRacesFromTimes(this.times)
     this.refreshRaceTotals()
   },
   bindDb () {

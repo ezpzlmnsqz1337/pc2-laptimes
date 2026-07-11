@@ -157,7 +157,7 @@
 
 <script lang="ts">
 import { ButtonType } from '@/constants/ButtonType'
-import { DriverRaceTotalRow, HeadToHeadItem, YearlyHeadToHeadItem } from '@/store/raceStats'
+import { DriverRaceTotalRow, HeadToHeadItem, YearlyHeadToHeadItem } from '@/builders/RaceStatisticsBuilder'
 import { Options, Vue } from 'vue-class-component'
 
 @Options({
