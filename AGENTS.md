@@ -243,9 +243,17 @@ See `src/assets/` for SQL files:
 
 ### Local Development
 ```bash
+nvm install
+nvm use
 npm install
 npm run serve
 ```
+
+### Node Version Management (nvm)
+- Use Node.js 22 LTS for this repository.
+- Root `.nvmrc` is the source of truth for Node.js version in this repository.
+- Always run `nvm install && nvm use` before installing dependencies or running scripts.
+- Use the same version for both the Vue app and `ws-server/` to avoid runtime/tooling mismatches.
 
 ### Development Environment Setup (Windows + WSL)
 
