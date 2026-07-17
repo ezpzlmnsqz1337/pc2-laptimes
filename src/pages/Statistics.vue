@@ -48,8 +48,10 @@
         :model-value="selectedYear"
         class="__yearSelect"
         :options="availableYears"
+        label="label"
         placeholder="All years"
         :clearable="true"
+        :reduce="extractYear"
         @update:model-value="setYear($event)"
       />
     </div>
@@ -115,6 +117,7 @@
 import Leaderboards from '@/components/statistics/Leaderboards.vue'
 import Medals from '@/components/statistics/MedalsComponent.vue'
 import RacesDaysBarChart, { ChartClickEvent } from '@/components/statistics/RacesDaysBarChart.vue'
+import SelectInput from '@/components/ui/SelectInput.vue'
 import { ScreenType } from '@/constants/ScreenType'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import eb from '@/eventBus'
@@ -125,7 +128,8 @@ import { Options, Vue } from 'vue-class-component'
   components: {
     Medals,
     RacesDaysBarChart,
-    Leaderboards
+    Leaderboards,
+    SelectInput
   }
 })
 class Statistics extends Vue {
@@ -149,6 +153,7 @@ class Statistics extends Vue {
     })
     return Array.from(years).sort()
       .reverse()
+      .map(y => ({ label: y }))
   }
 
   showScreen (screen: StatisticsScreenType) {
@@ -197,6 +202,10 @@ class Statistics extends Vue {
   setYear (year: string | null) {
     this.selectedYear = year
     this.refresh()
+  }
+
+  extractYear (option: { label: string }) {
+    return option.label
   }
 
   refresh (delay: number = 0) {
