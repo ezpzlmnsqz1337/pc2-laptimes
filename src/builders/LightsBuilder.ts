@@ -1,14 +1,4 @@
-export default class LightsBuilder {
-  // eslint-disable-next-line no-use-before-define
-  private static instance?: LightsBuilder
-
-  static getInstance (): LightsBuilder {
-    if (!LightsBuilder.instance) {
-      LightsBuilder.instance = new LightsBuilder()
-    }
-    return LightsBuilder.instance
-  }
-
+class LightsBuilder {
   async setLightsColor (url: string, lightId: string, colorHex: string, brightness: number) {
     const data = {
       id: lightId,
@@ -33,3 +23,5 @@ export default class LightsBuilder {
     })
   }
 }
+
+export const lightsBuilder = new LightsBuilder()

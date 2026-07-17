@@ -57,16 +57,16 @@
     </div>
 
     <keep-alive>
-      <StatisticsSection
+      <div
         v-if="!refreshing && activeScreen === StatisticsScreenType.MEDALS"
         class="__generalStatisticsSection"
       >
         <Medals :refresh="refresh" />
-      </StatisticsSection>
+      </div>
     </keep-alive>
 
     <keep-alive>
-      <StatisticsSection
+      <div
         v-if="!refreshing && activeScreen === StatisticsScreenType.CHARTS"
         class="__racesPerDaySection"
       >
@@ -79,11 +79,11 @@
             @click="onChartClick($event)"
           />
         </div>
-      </StatisticsSection>
+      </div>
     </keep-alive>
 
     <keep-alive>
-      <StatisticsSection
+      <div
         v-if="!refreshing && activeScreen === StatisticsScreenType.LEADERBOARDS"
         class="__trackCarMatrixSection"
       >
@@ -96,7 +96,7 @@
         <div class="__trackTimes">
           <Leaderboards :refresh="refresh" />
         </div>
-      </StatisticsSection>
+      </div>
     </keep-alive>
   </div>
 </template>
@@ -105,7 +105,6 @@
 import Leaderboards from '@/components/statistics/Leaderboards.vue'
 import Medals from '@/components/statistics/MedalsComponent.vue'
 import RacesDaysBarChart, { ChartClickEvent } from '@/components/statistics/RacesDaysBarChart.vue'
-import StatisticsSection from '@/components/statistics/StatisticsSection.vue'
 import { ScreenType } from '@/constants/ScreenType'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import eb from '@/eventBus'
@@ -114,7 +113,6 @@ import { Options, Vue } from 'vue-class-component'
 
 @Options({
   components: {
-    StatisticsSection,
     Medals,
     RacesDaysBarChart,
     Leaderboards

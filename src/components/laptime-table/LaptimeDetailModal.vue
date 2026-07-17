@@ -181,7 +181,6 @@ import { Game } from '@/constants/Game'
 import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
-import sha256 from 'crypto-js/sha256'
 import { Options, prop, Vue } from 'vue-class-component'
 
 interface LaptimeSettings {
@@ -276,8 +275,12 @@ class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
     this.$nextTick(() => (this.$refs.passwordInputRef as HTMLInputElement).focus())
   }
 
-  login () {
-    this.passwordHash = sha256(this.password).toString()
+  async login () {
+    const encoder = new TextEncoder()
+    const data = encoder.encode(this.password)
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    this.passwordHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
     this.password = ''
     this.showLogin = false
   }

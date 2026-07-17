@@ -118,61 +118,6 @@ table {
   }
 }
 
-.__weatherSunny {
-  background-color: var(--status-warning);
-  color: var(--text-dark1);
-}
-
-.__weatherRainy {
-  background-color: var(--dark-blue1);
-  color: var(--text-light1);
-}
-
-.__weatherSnow {
-  background-color: var(--surface-muted);
-  color: var(--text-dark1);
-}
-
-.__brakingLineOff {
-  background-color: var(--status-error);
-  color: var(--text-light1);
-}
-
-.__brakingLineOn {
-  background-color: var(--status-success);
-  color: var(--text-light1);
-}
-
-.__transmissionAutomatic {
-  background-color: var(--status-success);
-  color: var(--text-light1);
-}
-
-.__transmissionSequential {
-  background-color: var(--dark-blue1);
-  color: var(--text-light1);
-}
-
-.__transmissionHPattern {
-  background-color: var(--status-orange);
-  color: var(--text-light1);
-}
-
-.__controlsKeyboard {
-  background-color: var(--status-success);
-  color: var(--text-light1);
-}
-
-.__controlsGamepad {
-  background-color: var(--active);
-  color: var(--text-light1);
-}
-
-.__controlsSteeringWheel {
-  background-color: var(--bg-dark3);
-  color: var(--text-light1);
-}
-
 .__settings {
   width: 9rem;
 

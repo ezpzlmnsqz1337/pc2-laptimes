@@ -93,21 +93,6 @@
       >
         Realtime data
       </Button>
-      <!-- <Button
-          :type="ButtonType.SECONDARY"
-          :class="{__selected: activeScreen === ScreenType.SET_CAR_IMAGE}"
-          @click="showScreen(ScreenType.SET_CAR_IMAGE)"
-        >
-          Set car image
-        </Button> -->
-      <!-- <Button
-        v-if="isLocal()"
-        :type="ButtonType.DANGER"
-        :class="{__selected: activeScreen === ScreenType.WEBSOCKET_TESTING}"
-        @click="showScreen(ScreenType.WEBSOCKET_TESTING)"
-      >
-        Websocket testing
-      </Button> -->
     </div>
   </div>
 </template>

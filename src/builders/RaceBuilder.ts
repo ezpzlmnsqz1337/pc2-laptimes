@@ -1,4 +1,4 @@
-import LaptimeBuilder, { Laptime } from './LaptimeBuilder'
+import { LaptimeBuilder, Laptime, laptimeBuilder } from './LaptimeBuilder'
 
 export const RACE_GROUP_WINDOW_MS = 5 * 60 * 1000
 
@@ -57,7 +57,7 @@ export default class RaceBuilder {
         a.date - b.date
     })
 
-    const laptimeBuilder = LaptimeBuilder.getInstance()
+    // ponytail: laptimeBuilder already imported at top
     const races: Race[] = []
     let session: Laptime[] = []
 

@@ -12,17 +12,7 @@ export interface Medals {
   places: number[]
 }
 
-export default class StatisticsBuilder {
-  // eslint-disable-next-line no-use-before-define
-  private static instance?: StatisticsBuilder
-
-  static getInstance (): StatisticsBuilder {
-    if (!StatisticsBuilder.instance) {
-      StatisticsBuilder.instance = new StatisticsBuilder()
-    }
-    return StatisticsBuilder.instance
-  }
-
+export class StatisticsBuilder {
   calculatePoints (medals: Medals) {
     const firstPlacePoints = 3
     const secondPlacePoints = 2
@@ -105,3 +95,5 @@ export default class StatisticsBuilder {
     return Rank.EXPIRED
   }
 }
+
+export const statisticsBuilder = new StatisticsBuilder()

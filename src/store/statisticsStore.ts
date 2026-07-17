@@ -1,5 +1,5 @@
-import LaptimeBuilder, { Laptime } from '@/builders/LaptimeBuilder'
-import StatisticsBuilder, { Driver, Medals } from '@/builders/StatisticsBuilder'
+import { Laptime, laptimeBuilder } from '@/builders/LaptimeBuilder'
+import { Driver, Medals, statisticsBuilder } from '@/builders/StatisticsBuilder'
 import { Distinct } from '@/constants/Distinct'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import { WeatherType } from '@/constants/WeatherType'
@@ -79,8 +79,8 @@ export const statisticsStore: StatisticsStore = {
     this.resetState()
     this.calculateTotalRacesPerDriver(laptimes)
 
-    const ltb = LaptimeBuilder.getInstance()
-    const sb = StatisticsBuilder.getInstance()
+    const ltb = laptimeBuilder
+    const sb = statisticsBuilder
 
     const leaderboardsData = laptimes.reduce((acc, cur) => {
       if (!acc[cur.trackId]) {
@@ -146,7 +146,7 @@ export const statisticsStore: StatisticsStore = {
       })
   },
   sortMedals () {
-    const cp = StatisticsBuilder.getInstance().calculatePoints
+    const cp = statisticsBuilder.calculatePoints
     this.medals.sort((a, b) => cp(b) - cp(a))
   },
   setMedals (medals: Medals[]) {

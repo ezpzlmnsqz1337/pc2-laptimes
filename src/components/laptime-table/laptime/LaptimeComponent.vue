@@ -14,17 +14,6 @@
 import { Laptime } from '@/builders/LaptimeBuilder'
 import { Options, prop, Vue } from 'vue-class-component'
 
-type UpdateEventKey = 'laptime'
-
-export interface LaptimeComponentClickEvent {
-  laptime: string
-}
-
-export interface LaptimeComponentUpdateEvent {
-  key: UpdateEventKey
-  value: string
-}
-
 export class LaptimeProps {
   showDiff = prop<boolean>({ default: true })
   firstPlace = prop<Laptime>({ required: true })

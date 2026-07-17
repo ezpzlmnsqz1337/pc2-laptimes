@@ -16,17 +16,6 @@ import { Laptime } from '@/builders/LaptimeBuilder'
 import { Rank } from '@/constants/Rank'
 import { Options, prop, Vue } from 'vue-class-component'
 
-type UpdateEventKey = 'driverId'
-
-export interface DriverComponentClickEvent {
-  driverId: string
-}
-
-export interface DriverComponentUpdateEvent {
-  key: UpdateEventKey
-  value: string
-}
-
 export class DriverProps {
   time = prop<Laptime>({ required: true })
   editable = prop<boolean>({ default: false })

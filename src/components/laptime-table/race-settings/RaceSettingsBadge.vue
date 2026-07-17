@@ -12,12 +12,13 @@
 
 <script lang="ts">
 import { BadgeType } from '@/constants/BadgeType'
-import { BadgeValue } from '@/constants/BadgeValue'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { Options, prop, Vue } from 'vue-class-component'
+
+export type BadgeValue = TransmissionType | BrakingLine | ControlType | WeatherType
 
 export class RaceSettingsBadgeProps {
   type = prop<BadgeType>({ required: true })
@@ -59,19 +60,6 @@ class RaceSettingsBadge extends Vue.with(RaceSettingsBadgeProps) {
         return this.getControlsIcon(this.value as ControlType)
       case BadgeType.WEATHER:
         return this.getWeatherIcon(this.value as WeatherType)
-    }
-  }
-
-  getOptions (type: BadgeType) {
-    switch (type) {
-      case BadgeType.TRANSMISSION:
-        return Object.values(TransmissionType).map(x => ({ name: x }))
-      case BadgeType.BRAKING_LINE:
-        return Object.values(BrakingLine).map(x => ({ name: x }))
-      case BadgeType.CONTROLS:
-        return Object.values(ControlType).map(x => ({ name: x }))
-      case BadgeType.WEATHER:
-        return Object.values(WeatherType).map(x => ({ name: x }))
     }
   }
 

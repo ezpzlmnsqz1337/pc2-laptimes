@@ -1,5 +1,5 @@
 import { Laptime } from './LaptimeBuilder'
-import StatisticsBuilder, { Driver, Medals } from './StatisticsBuilder'
+import { statisticsBuilder, Driver, Medals } from './StatisticsBuilder'
 
 export interface RaceStatsLike {
   trackId: string
@@ -139,7 +139,6 @@ function buildHeadToHead (races: RaceStatsLike[]) {
 function buildRaceMedals (races: RaceStatsLike[], compareLaptimes: (left: string, right: string) => number): Medals[] {
   const maxSavedPlaces = 7
   const medalsByDriver = {} as Record<string, Medals>
-  const statisticsBuilder = StatisticsBuilder.getInstance()
 
   races.forEach(race => {
     const ranked = [...race.times].sort((a, b) => compareLaptimes(a.laptime, b.laptime))
@@ -155,7 +154,7 @@ function buildRaceMedals (races: RaceStatsLike[], compareLaptimes: (left: string
   })
 
   return Object.values(medalsByDriver)
-    .sort((a, b) => StatisticsBuilder.getInstance().calculatePoints(b) - StatisticsBuilder.getInstance().calculatePoints(a))
+    .sort((a, b) => statisticsBuilder.calculatePoints(b) - statisticsBuilder.calculatePoints(a))
 }
 
 export default class RaceStatisticsBuilder {
@@ -206,8 +205,6 @@ export default class RaceStatisticsBuilder {
       }))
       .filter((entry): entry is { driver: Driver, races: number } => !!entry.driver)
       .sort((a, b) => b.races - a.races)
-
-    const statisticsBuilder = StatisticsBuilder.getInstance()
 
     return Object.keys(totalByDriver)
       .map((driverId) => {
