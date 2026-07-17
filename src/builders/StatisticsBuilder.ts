@@ -53,48 +53,37 @@ export class StatisticsBuilder {
   }
 
   getRank (driver: Driver, totalRaces: TotalDriverRaces[], medals: Medals[]) {
-    const MIN_RACES_FOR_RANK = 10
-    // if (driver.name === 'mazel') return Rank.GLOBAL
-    // if (driver.name === 'jara') return Rank.SILVER1
+    const dr = totalRaces.find((x: TotalDriverRaces) => x.driver.name === driver.name)
+    if (!dr || dr.races <= 0) return Rank.UNRANKED
 
-    const driverTotalRaces = totalRaces.find((x: TotalDriverRaces) => x.driver.name === driver.name)
-    if (!driverTotalRaces) return Rank.UNRANKED
-    if (driverTotalRaces.races < MIN_RACES_FOR_RANK) return Rank.UNRANKED
+    const dm = medals.find((x: Medals) => x.driverId === driver.uid)
+    const wins = dm ? (dm.places[0] || 0) : 0
 
-    const driverMedals = medals.find((x: Medals) => x.driverId === driver.uid)
-    if (!driverMedals) return Rank.UNRANKED
+    return this.getRaceRank(dr.races, wins)
+  }
 
-    // get max points currently
-    const maxBonus = this.calculateBonus(medals[0], totalRaces[0].races)
-    const maxPoints = this.calculatePoints(medals[0]) / totalRaces[0].races * 10 + maxBonus
+  getRaceRank (races: number, wins: number) {
+    if (races <= 0) return Rank.UNRANKED
+    const wr = wins / races
 
-    const bonus = this.calculateBonus(driverMedals, driverTotalRaces.races)
-    const driverPoints = this.calculatePoints(driverMedals)
-    if (driverPoints <= 0) return Rank.EXPIRED
-    const points = driverPoints / driverTotalRaces.races * 10 + bonus
+    if (races >= 500 && wr >= 0.70) return Rank.GLOBAL
+    if (races >= 300 && wr >= 0.65) return Rank.SUPREME
+    if (races >= 200 && wr >= 0.60) return Rank.LEM
+    if (races >= 100 && wr >= 0.55) return Rank.EAGLE
+    if (races >= 75 && wr >= 0.50) return Rank.SHERIF
+    if (races >= 50 && wr >= 0.45) return Rank.DOUBLE_AK
+    if (races >= 30 && wr >= 0.40) return Rank.AK1
+    if (races >= 20 && wr >= 0.35) return Rank.AK
+    if (races >= 15 && wr >= 0.30) return Rank.GOLD4
+    if (races >= 10 && wr >= 0.25) return Rank.GOLD3
+    if (races >= 8 && wr >= 0.20) return Rank.GOLD2
+    if (races >= 5 && wr >= 0.15) return Rank.GOLD1
+    if (races >= 3 && wr >= 0.10) return Rank.SILVER4
+    if (races >= 3) return Rank.SILVER3
+    if (races >= 2) return Rank.SILVER2
+    if (races >= 1) return Rank.SILVER1
 
-    const weightedPoints = this.mapValueInRange(points, 0, maxPoints, 0, 1) * 1000
-
-    if (weightedPoints > 910) return Rank.GLOBAL
-    if (this.isInRange(weightedPoints, 510, 910)) return Rank.SUPREME
-    if (this.isInRange(weightedPoints, 310, 510)) return Rank.LEM
-    if (this.isInRange(weightedPoints, 200, 310)) return Rank.EAGLE
-    if (this.isInRange(weightedPoints, 100, 200)) return Rank.SHERIF
-    if (this.isInRange(weightedPoints, 80, 100)) return Rank.DOUBLE_AK
-    if (this.isInRange(weightedPoints, 61, 80)) return Rank.AK1
-    if (this.isInRange(weightedPoints, 59, 61)) return Rank.AK
-    if (this.isInRange(weightedPoints, 57, 59)) return Rank.GOLD4
-    if (this.isInRange(weightedPoints, 55, 57)) return Rank.GOLD3
-    if (this.isInRange(weightedPoints, 51, 55)) return Rank.GOLD2
-    if (this.isInRange(weightedPoints, 46, 51)) return Rank.GOLD1
-    if (this.isInRange(weightedPoints, 41, 46)) return Rank.SILVER_ELITE_MASTER
-    if (this.isInRange(weightedPoints, 36, 41)) return Rank.SILVER_ELITE
-    if (this.isInRange(weightedPoints, 31, 36)) return Rank.SILVER4
-    if (this.isInRange(weightedPoints, 23, 61)) return Rank.SILVER3
-    if (this.isInRange(weightedPoints, 11, 23)) return Rank.SILVER2
-    if (this.isInRange(weightedPoints, 0, 11)) return Rank.SILVER1
-
-    return Rank.EXPIRED
+    return Rank.UNRANKED
   }
 }
 
