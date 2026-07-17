@@ -157,24 +157,39 @@
 
 <script lang="ts">
 import { ButtonType } from '@/constants/ButtonType'
-import { DriverRaceTotalRow, HeadToHeadItem, YearlyHeadToHeadItem } from '@/builders/RaceStatisticsBuilder'
-import { Options, Vue } from 'vue-class-component'
+import RaceStatisticsBuilder, { DriverRaceTotalRow, HeadToHeadItem, YearlyHeadToHeadItem } from '@/builders/RaceStatisticsBuilder'
+import { laptimeBuilder } from '@/builders/LaptimeBuilder'
+import { Options, Vue, prop } from 'vue-class-component'
+
+class RaceTotalsTableProps {
+  includeSolo = prop<boolean>({ default: false })
+  filterYear = prop<string | null>({ default: null })
+}
 
 @Options({
-  props: {
-    includeSolo: {
-      type: Boolean,
-      default: false
-    }
-  },
   emits: ['show-driver-races']
 })
-class RaceTotalsTable extends Vue {
-  readonly includeSolo!: boolean
+class RaceTotalsTable extends Vue.with(RaceTotalsTableProps) {
   readonly ButtonType = ButtonType
   expandedDriverId: string | null = null
 
   get driverTotals (): DriverRaceTotalRow[] {
+    if (this.filterYear) {
+      const year = this.filterYear
+      const races = this.$dataStore.races
+        .filter(r => this.includeSolo || r.times.length > 1)
+        .filter(r => new Date(r.startDate).getFullYear()
+          .toString() === year)
+
+      return RaceStatisticsBuilder.buildDriverRaceTotals({
+        races,
+        resolveDriver: (driverId) => this.$dataStore.getDriverById(driverId),
+        resolveTrackName: (trackId) => this.$dataStore.getTrackById(trackId)?.track || 'Unknown',
+        resolveCar: (carId) => this.$dataStore.getCarById(carId),
+        compareLaptimes: (left, right) => laptimeBuilder.compareLaptimes(left, right)
+      })
+    }
+
     return this.$dataStore.getRaceTotals(this.includeSolo)
   }
 

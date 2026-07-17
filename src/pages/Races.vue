@@ -34,6 +34,7 @@
 
       <RaceTotalsTable
         :include-solo="includeSolo"
+        :filter-year="filterYear"
         @show-driver-races="showDriverRaces"
       />
     </div>
