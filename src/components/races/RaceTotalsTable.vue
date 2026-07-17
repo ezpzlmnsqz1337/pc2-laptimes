@@ -107,7 +107,7 @@
               <div class="__detailsBlock __detailsBlockFullWidth">
                 <h4>Head to head</h4>
                 <table
-                  v-if="row.headToHead.length"
+                  v-if="allTimeHeadToHeadMap[row.driverId]?.length"
                   class="__h2hTable"
                 >
                   <thead>
@@ -115,7 +115,7 @@
                       <th>Opponent</th>
                       <th>Total</th>
                       <th
-                        v-for="year in getHeadToHeadYears(row)"
+                        v-for="year in getHeadToHeadYears(allTimeHeadToHeadMap[row.driverId])"
                         :key="`h2h-header-${row.driverId}-${year}`"
                       >
                         {{ year }}
@@ -124,7 +124,7 @@
                   </thead>
                   <tbody>
                     <tr
-                      v-for="record in row.headToHead"
+                      v-for="record in allTimeHeadToHeadMap[row.driverId]"
                       :key="`h2h-${row.driverId}-${record.opponentId}`"
                     >
                       <td class="__h2hOpponentCell">
@@ -134,7 +134,7 @@
                         {{ record.wins }}:{{ record.losses }}
                       </td>
                       <td
-                        v-for="year in getHeadToHeadYears(row)"
+                        v-for="year in getHeadToHeadYears(allTimeHeadToHeadMap[row.driverId])"
                         :key="`h2h-cell-${row.driverId}-${record.opponentId}-${year}`"
                         :class="['__h2hScoreCell', getHeadToHeadClass(getYearRecord(record, year))]"
                       >
@@ -193,6 +193,11 @@ class RaceTotalsTable extends Vue.with(RaceTotalsTableProps) {
     return this.$dataStore.getRaceTotals(this.includeSolo)
   }
 
+  get allTimeHeadToHeadMap (): Record<string, HeadToHeadItem[]> {
+    const totals = this.$dataStore.getRaceTotals(this.includeSolo)
+    return Object.fromEntries(totals.map(t => [t.driverId, t.headToHead]))
+  }
+
   emitShowDriverRaces (driverId: string) {
     this.$emit('show-driver-races', driverId)
   }
@@ -205,9 +210,9 @@ class RaceTotalsTable extends Vue.with(RaceTotalsTableProps) {
     this.expandedDriverId = this.expandedDriverId === driverId ? null : driverId
   }
 
-  getHeadToHeadYears (row: DriverRaceTotalRow) {
+  getHeadToHeadYears (records: HeadToHeadItem[]) {
     return Array.from(new Set(
-      row.headToHead.flatMap(record => record.yearlyRecords.map(yearRecord => yearRecord.year))
+      records.flatMap(record => record.yearlyRecords.map(yearRecord => yearRecord.year))
     )).sort((a, b) => b - a)
   }
 
