@@ -180,7 +180,12 @@ class Races extends Vue.with(RacesProps) {
   }
 
   get trackOptions (): CountedOption[] {
-    const byTrack = this.baseRaces.reduce((acc, race) => {
+    const races = this.filterYear
+      ? this.baseRaces.filter(r => new Date(r.startDate).getFullYear()
+        .toString() === this.filterYear)
+      : this.baseRaces
+
+    const byTrack = races.reduce((acc, race) => {
       acc[race.trackId] = (acc[race.trackId] || 0) + 1
       return acc
     }, {} as Record<string, number>)
@@ -199,7 +204,12 @@ class Races extends Vue.with(RacesProps) {
 
   get variantOptions (): CountedOption[] {
     if (!this.selectedTrackId) return []
-    const byVariant = this.baseRaces
+    const races = this.filterYear
+      ? this.baseRaces.filter(r => new Date(r.startDate).getFullYear()
+        .toString() === this.filterYear)
+      : this.baseRaces
+
+    const byVariant = races
       .filter(r => r.trackId === this.selectedTrackId)
       .reduce((acc, race) => {
         const variant = race.trackVariant || EMPTY_VARIANT_VALUE
