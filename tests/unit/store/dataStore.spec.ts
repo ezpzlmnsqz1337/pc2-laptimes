@@ -140,3 +140,110 @@ describe('dataStore', () => {
     })
   })
 })
+
+describe('getTimes', () => {
+  beforeEach(() => {
+    dataStore.times = [
+      createLaptime({ uid: 't1', driverId: 'driver-a', carId: 'car-x', laptime: '1:30.000' }),
+      createLaptime({ uid: 't2', driverId: 'driver-b', carId: 'car-y', laptime: '1:29.000' }),
+      createLaptime({ uid: 't3', driverId: 'driver-a', carId: 'car-y', laptime: '1:31.000' })
+    ];
+    (dataStore.times[0] as any).dateString = '15/01/2025';
+    (dataStore.times[1] as any).dateString = '15/01/2025';
+    (dataStore.times[2] as any).dateString = '16/01/2025'
+  })
+
+  it('returns all times when no filter is given', () => {
+    const times = dataStore.getTimes()
+    expect(times).toHaveLength(3)
+  })
+
+  it('filters by driverId', () => {
+    const times = dataStore.getTimes({ driverId: 'driver-a' })
+    expect(times).toHaveLength(2)
+    expect(times.every(t => t.driverId === 'driver-a')).toBe(true)
+  })
+
+  it('filters by date', () => {
+    const times = dataStore.getTimes({ date: new Date(2025, 0, 15) })
+    expect(times).toHaveLength(2)
+    expect(times.every((t: any) => t.dateString === '15/01/2025')).toBe(true)
+  })
+
+  it('sorts results fastest first when applying a filter', () => {
+    const times = dataStore.getTimes({ driverId: 'driver-a' })
+    expect(times[0].laptime).toBe('1:30.000')
+    expect(times[1].laptime).toBe('1:31.000')
+  })
+
+  it('returns times unsorted when no filter is given', () => {
+    const times = dataStore.getTimes()
+    expect(times).toHaveLength(3)
+    expect(times[0].laptime).toBe('1:30.000')
+  })
+})
+
+describe('getDistinctTimes', () => {
+  it('deduplicates by driverId+carId+trackId+trackVariant key', () => {
+    const base = createLaptime({ uid: 't1' })
+    const duplicate = createLaptime({ uid: 't2' })
+    const differentDriver = createLaptime({ uid: 't3', driverId: 'driver-other' })
+
+    const result = dataStore.getDistinctTimes([base, duplicate, differentDriver])
+    expect(result).toHaveLength(2)
+    expect(result.map(t => t.uid)).toEqual(['t1', 't3'])
+  })
+
+  it('handles empty trackVariant', () => {
+    const withVariant = createLaptime({ uid: 't1', trackVariant: 'GP' })
+    const withoutVariant = createLaptime({ uid: 't2', trackVariant: '' })
+
+    const result = dataStore.getDistinctTimes([withVariant, withoutVariant])
+    expect(result).toHaveLength(2)
+  })
+})
+
+describe('reloadData', () => {
+  let fetchCars: ReturnType<typeof vi.spyOn>
+  let fetchTracks: ReturnType<typeof vi.spyOn>
+  let fetchDrivers: ReturnType<typeof vi.spyOn>
+  let fetchTimes: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    fetchCars = vi.spyOn(dataStore, 'fetchCars').mockResolvedValue()
+    fetchTracks = vi.spyOn(dataStore, 'fetchTracks').mockResolvedValue()
+    fetchDrivers = vi.spyOn(dataStore, 'fetchDrivers').mockResolvedValue()
+    fetchTimes = vi.spyOn(dataStore, 'fetchTimes').mockResolvedValue()
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
+
+  it('case cars calls fetchCars not fetchTracks', async () => {
+    await dataStore.reloadData('cars')
+
+    expect(fetchCars).toHaveBeenCalledTimes(1)
+    expect(fetchTracks).not.toHaveBeenCalled()
+  })
+
+  it('case tracks calls fetchTracks not fetchCars', async () => {
+    await dataStore.reloadData('tracks')
+
+    expect(fetchTracks).toHaveBeenCalledTimes(1)
+    expect(fetchCars).not.toHaveBeenCalled()
+  })
+
+  it('case times calls fetchTimes', async () => {
+    await dataStore.reloadData('times')
+
+    expect(fetchTimes).toHaveBeenCalledTimes(1)
+  })
+
+  it('case drivers calls fetchDrivers', async () => {
+    await dataStore.reloadData('drivers')
+
+    expect(fetchDrivers).toHaveBeenCalledTimes(1)
+  })
+})
