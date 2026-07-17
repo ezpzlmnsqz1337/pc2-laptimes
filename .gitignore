@@ -22,3 +22,6 @@ pnpm-debug.log*
 *.sw?
 
 pc2-laptimes.tar
+
+/home/hosting
+/src/assets/db
