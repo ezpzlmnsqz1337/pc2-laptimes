@@ -48,6 +48,7 @@ class RacesDaysBarChartProps {
   cssClasses = prop<string>({ default: '' })
   styles = prop<object>({ default: () => {} })
   plugins = prop<object>({ default: () => {} })
+  filterYear = prop<string | null>({ default: null })
 }
 
 @Options({
@@ -171,11 +172,14 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
   }
 
   async getData () {
-    // clear chart data
     this.chartData.labels.splice(0)
     this.chartData.datasets.splice(0)
 
-    const laptimes = this.$dataStore.getTimes().sort((a, b) => b.date - a.date)
+    const all = this.$dataStore.getTimes().sort((a, b) => b.date - a.date)
+    const laptimes = this.filterYear
+      ? all.filter(t => new Date(t.date).getFullYear()
+        .toString() === this.filterYear)
+      : all
     const noOfRaces = this.countNumberOfRaces(laptimes)
 
     this.generateChartData(noOfRaces)

@@ -44,6 +44,14 @@
           class="fa fa-share"
         /><span>Share</span>
       </Button>
+      <SelectInput
+        :model-value="selectedYear"
+        class="__yearSelect"
+        :options="availableYears"
+        placeholder="All years"
+        :clearable="true"
+        @update:model-value="setYear($event)"
+      />
     </div>
 
     <div
@@ -75,6 +83,8 @@
         </h2>
         <div class="__chart">
           <RacesDaysBarChart
+            :key="selectedYear"
+            :filter-year="selectedYear"
             :height="1400"
             @click="onChartClick($event)"
           />
@@ -120,6 +130,7 @@ import { Options, Vue } from 'vue-class-component'
 })
 class Statistics extends Vue {
   refreshing = false
+  selectedYear: string | null = null
 
   get activeScreen () {
     return this.$statisticsStore.activeScreen
@@ -127,6 +138,17 @@ class Statistics extends Vue {
 
   get leaderboardsData () {
     return this.$statisticsStore.leaderboardsData
+  }
+
+  get availableYears () {
+    const years = new Set<string>()
+    this.$dataStore.getTimes().forEach(t => {
+      const y = new Date(t.date).getFullYear()
+        .toString()
+      years.add(y)
+    })
+    return Array.from(years).sort()
+      .reverse()
   }
 
   showScreen (screen: StatisticsScreenType) {
@@ -172,12 +194,21 @@ class Statistics extends Vue {
     this.$toast.success('Link copied to clipboard.')
   }
 
+  setYear (year: string | null) {
+    this.selectedYear = year
+    this.refresh()
+  }
+
   refresh (delay: number = 0) {
     if (this.refreshing) return
 
     this.refreshing = true
     setTimeout(() => {
-      const laptimes = this.$dataStore.getTimes()
+      const all = this.$dataStore.getTimes()
+      const laptimes = this.selectedYear
+        ? all.filter(t => new Date(t.date).getFullYear()
+          .toString() === this.selectedYear)
+        : all
       this.$statisticsStore.refreshData(laptimes)
 
       this.refreshing = false
@@ -218,6 +249,14 @@ export default Statistics
 .__controls {
   margin-top: var(--space-10xl);
   text-align: center;
+}
+
+.__yearSelect {
+  width: 10rem;
+  max-width: 100%;
+  display: inline-block;
+  margin-left: var(--space-2xl);
+  vertical-align: middle;
 }
 
 .__controls .fa {
