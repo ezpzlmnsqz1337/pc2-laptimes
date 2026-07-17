@@ -9,9 +9,6 @@
       <BrowseTimes v-if="activeScreen === ScreenType.BROWSE_TIMES" />
     </keep-alive>
     <keep-alive>
-      <Races v-if="activeScreen === ScreenType.RACES" />
-    </keep-alive>
-    <keep-alive>
       <Statistics v-if="activeScreen === ScreenType.STATISTICS" />
     </keep-alive>
     <keep-alive>
@@ -30,7 +27,6 @@
 <script lang="ts">
 import AddLaptime from '@/pages/AddLaptime.vue'
 import BrowseTimes from '@/pages/BrowseTimes.vue'
-import Races from '@/pages/Races.vue'
 import Background from '@/components/Background.vue'
 import Menu from '@/components/Menu.vue'
 import LaptimeDetailModal from '@/components/laptime-table/LaptimeDetailModal.vue'
@@ -38,6 +34,7 @@ import RealtimeData from '@/pages/RealtimeData.vue'
 import Statistics from '@/pages/Statistics.vue'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from '@/constants/ScreenType'
+import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
 import { RaceState } from '@/constants/RaceState'
 
@@ -47,7 +44,6 @@ import { RaceState } from '@/constants/RaceState'
     Menu,
     AddLaptime,
     BrowseTimes,
-    Races,
     RealtimeData,
     Statistics,
     LaptimeDetailModal
@@ -105,7 +101,8 @@ class App extends Vue {
           this.$dataStore.showScreen(ScreenType.BROWSE_TIMES)
           break
         case ScreenType.RACES:
-          this.$dataStore.showScreen(ScreenType.RACES)
+          this.$dataStore.showScreen(ScreenType.STATISTICS)
+          this.$statisticsStore.showScreen(StatisticsScreenType.RACES)
           break
         default:
           console.error('Unknown page: ', page)

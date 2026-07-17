@@ -73,13 +73,6 @@
       </Button>
       <Button
         :type="ButtonType.SECONDARY"
-        :class="{__selected: activeScreen === ScreenType.RACES}"
-        @click="showScreen(ScreenType.RACES)"
-      >
-        Races
-      </Button>
-      <Button
-        :type="ButtonType.SECONDARY"
         :class="{__selected: activeScreen === ScreenType.STATISTICS}"
         @click="showScreen(ScreenType.STATISTICS)"
       >

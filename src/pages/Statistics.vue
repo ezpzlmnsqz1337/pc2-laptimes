@@ -22,6 +22,13 @@
       >
         Leaderboards
       </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        :class="{__selected: activeScreen === StatisticsScreenType.RACES}"
+        @click="showScreen(StatisticsScreenType.RACES)"
+      >
+        Races
+      </Button>
     </div>
 
     <div
@@ -45,6 +52,7 @@
         /><span>Share</span>
       </Button>
       <SelectInput
+        v-if="activeScreen !== StatisticsScreenType.RACES"
         :model-value="selectedYear"
         class="__yearSelect"
         :options="availableYears"
@@ -108,6 +116,9 @@
         </div>
       </div>
     </keep-alive>
+    <keep-alive>
+      <RacesStats v-if="!refreshing && activeScreen === StatisticsScreenType.RACES" />
+    </keep-alive>
   </div>
 </template>
 
@@ -116,6 +127,7 @@ import Leaderboards from '@/components/statistics/Leaderboards.vue'
 import Medals from '@/components/statistics/MedalsComponent.vue'
 import RacesDaysBarChart, { ChartClickEvent } from '@/components/statistics/RacesDaysBarChart.vue'
 import SelectInput from '@/components/ui/SelectInput.vue'
+import RacesStats from '@/pages/Races.vue'
 import { ScreenType } from '@/constants/ScreenType'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
 import eb from '@/eventBus'
@@ -127,7 +139,8 @@ import { Options, Vue } from 'vue-class-component'
     Medals,
     RacesDaysBarChart,
     Leaderboards,
-    SelectInput
+    SelectInput,
+    RacesStats
   }
 })
 class Statistics extends Vue {
@@ -175,6 +188,9 @@ class Statistics extends Vue {
           break
         case StatisticsScreenType.LEADERBOARDS:
           this.showScreen(StatisticsScreenType.LEADERBOARDS)
+          break
+        case StatisticsScreenType.RACES:
+          this.showScreen(StatisticsScreenType.RACES)
           break
         default:
           console.error('Unknown section: ', section)

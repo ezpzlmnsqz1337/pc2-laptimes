@@ -7,7 +7,7 @@
       <table class="__medalsTable">
         <tbody>
           <tr>
-            <th>Driver</th><th>No. of races</th>
+            <th>Driver</th><th>Events</th>
             <th
               v-for="place in 7"
               :key="`place-heading-${place}`"
