@@ -66,10 +66,12 @@ export class StatisticsBuilder {
 
     // get max points currently
     const maxBonus = this.calculateBonus(medals[0], totalRaces[0].races)
-    const maxPoints = driverTotalRaces.races / this.calculatePoints(medals[0]) * 10 + maxBonus
+    const maxPoints = this.calculatePoints(medals[0]) / totalRaces[0].races * 10 + maxBonus
 
     const bonus = this.calculateBonus(driverMedals, driverTotalRaces.races)
-    const points = driverTotalRaces.races / this.calculatePoints(driverMedals) * 10 + bonus
+    const driverPoints = this.calculatePoints(driverMedals)
+    if (driverPoints <= 0) return Rank.EXPIRED
+    const points = driverPoints / driverTotalRaces.races * 10 + bonus
 
     const weightedPoints = this.mapValueInRange(points, 0, maxPoints, 0, 1) * 1000
 
