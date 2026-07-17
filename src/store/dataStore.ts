@@ -552,11 +552,11 @@ export const dataStore: DataStore = {
     try {
       switch (table) {
         case 'cars':
-          await this.fetchTracks()
+          await this.fetchCars()
           console.log('Cars reloaded')
           break
         case 'tracks':
-          await this.fetchCars()
+          await this.fetchTracks()
           console.log('Tracks reloaded')
           break
         case 'drivers':
