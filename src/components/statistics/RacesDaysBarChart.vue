@@ -53,7 +53,12 @@ class RacesDaysBarChartProps {
 
 @Options({
   components: { Bar },
-  emits: ['click']
+  emits: ['click'],
+  watch: {
+    filterYear () {
+      this.getData()
+    }
+  }
 })
 class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
   chartData = {
@@ -150,16 +155,11 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
     return result
   }
 
-  generateChartData (noOfRaces: RacesByDate) {
+  generateChartData (noOfRaces: RacesByDate, activeDrivers: string[]) {
     Object.keys(noOfRaces).forEach(date => {
       this.chartData.labels.push(date)
-      // total races
-      // const tr = this.getDatasetByLabel('Total')
-      // tr.data.push(result[date].totalRaces)
-      // tr.stack = 'total'
 
-      // every driver
-      this.$dataStore.drivers.forEach(({ name }) => {
+      activeDrivers.forEach(name => {
         const ds = this.getDatasetByLabel(name)
         ds.data.push(noOfRaces[date].drivers[name] || 0)
         ds.stack = 'drivers'
@@ -182,7 +182,10 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
       : all
     const noOfRaces = this.countNumberOfRaces(laptimes)
 
-    this.generateChartData(noOfRaces)
+    const activeDrivers = new Set<string>()
+    Object.values(noOfRaces).forEach(d => Object.keys(d.drivers).forEach(n => activeDrivers.add(n)))
+
+    this.generateChartData(noOfRaces, Array.from(activeDrivers).sort())
   }
 
   getDatasetByLabel (label: string) {
