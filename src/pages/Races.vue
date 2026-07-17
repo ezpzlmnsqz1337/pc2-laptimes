@@ -112,7 +112,7 @@ import { Driver } from '@/builders/StatisticsBuilder'
 import RaceListItem from '@/components/races/RaceListItem.vue'
 import RaceTotalsTable from '@/components/races/RaceTotalsTable.vue'
 import SelectInput from '@/components/ui/SelectInput.vue'
-import { Options, Vue } from 'vue-class-component'
+import { Options, Vue, prop } from 'vue-class-component'
 
 enum RacesSectionType {
   TOTAL = 'total_races',
@@ -127,6 +127,10 @@ interface CountedOption {
 
 const EMPTY_VARIANT_VALUE = '__NO_TRACK_VARIANT__'
 
+class RacesProps {
+  filterYear = prop<string | null>({ default: null })
+}
+
 @Options({
   components: {
     SelectInput,
@@ -134,7 +138,7 @@ const EMPTY_VARIANT_VALUE = '__NO_TRACK_VARIANT__'
     RaceTotalsTable
   }
 })
-class Races extends Vue {
+class Races extends Vue.with(RacesProps) {
   racesSectionType = RacesSectionType
   activeSection = RacesSectionType.TOTAL
   selectedDriverId: string | null = null
@@ -155,7 +159,15 @@ class Races extends Vue {
   }
 
   get races () {
-    return this.baseRaces.filter(r => {
+    let filtered = this.baseRaces
+
+    if (this.filterYear) {
+      const year = this.filterYear
+      filtered = filtered.filter(r => new Date(r.startDate).getFullYear()
+        .toString() === year)
+    }
+
+    return filtered.filter(r => {
       if (!this.selectedTrackId) return true
       if (r.trackId !== this.selectedTrackId) return false
       if (!this.selectedTrackVariant) return true

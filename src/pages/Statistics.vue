@@ -52,7 +52,6 @@
         /><span>Share</span>
       </Button>
       <SelectInput
-        v-if="activeScreen !== StatisticsScreenType.RACES"
         :model-value="selectedYear"
         class="__yearSelect"
         :options="availableYears"
@@ -117,7 +116,10 @@
       </div>
     </keep-alive>
     <keep-alive>
-      <RacesStats v-if="!refreshing && activeScreen === StatisticsScreenType.RACES" />
+      <RacesStats
+        v-if="!refreshing && activeScreen === StatisticsScreenType.RACES"
+        :filter-year="selectedYear"
+      />
     </keep-alive>
   </div>
 </template>
