@@ -1,4 +1,4 @@
-import LaptimeBuilder from '@/builders/LaptimeBuilder'
+import { laptimeBuilder } from '@/builders/LaptimeBuilder'
 import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ButtonType } from '@/constants/ButtonType'
@@ -61,7 +61,7 @@ describe('AddLaptime auto-submit flow', () => {
             },
             getHostname: () => 'wallpc'
           },
-          $ltb: LaptimeBuilder.getInstance(),
+          $ltb: laptimeBuilder,
           $toast: { success: toastSuccess },
           queryParams: new URLSearchParams(),
           ButtonType,

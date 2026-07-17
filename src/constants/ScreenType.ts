@@ -3,7 +3,5 @@ export enum ScreenType {
   BROWSE_TIMES = 'laptime_board',
   RACES = 'races',
   STATISTICS = 'statistics',
-  REALTIME_DATA = 'realtime_data',
-  SET_CAR_IMAGE = 'set_car_image',
-  WEBSOCKET_TESTING = 'websocket_testing'
+  REALTIME_DATA = 'realtime_data'
 }

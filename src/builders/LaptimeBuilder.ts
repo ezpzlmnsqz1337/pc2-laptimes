@@ -25,23 +25,7 @@ export interface Laptime {
   notes: string
 }
 
-export interface LaptimeComponents {
-  minutes: string
-  seconds: string
-  miliseconds: string
-}
-
-export default class LaptimeBuilder {
-  // eslint-disable-next-line no-use-before-define
-  private static instance?: LaptimeBuilder
-
-  static getInstance (): LaptimeBuilder {
-    if (!LaptimeBuilder.instance) {
-      LaptimeBuilder.instance = new LaptimeBuilder()
-    }
-    return LaptimeBuilder.instance
-  }
-
+export class LaptimeBuilder {
   compareLaptimes (laptime1: string, laptime2: string) {
     return this.laptimeToDate(laptime1)!.getTime() - this.laptimeToDate(laptime2)!.getTime()
   }
@@ -91,13 +75,6 @@ export default class LaptimeBuilder {
       parseInt(milliseconds)
     ))
   }
-
-  componentsFromLaptime (laptime: string): LaptimeComponents | undefined {
-    const pattern = /^(\d{1,2}):(\d{2})\.(\d{3})$/
-    const components = laptime.match(pattern)
-    if (!components || components.length !== 3) return
-
-    const [minutes, seconds, miliseconds] = components
-    return { minutes, seconds, miliseconds }
-  }
 }
+
+export const laptimeBuilder = new LaptimeBuilder()

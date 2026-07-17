@@ -17,8 +17,6 @@
     <keep-alive>
       <RealtimeData v-show="activeScreen === ScreenType.REALTIME_DATA" />
     </keep-alive>
-    <!-- <SetCarImage v-show="activeScreen === ScreenType.SET_CAR_IMAGE" /> -->
-    <WebsocketTesting v-if="activeScreen === ScreenType.WEBSOCKET_TESTING" />
     <transition name="bounce">
       <LaptimeDetailModal
         v-if="editLaptime"
@@ -33,13 +31,11 @@
 import AddLaptime from '@/pages/AddLaptime.vue'
 import BrowseTimes from '@/pages/BrowseTimes.vue'
 import Races from '@/pages/Races.vue'
-// import SetCarImage from '@/components/SetCarImage'
 import Background from '@/components/Background.vue'
 import Menu from '@/components/Menu.vue'
 import LaptimeDetailModal from '@/components/laptime-table/LaptimeDetailModal.vue'
 import RealtimeData from '@/pages/RealtimeData.vue'
 import Statistics from '@/pages/Statistics.vue'
-import WebsocketTesting from '@/pages/WebsocketTesting.vue'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from '@/constants/ScreenType'
 import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
@@ -53,10 +49,8 @@ import { RaceState } from '@/constants/RaceState'
     BrowseTimes,
     Races,
     RealtimeData,
-    WebsocketTesting,
     Statistics,
     LaptimeDetailModal
-    // SetCarImage
   }
 })
 class App extends Vue {

@@ -14,7 +14,6 @@ import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import '@fortawesome/fontawesome-free/css/all.css'
 import Toaster from '@meforma/vue-toaster'
-import { debounce } from 'debounce'
 import 'material-icons/iconfont/material-icons.css'
 import { createApp } from 'vue'
 import vSelect from 'vue-select'
@@ -26,10 +25,10 @@ import PerfectScrollbar from 'vue3-perfect-scrollbar'
 import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 import { Car } from '@/constants/Car'
 import { Track } from '@/constants/Track'
-import LaptimeBuilder from './builders/LaptimeBuilder'
-import LightsBuilder from './builders/LightsBuilder'
+import { laptimeBuilder } from './builders/LaptimeBuilder'
+import { lightsBuilder } from './builders/LightsBuilder'
 import RealtimeDataBuilder from './builders/RealtimeDataBuilder'
-import StatisticsBuilder, { Driver } from './builders/StatisticsBuilder'
+import { statisticsBuilder, Driver } from './builders/StatisticsBuilder'
 import { WebsocketState } from './constants/WebsocketState'
 import { storePlugin } from './plugins/store-plugin'
 import './registerServiceWorker'
@@ -61,9 +60,9 @@ export interface VueToaster {
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $rdb: RealtimeDataBuilder
-    $ltb: LaptimeBuilder
-    $lb: LightsBuilder
-    $sb: StatisticsBuilder
+    $ltb: typeof laptimeBuilder
+    $lb: typeof lightsBuilder
+    $sb: typeof statisticsBuilder
     queryParams: URLSearchParams
     authorize(pass: string): boolean
     isLocal(): boolean
@@ -83,7 +82,6 @@ declare module '@vue/runtime-core' {
     Car: Car
     Driver: Driver
     Distinct: typeof Distinct
-    debounce: typeof debounce
 
   }
 }
@@ -100,14 +98,13 @@ app.config.globalProperties.WebsocketState = WebsocketState
 app.config.globalProperties.StatisticsScreenType = StatisticsScreenType
 app.config.globalProperties.Game = Game
 app.config.globalProperties.Distinct = Distinct
-app.config.globalProperties.debounce = debounce
 app.config.globalProperties.queryParams = new URLSearchParams(window.location.search)
 
 // builders
 app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
-app.config.globalProperties.$ltb = LaptimeBuilder.getInstance()
-app.config.globalProperties.$lb = LightsBuilder.getInstance()
-app.config.globalProperties.$sb = StatisticsBuilder.getInstance()
+app.config.globalProperties.$ltb = laptimeBuilder
+app.config.globalProperties.$lb = lightsBuilder
+app.config.globalProperties.$sb = statisticsBuilder
 app.config.globalProperties.isLocal = () => ['localhost:8080', 'pc2laptimes.homelab.net'].includes(window.location.host)
 app.config.globalProperties.authorize = (pass: string) => pass === '3f83e9ad5be63bd5bf2fd009fffe6b7dd4066243975bc962edc37459c17e65b9'
 

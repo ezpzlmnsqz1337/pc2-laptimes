@@ -25,10 +25,6 @@
 <script lang="ts">
 import { Options, prop, Vue } from 'vue-class-component'
 
-export interface TableControlsClickEvent {
-  laptime: string
-}
-
 export class TableControlsProps {
   showFilter = prop<boolean>({ required: true })
 }

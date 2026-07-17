@@ -1,6 +1,6 @@
 import { Car } from '@/constants/Car'
 import { Track } from '@/constants/Track'
-import LaptimeBuilder, { Laptime } from '@/builders/LaptimeBuilder'
+import { laptimeBuilder, Laptime } from '@/builders/LaptimeBuilder'
 import RaceBuilder from '@/builders/RaceBuilder'
 import type { Race } from '@/builders/RaceBuilder'
 import RaceStatisticsBuilder, { DriverRaceTotalRow } from '@/builders/RaceStatisticsBuilder'
@@ -86,7 +86,6 @@ export interface DataStore {
     includeSolo: DriverRaceTotalRow[]
     excludeSolo: DriverRaceTotalRow[]
   }
-  mytimes: Laptime[]
   tracks: Track[]
   drivers: Driver[]
   lastAddedLaptime: Laptime | null
@@ -102,7 +101,6 @@ export interface DataStore {
   getTimes(filter?: LaptimeFilter): Laptime[]
   getRaces(filter?: RaceFilter): Race[]
   getRaceTotals(includeSolo?: boolean): DriverRaceTotalRow[]
-  getTracksTimes(tracks: Track[]): Laptime[]
   getDistinctTimes(laptimes: Laptime[]): Laptime[]
   refreshRaceTotals(): void
   toggleAutoSubmit(): void
@@ -149,7 +147,6 @@ export const dataStore: DataStore = {
     includeSolo: [],
     excludeSolo: []
   },
-  mytimes: [],
   tracks: [],
   drivers: [],
   lastAddedLaptime: null,
@@ -382,22 +379,10 @@ export const dataStore: DataStore = {
     if (!driverId) return []
     return this.times.filter(x => x.driverId === driverId)
   },
-  getTracksTimes (tracks: Track[]) {
-    const ltb = LaptimeBuilder.getInstance()
-    const result = {} as any
-    tracks.forEach(x => {
-      const trackTimes = this.times
-        .filter(x => x.trackId === x.uid)
-        .sort((a, b) => ltb.compareLaptimes(b.laptime, a.laptime))
-
-      result[x.uid] = this.getDistinctTimes(trackTimes)
-    })
-    return result
-  },
   getTimes (filter?: LaptimeFilter) {
     if (!filter) return this.times
 
-    const ltb = LaptimeBuilder.getInstance()
+    const ltb = laptimeBuilder
     const { distinct, date, ...rest } = filter
 
     const normalizedDate = date ? new Date(date).toLocaleDateString('en-GB') : null
@@ -426,7 +411,7 @@ export const dataStore: DataStore = {
     return includeSolo ? this.raceTotals.includeSolo : this.raceTotals.excludeSolo
   },
   refreshRaceTotals () {
-    const ltb = LaptimeBuilder.getInstance()
+    const ltb = laptimeBuilder
     const buildTotalsFor = (includeSolo: boolean) => {
       const races = includeSolo ? this.races : this.races.filter(x => x.times.length > 1)
       return RaceStatisticsBuilder.buildDriverRaceTotals({

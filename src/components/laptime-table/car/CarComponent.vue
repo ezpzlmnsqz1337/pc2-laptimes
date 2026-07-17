@@ -13,17 +13,6 @@
 import { Laptime } from '@/builders/LaptimeBuilder'
 import { Options, prop, Vue } from 'vue-class-component'
 
-type UpdateEventKey = 'carId'
-
-export interface CarComponentClickEvent {
-  carId: string
-}
-
-export interface CarComponentUpdateEvent {
-  key: UpdateEventKey
-  value: string
-}
-
 export class CarProps {
   time = prop<Laptime>({ required: true })
   editable = prop<boolean>({ default: false })

@@ -14,18 +14,6 @@
 import { Laptime } from '@/builders/LaptimeBuilder'
 import { Options, prop, Vue } from 'vue-class-component'
 
-type UpdateEventKey = 'trackId' | 'trackVariant'
-
-export interface TrackComponentClickEvent {
-  trackId: string
-  trackVariant?: string
-}
-
-export interface TrackComponentUpdateEvent {
-  key: UpdateEventKey
-  value: string
-}
-
 export class TrackProps {
   time = prop<Laptime>({ required: true })
   editable = prop<boolean>({ default: false })
