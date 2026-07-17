@@ -9,7 +9,7 @@
     :css-classes="cssClasses"
     :styles="styles"
     :width="width"
-    :height="height"
+    :height="computedHeight"
     @click="handleClick($event)"
   />
 </template>
@@ -64,6 +64,11 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
   chartData = {
     labels: [] as string[],
     datasets: [] as any[]
+  }
+
+  get computedHeight () {
+    const barHeight = 30
+    return Math.max(400, this.chartData.labels.length * barHeight)
   }
 
   $refs!: {

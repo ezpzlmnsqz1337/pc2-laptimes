@@ -86,7 +86,6 @@
         <div class="__chart">
           <RacesDaysBarChart
             :filter-year="selectedYear"
-            :height="1400"
             @click="onChartClick($event)"
           />
         </div>
