@@ -45,6 +45,28 @@ export class StatisticsBuilder {
     const maxPoints = medals.length > 0 ? this.calculatePoints(medals[0]) : 1
     const ratio = driverPoints / maxPoints
 
+    const rank = this.tierForRatio(ratio)
+    if (rank) return rank
+
+    if (dr.races >= 10) return Rank.SILVER1
+    return Rank.EXPIRED
+  }
+
+  // ponytail: race-wins-based rank for the races section; wins combine race count + win rate naturally
+  getRaceRank (races: number, wins: number, maxWins: number): Rank {
+    if (races <= 0) return Rank.UNRANKED
+    if (races < 10) return Rank.UNRANKED
+
+    if (maxWins <= 0) return Rank.SILVER1
+
+    const ratio = wins / maxWins
+    const rank = this.tierForRatio(ratio)
+    if (rank) return rank
+
+    return Rank.SILVER1
+  }
+
+  private tierForRatio (ratio: number): Rank | null {
     const tiers: [Rank, number][] = [
       [Rank.GLOBAL, 0.85],
       [Rank.SUPREME, 0.60],
@@ -70,10 +92,7 @@ export class StatisticsBuilder {
       if (ratio >= threshold) return rank
     }
 
-    // ponytail: active drivers with 10+ events always get at least SILVER1
-    if (dr.races >= 10) return Rank.SILVER1
-
-    return Rank.EXPIRED
+    return null
   }
 }
 

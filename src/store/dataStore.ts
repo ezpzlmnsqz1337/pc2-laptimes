@@ -411,15 +411,13 @@ export const dataStore: DataStore = {
     return includeSolo ? this.raceTotals.includeSolo : this.raceTotals.excludeSolo
   },
   refreshRaceTotals () {
-    const ltb = laptimeBuilder
     const buildTotalsFor = (includeSolo: boolean) => {
       const races = includeSolo ? this.races : this.races.filter(x => x.times.length > 1)
       return RaceStatisticsBuilder.buildDriverRaceTotals({
         races,
         resolveDriver: (driverId) => this.getDriverById(driverId),
         resolveTrackName: (trackId) => this.getTrackById(trackId)?.track || 'Unknown',
-        resolveCar: (carId) => this.getCarById(carId),
-        compareLaptimes: (left, right) => ltb.compareLaptimes(left, right)
+        resolveCar: (carId) => this.getCarById(carId)
       })
     }
 

@@ -1,5 +1,5 @@
 import { Laptime } from './LaptimeBuilder'
-import { statisticsBuilder, Driver, Medals } from './StatisticsBuilder'
+import { statisticsBuilder, Driver } from './StatisticsBuilder'
 
 export interface RaceStatsLike {
   trackId: string
@@ -49,7 +49,6 @@ export interface BuildDriverRaceTotalsArgs {
   resolveDriver: (driverId: string) => Driver | undefined
   resolveTrackName: (trackId: string) => string
   resolveCar: (carId: string) => { name: string, imageUrl?: string } | undefined
-  compareLaptimes: (left: string, right: string) => number
 }
 
 interface HeadToHeadScore {
@@ -136,34 +135,12 @@ function buildHeadToHead (races: RaceStatsLike[]) {
   return result
 }
 
-function buildRaceMedals (races: RaceStatsLike[], compareLaptimes: (left: string, right: string) => number): Medals[] {
-  const maxSavedPlaces = 7
-  const medalsByDriver = {} as Record<string, Medals>
-
-  races.forEach(race => {
-    const ranked = [...race.times].sort((a, b) => compareLaptimes(a.laptime, b.laptime))
-    const distinctDrivers = statisticsBuilder.handleDistinct(ranked).map(x => x.driverId)
-      .slice(0, maxSavedPlaces)
-
-    distinctDrivers.forEach((driverId, index) => {
-      if (!medalsByDriver[driverId]) {
-        medalsByDriver[driverId] = { driverId, places: new Array(maxSavedPlaces).fill(0) }
-      }
-      medalsByDriver[driverId].places[index] += 1
-    })
-  })
-
-  return Object.values(medalsByDriver)
-    .sort((a, b) => statisticsBuilder.calculatePoints(b) - statisticsBuilder.calculatePoints(a))
-}
-
 export default class RaceStatisticsBuilder {
   static buildDriverRaceTotals ({
     races,
     resolveDriver,
     resolveTrackName,
-    resolveCar,
-    compareLaptimes
+    resolveCar
   }: BuildDriverRaceTotalsArgs): DriverRaceTotalRow[] {
     const winners = races.filter(race => race.winnerDriverId)
     const totalByDriver = races.reduce((acc, race) => {
@@ -197,14 +174,7 @@ export default class RaceStatisticsBuilder {
     }, {} as Record<string, Record<string, number>>)
 
     const headToHeadByDriver = buildHeadToHead(races)
-    const medals = buildRaceMedals(races, compareLaptimes)
-    const totalRaces = Object.keys(totalByDriver)
-      .map(driverId => ({
-        driver: resolveDriver(driverId),
-        races: totalByDriver[driverId]
-      }))
-      .filter((entry): entry is { driver: Driver, races: number } => !!entry.driver)
-      .sort((a, b) => b.races - a.races)
+    const maxWins = Math.max(...Object.values(winsByDriver), 0)
 
     return Object.keys(totalByDriver)
       .map((driverId) => {
@@ -251,7 +221,7 @@ export default class RaceStatisticsBuilder {
         return {
           driverId,
           driverName: driver?.name || 'Unknown',
-          rank: driver ? statisticsBuilder.getRank(driver, totalRaces as any, medals) as unknown as string : '',
+          rank: statisticsBuilder.getRaceRank(totalRacesForDriver, wonRacesForDriver, maxWins) as unknown as string,
           totalRaces: totalRacesForDriver,
           wonRaces: wonRacesForDriver,
           winRateLabel: `${winRate.toFixed(1)}%`,

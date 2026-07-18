@@ -158,7 +158,6 @@
 <script lang="ts">
 import { ButtonType } from '@/constants/ButtonType'
 import RaceStatisticsBuilder, { DriverRaceTotalRow, HeadToHeadItem, YearlyHeadToHeadItem } from '@/builders/RaceStatisticsBuilder'
-import { laptimeBuilder } from '@/builders/LaptimeBuilder'
 import { Options, Vue, prop } from 'vue-class-component'
 
 class RaceTotalsTableProps {
@@ -185,8 +184,7 @@ class RaceTotalsTable extends Vue.with(RaceTotalsTableProps) {
         races,
         resolveDriver: (driverId) => this.$dataStore.getDriverById(driverId),
         resolveTrackName: (trackId) => this.$dataStore.getTrackById(trackId)?.track || 'Unknown',
-        resolveCar: (carId) => this.$dataStore.getCarById(carId),
-        compareLaptimes: (left, right) => laptimeBuilder.compareLaptimes(left, right)
+        resolveCar: (carId) => this.$dataStore.getCarById(carId)
       })
     }
 

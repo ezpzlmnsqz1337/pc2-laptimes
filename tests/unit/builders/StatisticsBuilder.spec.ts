@@ -219,3 +219,37 @@ describe('getRank', () => {
     expect(result).toBe(Rank.SILVER1)
   })
 })
+
+describe('getRaceRank', () => {
+  it('returns UNRANKED for 0 races', () => {
+    expect(statisticsBuilder.getRaceRank(0, 0, 10)).toBe(Rank.UNRANKED)
+  })
+
+  it('returns UNRANKED for less than 10 races', () => {
+    expect(statisticsBuilder.getRaceRank(9, 5, 50)).toBe(Rank.UNRANKED)
+  })
+
+  it('returns GLOBAL for top driver (ratio = 1.0)', () => {
+    expect(statisticsBuilder.getRaceRank(100, 80, 80)).toBe(Rank.GLOBAL)
+  })
+
+  it('returns SUPREME at 85% of top wins', () => {
+    expect(statisticsBuilder.getRaceRank(50, 68, 80)).toBe(Rank.GLOBAL)
+  })
+
+  it('returns LEM at 50% of top wins', () => {
+    expect(statisticsBuilder.getRaceRank(50, 40, 80)).toBe(Rank.LEM)
+  })
+
+  it('returns GOLD3 at 10% of top wins', () => {
+    expect(statisticsBuilder.getRaceRank(50, 8, 80)).toBe(Rank.GOLD3)
+  })
+
+  it('returns SILVER1 floor for 10+ races with 0 wins', () => {
+    expect(statisticsBuilder.getRaceRank(10, 0, 80)).toBe(Rank.SILVER1)
+  })
+
+  it('returns SILVER1 when all have 0 wins', () => {
+    expect(statisticsBuilder.getRaceRank(50, 0, 0)).toBe(Rank.SILVER1)
+  })
+})
