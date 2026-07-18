@@ -68,8 +68,7 @@ function buildTotals (races: RaceStatsLike[]) {
     races,
     resolveDriver: (driverId) => drivers.find(driver => driver.uid === driverId),
     resolveTrackName: (trackId) => tracks[trackId] || 'Unknown',
-    resolveCar: (carId) => cars[carId as keyof typeof cars],
-    compareLaptimes: (left, right) => left.localeCompare(right)
+    resolveCar: (carId) => cars[carId as keyof typeof cars]
   })
 }
 
