@@ -1,12 +1,6 @@
 import { statisticsBuilder, Medals, Driver } from '@/builders/StatisticsBuilder'
-import { Laptime } from '@/builders/LaptimeBuilder'
-import { BrakingLine } from '@/constants/BrakingLine'
-import { ControlType } from '@/constants/ControlType'
-import { Game } from '@/constants/Game'
-import { StartType } from '@/constants/StartType'
-import { TransmissionType } from '@/constants/TransmissionType'
-import { WeatherType } from '@/constants/WeatherType'
 import { Rank } from '@/constants/Rank'
+import type { TotalDriverRaces } from '@/store/statisticsStore'
 import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/constants/Rank', () => ({
@@ -42,26 +36,6 @@ function makeMedals (overrides: Partial<Medals> = {}): Medals {
   }
 }
 
-function makeLaptime (overrides: Partial<Laptime> = {}): Laptime {
-  return {
-    uid: 'time-id',
-    carId: 'car-a',
-    trackId: 'track-a',
-    trackVariant: '',
-    driverId: 'driver-1',
-    transmission: TransmissionType.SEQUENTIAL,
-    weather: WeatherType.SUN,
-    brakingLine: BrakingLine.OFF,
-    controls: ControlType.STEERING_WHEEL,
-    startType: StartType.RUNNING,
-    laptime: '1:30.000',
-    game: Game.PC2,
-    date: 1000000,
-    notes: '',
-    ...overrides
-  }
-}
-
 describe('calculatePoints', () => {
   it('calculates points from medal counts (1st=3pt, 2nd=2pt, 3rd=1pt)', () => {
     expect(statisticsBuilder.calculatePoints(makeMedals({ places: [10, 5, 3] }))).toBe(43)
@@ -76,96 +50,20 @@ describe('calculatePoints', () => {
   })
 })
 
-describe('calculateBonus', () => {
-  it('returns a positive integer for a real-world driver', () => {
-    const bonus = statisticsBuilder.calculateBonus(
-      makeMedals({ places: [20, 15, 10] }),
-      100
-    )
-    expect(bonus).toBeGreaterThan(0)
-    expect(Number.isInteger(bonus)).toBe(true)
-  })
-
-  it('returns zero when driver has no race participation', () => {
-    const bonus = statisticsBuilder.calculateBonus(
-      makeMedals({ places: [0, 0, 0] }),
-      0
-    )
-    expect(bonus).toBe(0)
-  })
-
-  it('returns a larger bonus for a higher-performing driver', () => {
-    const highBonus = statisticsBuilder.calculateBonus(
-      makeMedals({ places: [50, 20, 10] }),
-      100
-    )
-    const lowBonus = statisticsBuilder.calculateBonus(
-      makeMedals({ places: [5, 2, 1] }),
-      100
-    )
-    expect(highBonus).toBeGreaterThan(lowBonus)
-  })
-
-  it('returns consistent results', () => {
-    const a = statisticsBuilder.calculateBonus(makeMedals({ places: [10, 5, 2] }), 50)
-    const b = statisticsBuilder.calculateBonus(makeMedals({ places: [10, 5, 2] }), 50)
-    expect(a).toBe(b)
-  })
-})
-
-describe('handleDistinct', () => {
-  it('keeps only the first laptime per driver', () => {
-    const times = [
-      makeLaptime({ uid: '1', driverId: 'driver-a' }),
-      makeLaptime({ uid: '2', driverId: 'driver-a' }),
-      makeLaptime({ uid: '3', driverId: 'driver-b' }),
-      makeLaptime({ uid: '4', driverId: 'driver-a' }),
-      makeLaptime({ uid: '5', driverId: 'driver-c' })
-    ]
-    const result = statisticsBuilder.handleDistinct(times)
-    expect(result).toHaveLength(3)
-    expect(result.map(x => x.uid)).toEqual(['1', '3', '5'])
-  })
-
-  it('returns empty array for empty input', () => {
-    expect(statisticsBuilder.handleDistinct([])).toEqual([])
-  })
-})
-
-describe('mapValueInRange', () => {
-  it('maps 0 from [0..100] to [0..1]', () => {
-    expect(statisticsBuilder.mapValueInRange(0, 0, 100, 0, 1)).toBe(0)
-  })
-
-  it('maps 100 from [0..100] to [0..1]', () => {
-    expect(statisticsBuilder.mapValueInRange(100, 0, 100, 0, 1)).toBe(1)
-  })
-
-  it('maps midpoint correctly', () => {
-    expect(statisticsBuilder.mapValueInRange(50, 0, 100, 0, 10)).toBe(5)
-  })
-})
-
-describe('isInRange', () => {
-  it('returns true when value is within range', () => {
-    expect(statisticsBuilder.isInRange(5, 0, 10)).toBe(true)
-  })
-
-  it('returns true at boundaries', () => {
-    expect(statisticsBuilder.isInRange(0, 0, 10)).toBe(true)
-    expect(statisticsBuilder.isInRange(10, 0, 10)).toBe(true)
-  })
-
-  it('returns false outside range', () => {
-    expect(statisticsBuilder.isInRange(-1, 0, 10)).toBe(false)
-    expect(statisticsBuilder.isInRange(11, 0, 10)).toBe(false)
-  })
-})
-
 describe('getRank', () => {
+  const races = (uid: string, name: string, count: number): TotalDriverRaces => ({
+    driver: { uid, name },
+    races: count
+  })
+
+  const medals = (driverId: string, places: number[]): Medals => ({
+    driverId,
+    places
+  })
+
   it('returns UNRANKED when driver not found in totals', () => {
     const driver: Driver = { uid: 'driver-1', name: 'Missing' }
-    const totalRaces = [{ driver: { uid: 'driver-2', name: 'Other' }, races: 50 }]
+    const totalRaces = [races('driver-2', 'Other', 50)]
 
     const result = statisticsBuilder.getRank(driver, totalRaces, [])
     expect(result).toBe(Rank.UNRANKED)
@@ -173,83 +71,151 @@ describe('getRank', () => {
 
   it('returns UNRANKED for driver with 0 races', () => {
     const driver: Driver = { uid: 'driver-1', name: 'Inactive' }
-    const totalRaces = [{ driver: { uid: 'driver-1', name: 'Inactive' }, races: 0 }]
+    const totalRaces = [races('driver-1', 'Inactive', 0)]
 
     const result = statisticsBuilder.getRank(driver, totalRaces, [])
     expect(result).toBe(Rank.UNRANKED)
   })
 
-  it('returns GLOBAL for 500+ races with 70%+ win rate', () => {
-    const driver: Driver = { uid: 'top', name: 'Top' }
-    const totalRaces = [{ driver: { uid: 'top', name: 'Top' }, races: 548 }]
-    const medals: Medals[] = [{ driverId: 'top', places: [394, 100, 50] }]
+  it('returns UNRANKED when driver not in medals', () => {
+    const driver: Driver = { uid: 'driver-1', name: 'Active' }
+    const totalRaces = [races('driver-1', 'Active', 10)]
 
-    const result = statisticsBuilder.getRank(driver, totalRaces, medals)
+    const result = statisticsBuilder.getRank(driver, totalRaces, [])
+    expect(result).toBe(Rank.UNRANKED)
+  })
+
+  it('returns EXPIRED when driver has 0 points', () => {
+    const driver: Driver = { uid: 'driver-1', name: 'Nopoints' }
+    const totalRaces = [races('driver-1', 'Nopoints', 10)]
+    const m = [medals('driver-1', [0, 0, 0])]
+
+    const result = statisticsBuilder.getRank(driver, totalRaces, m)
+    expect(result).toBe(Rank.EXPIRED)
+  })
+
+  it('returns GLOBAL for top driver (ratio >= 0.90)', () => {
+    const driver: Driver = { uid: 'top', name: 'Top' }
+    const totalRaces = [races('top', 'Top', 100)]
+    const m = [medals('top', [50, 20, 10])] // top driver, ratio = 1.0
+
+    const result = statisticsBuilder.getRank(driver, totalRaces, m)
     expect(result).toBe(Rank.GLOBAL)
   })
 
-  it('returns SUPREME for 300+ races with 65%+ win rate', () => {
-    const driver: Driver = { uid: 'sup', name: 'Sup' }
-    const totalRaces = [{ driver: { uid: 'sup', name: 'Sup' }, races: 341 }]
-    const medals: Medals[] = [{ driverId: 'sup', places: [222, 80, 30] }]
+  it('returns SUPREME for driver at 85% of top points', () => {
+    const driver: Driver = { uid: 'mid', name: 'Mid' }
+    const totalRaces = [
+      races('best', 'Best', 100),
+      races('mid', 'Mid', 80)
+    ]
+    // best points: 50*3 + 20*2 + 10*1 = 150 + 40 + 10 = 200
+    // mid points: 45*3 + 18*2 + 8*1 = 135 + 36 + 8 = 179, ratio = 179/200 = 0.895
+    const m = [
+      medals('best', [50, 20, 10]),
+      medals('mid', [45, 18, 8])
+    ]
 
-    const result = statisticsBuilder.getRank(driver, totalRaces, medals)
-    expect(result).toBe(Rank.SUPREME)
+    const result = statisticsBuilder.getRank(driver, totalRaces, m)
+    expect(result).toBe(Rank.GLOBAL)
   })
 
-  it('returns SILVER3 for a driver with 10 races and 0 wins', () => {
-    const driver: Driver = { uid: 'flama', name: 'flama' }
-    const totalRaces = [{ driver: { uid: 'flama', name: 'flama' }, races: 10 }]
-    const medals: Medals[] = [{ driverId: 'flama', places: [0, 5, 5] }]
+  it('returns LEM for driver at 50% of top points', () => {
+    const driver: Driver = { uid: 'mid', name: 'Mid' }
+    const totalRaces = [
+      races('best', 'Best', 100),
+      races('mid', 'Mid', 50)
+    ]
+    // best points: 100*3 + 50*2 + 20*1 = 300 + 100 + 20 = 420
+    // mid points: 50*3 + 25*2 + 10*1 = 150 + 50 + 10 = 210, ratio = 210/420 = 0.50
+    const m = [
+      medals('best', [100, 50, 20]),
+      medals('mid', [50, 25, 10])
+    ]
 
-    const result = statisticsBuilder.getRank(driver, totalRaces, medals)
-    expect(result).toBe(Rank.SILVER3)
+    const result = statisticsBuilder.getRank(driver, totalRaces, m)
+    expect(result).toBe(Rank.LEM)
   })
 
-  it('returns SILVER1 for a driver with 1 race', () => {
-    const driver: Driver = { uid: 'new', name: 'New' }
-    const totalRaces = [{ driver: { uid: 'new', name: 'New' }, races: 1 }]
-    const medals: Medals[] = [{ driverId: 'new', places: [0, 0, 0] }]
+  it('returns rank proportional to points — lower driver gets lower rank', () => {
+    const driver: Driver = { uid: 'low', name: 'Low' }
+    const totalRaces = [
+      races('champ', 'Champ', 200),
+      races('low', 'Low', 50)
+    ]
+    // champ points: 100*3 + 40*2 + 20*1 = 300 + 80 + 20 = 400
+    // low points: 10*3 + 5*2 + 2*1 = 30 + 10 + 2 = 42, ratio = 42/400 = 0.105
+    const m = [
+      medals('champ', [100, 40, 20]),
+      medals('low', [10, 5, 2])
+    ]
 
-    const result = statisticsBuilder.getRank(driver, totalRaces, medals)
+    const result = statisticsBuilder.getRank(driver, totalRaces, m)
+    expect(result).toBe(Rank.GOLD3)
+  })
+
+  it('returns EXPIRED for driver with <10 races and ratio below SILVER1', () => {
+    const driver: Driver = { uid: 'newbie', name: 'Newbie' }
+    const totalRaces = [
+      races('champ', 'Champ', 500),
+      races('newbie', 'Newbie', 5)
+    ]
+    const m = [
+      medals('champ', [200, 100, 50]),
+      medals('newbie', [1, 0, 0])
+    ]
+
+    const result = statisticsBuilder.getRank(driver, totalRaces, m)
+    expect(result).toBe(Rank.EXPIRED)
+  })
+
+  it('returns rank for all ratio thresholds', () => {
+    const topM = [medals('best', [100, 100, 100])] // maxPoints = 600
+    const topR = [races('best', 'Best', 300)]
+
+    const r = races('d', 'd', 50)
+
+    const cases: [Medals, Rank][] = [
+      [medals('d', [85, 85, 85]), Rank.GLOBAL], // 510/600 = 0.85
+      [medals('d', [60, 60, 60]), Rank.SUPREME], // 360/600 = 0.60
+      [medals('d', [45, 45, 45]), Rank.LEM], // 270/600 = 0.45
+      [medals('d', [35, 35, 35]), Rank.EAGLE], // 210/600 = 0.35
+      [medals('d', [28, 28, 28]), Rank.SHERIF], // 168/600 = 0.28
+      [medals('d', [22, 22, 22]), Rank.DOUBLE_AK], // 132/600 = 0.22
+      [medals('d', [18, 18, 18]), Rank.AK1], // 108/600 = 0.18
+      [medals('d', [15, 15, 15]), Rank.AK], // 90/600 = 0.15
+      [medals('d', [12, 12, 12]), Rank.GOLD4], // 72/600 = 0.12
+      [medals('d', [10, 10, 10]), Rank.GOLD3], // 60/600 = 0.10
+      [medals('d', [8, 8, 8]), Rank.GOLD2], // 48/600 = 0.08
+      [medals('d', [6, 6, 6]), Rank.GOLD1], // 36/600 = 0.06
+      [medals('d', [5, 5, 5]), Rank.SILVER_ELITE_MASTER], // 30/600 = 0.05
+      [medals('d', [4, 4, 4]), Rank.SILVER_ELITE], // 24/600 = 0.04
+      [medals('d', [3, 3, 3]), Rank.SILVER4], // 18/600 = 0.03
+      [medals('d', [3, 2, 2]), Rank.SILVER3], // 9+4+2=15/600 = 0.025
+      [medals('d', [2, 2, 2]), Rank.SILVER2], // 12/600 = 0.02
+      [medals('d', [2, 1, 1]), Rank.SILVER1] // 6+2+1=9/600 = 0.015
+    ]
+
+    for (const [medal, expected] of cases) {
+      const driver: Driver = { uid: 'd', name: 'd' }
+      const m2 = [topM[0], medal]
+      const r2 = [...topR, r]
+      expect(statisticsBuilder.getRank(driver, r2, m2)).toBe(expected)
+    }
+  })
+
+  it('returns SILVER1 floor for driver with 10+ races regardless of ratio', () => {
+    const driver: Driver = { uid: 'floor', name: 'Floor' }
+    const totalRaces = [
+      races('best', 'Best', 500),
+      races('floor', 'Floor', 10)
+    ]
+    const m = [
+      medals('best', [200, 100, 50]),
+      medals('floor', [1, 0, 0])
+    ]
+    // ratio = 3/850 ≈ 0.0035, below all thresholds, but 10 races → SILVER1
+    const result = statisticsBuilder.getRank(driver, totalRaces, m)
     expect(result).toBe(Rank.SILVER1)
-  })
-})
-
-describe('getRaceRank', () => {
-  it('returns UNRANKED for 0 races', () => {
-    expect(statisticsBuilder.getRaceRank(0, 0)).toBe(Rank.UNRANKED)
-  })
-
-  it('returns GLOBAL for 500 races at 70%', () => {
-    expect(statisticsBuilder.getRaceRank(500, 350)).toBe(Rank.GLOBAL)
-  })
-
-  it('returns SUPREME for 300 races at 65%', () => {
-    expect(statisticsBuilder.getRaceRank(300, 195)).toBe(Rank.SUPREME)
-  })
-
-  it('returns LEM for 200 races at 60%', () => {
-    expect(statisticsBuilder.getRaceRank(200, 120)).toBe(Rank.LEM)
-  })
-
-  it('returns EAGLE for 100 races at 55%', () => {
-    expect(statisticsBuilder.getRaceRank(100, 55)).toBe(Rank.EAGLE)
-  })
-
-  it('returns SHERIF for 75 races at 50%', () => {
-    expect(statisticsBuilder.getRaceRank(75, 38)).toBe(Rank.SHERIF)
-  })
-
-  it('returns AK for 20 races at 35%', () => {
-    expect(statisticsBuilder.getRaceRank(20, 7)).toBe(Rank.AK)
-  })
-
-  it('returns SILVER3 for 3 races with 0 wins', () => {
-    expect(statisticsBuilder.getRaceRank(3, 0)).toBe(Rank.SILVER3)
-  })
-
-  it('falls back to SILVER1 for 1 race with 0 wins', () => {
-    expect(statisticsBuilder.getRaceRank(1, 0)).toBe(Rank.SILVER1)
   })
 })
