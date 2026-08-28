@@ -105,7 +105,7 @@ app.config.globalProperties.$rdb = RealtimeDataBuilder.getInstance()
 app.config.globalProperties.$ltb = laptimeBuilder
 app.config.globalProperties.$lb = lightsBuilder
 app.config.globalProperties.$sb = statisticsBuilder
-app.config.globalProperties.isLocal = () => ['localhost:8080', 'pc2laptimes.homelab.net'].includes(window.location.host)
+app.config.globalProperties.isLocal = () => ['localhost:8080', 'pc2laptimes.braun-dev.eu'].includes(window.location.host)
 app.config.globalProperties.authorize = (pass: string) => pass === '3f83e9ad5be63bd5bf2fd009fffe6b7dd4066243975bc962edc37459c17e65b9'
 
 app.use(storePlugin)

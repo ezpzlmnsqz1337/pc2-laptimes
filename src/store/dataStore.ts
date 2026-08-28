@@ -60,8 +60,12 @@ export interface LaptimeFilter {
   date?: Date | null
   distinct?: Distinct
 }
-export const DB_URL = 'http://192.168.0.102:3000'
-export const WS_NOTIFICATION_URL = 'ws://192.168.0.102:3002'
+// PostgREST/WS are only reachable directly by LAN IP; over the public HTTPS domain
+// they're reverse-proxied via separate NPM hosts that terminate TLS (browsers block
+// insecure http/ws requests from an https page).
+const isSecureContext = window.location.protocol === 'https:'
+export const DB_URL = isSecureContext ? 'https://pc2laptimes-api.braun-dev.eu' : 'http://192.168.0.102:3000'
+export const WS_NOTIFICATION_URL = isSecureContext ? 'wss://pc2laptimes-ws.braun-dev.eu' : 'ws://192.168.0.102:3002'
 export const CARS_ENDPOINT = `${DB_URL}/cars`
 export const TRACKS_ENDPOINT = `${DB_URL}/tracks`
 export const DRIVERS_ENDPOINT = `${DB_URL}/drivers`
