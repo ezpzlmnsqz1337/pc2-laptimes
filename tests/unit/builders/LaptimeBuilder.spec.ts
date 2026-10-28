@@ -78,6 +78,16 @@ describe('getLaptimeDiff', () => {
     const diff = laptimeBuilder.getLaptimeDiff('0:58.000', '1:02.000')
     expect(diff).toBe('+ 0:04.000')
   })
+
+  it('reports a negative diff instead of wrapping around the hour', () => {
+    const diff = laptimeBuilder.getLaptimeDiff('1:32.500', '1:30.000')
+    expect(diff).toBe('- 0:02.500')
+  })
+
+  it('does not produce a negative lap minute when the second time is faster', () => {
+    const diff = laptimeBuilder.getLaptimeDiff('1:00.000', '0:59.999')
+    expect(diff).toBe('- 0:00.001')
+  })
 })
 
 describe('isLaptimeValid', () => {

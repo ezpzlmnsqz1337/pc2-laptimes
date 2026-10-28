@@ -47,9 +47,10 @@ export class LaptimeBuilder {
     const time1 = this.laptimeToDate(laptime1)
     const time2 = this.laptimeToDate(laptime2)
 
-    const diff = new Date(time2!.getTime() - time1!.getTime())
+    const diffMs = time2!.getTime() - time1!.getTime()
+    const sign = diffMs < 0 ? '-' : '+'
 
-    return `+ ${this.dateToLaptime(diff)}`
+    return `${sign} ${this.dateToLaptime(new Date(Math.abs(diffMs)))}`
   }
 
   isLaptimeValid (minutes: string, seconds: string, milliseconds: string) {

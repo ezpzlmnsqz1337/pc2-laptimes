@@ -1,6 +1,7 @@
 import { WebSocketServer } from 'ws'
 
 const WS_PORT = process.env.WS_PORT || 3002
+const HEARTBEAT_INTERVAL_MS = 30000
 
 // Create WebSocket server
 const wss = new WebSocketServer({ port: WS_PORT })
@@ -14,6 +15,7 @@ wss.on('connection', (ws, req) => {
   console.log(`New WebSocket client connected from ${clientIp}. Total clients: ${clients.size + 1}`)
 
   clients.add(ws)
+  ws.isAlive = true
 
   // Send welcome message
   ws.send(JSON.stringify({
@@ -56,7 +58,28 @@ wss.on('connection', (ws, req) => {
   ws.on('ping', () => {
     ws.pong()
   })
+
+  ws.on('pong', () => {
+    ws.isAlive = true
+  })
 })
+
+// Keep connections alive through reverse proxies that close idle sockets and
+// drop clients that stopped answering pings (sleep, network change, crash).
+const heartbeat = setInterval(() => {
+  clients.forEach((ws) => {
+    if (ws.isAlive === false) {
+      clients.delete(ws)
+      ws.terminate()
+      return
+    }
+
+    ws.isAlive = false
+    ws.ping()
+  })
+}, HEARTBEAT_INTERVAL_MS)
+
+wss.on('close', () => clearInterval(heartbeat))
 
 // Handle server errors
 wss.on('error', (error) => {

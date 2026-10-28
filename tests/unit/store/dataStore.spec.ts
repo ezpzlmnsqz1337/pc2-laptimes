@@ -1,6 +1,7 @@
 import { Laptime } from '@/builders/LaptimeBuilder'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'
+import { Distinct } from '@/constants/Distinct'
 import { Game } from '@/constants/Game'
 import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
@@ -89,7 +90,7 @@ describe('dataStore', () => {
         date_string: '15/01/2025'
       })
     })
-    expect(broadcastDataChange).toHaveBeenCalledWith('times')
+    expect(broadcastDataChange).toHaveBeenCalledWith('times', 'generated-uid')
   })
 
   it('does not broadcast when the laptime write fails', async () => {
@@ -180,6 +181,110 @@ describe('getTimes', () => {
     const times = dataStore.getTimes()
     expect(times).toHaveLength(3)
     expect(times[0].laptime).toBe('1:30.000')
+  })
+})
+
+describe('getDisplayTimes', () => {
+  const filter = {
+    carId: 'car-id',
+    trackId: 'track-id',
+    trackVariant: 'Grand Prix Circuit',
+    distinct: Distinct.YES
+  }
+
+  function lap (uid: string, driverId: string, laptime: string, date: number) {
+    return createLaptime({ uid, driverId, laptime, date })
+  }
+
+  it('keeps both the new best and the previous best for each driver', () => {
+    dataStore.times = [
+      lap('a-old', 'driver-a', '1:31.000', 100),
+      lap('a-new', 'driver-a', '1:30.000', 200),
+      lap('b-old', 'driver-b', '1:29.000', 100),
+      lap('b-new', 'driver-b', '1:28.000', 200)
+    ]
+
+    const result = dataStore.getDisplayTimes(filter)
+
+    expect(result.map(t => t.uid)).toEqual(['b-new', 'b-old', 'a-new', 'a-old'])
+  })
+
+  it('keeps the best and the latest lap when the latest lap is slower', () => {
+    dataStore.times = [
+      lap('a-best', 'driver-a', '1:30.000', 100),
+      lap('a-latest', 'driver-a', '1:31.000', 200)
+    ]
+
+    const result = dataStore.getDisplayTimes(filter)
+
+    expect(result.map(t => t.uid)).toEqual(['a-best', 'a-latest'])
+  })
+
+  it('shows a single row when the driver has only one lap', () => {
+    dataStore.times = [lap('a-only', 'driver-a', '1:30.000', 100)]
+
+    const result = dataStore.getDisplayTimes(filter)
+
+    expect(result.map(t => t.uid)).toEqual(['a-only'])
+  })
+
+  it('returns every matching lap in fastest-first order when distinct is off', () => {
+    dataStore.times = [
+      lap('a-old', 'driver-a', '1:31.000', 100),
+      lap('a-new', 'driver-a', '1:30.000', 200)
+    ]
+
+    const result = dataStore.getDisplayTimes({ ...filter, distinct: Distinct.NO })
+
+    expect(result.map(t => t.uid)).toEqual(['a-new', 'a-old'])
+  })
+})
+
+describe('broadcastDataChange', () => {
+  afterEach(() => {
+    dataStore.dbNotificationWs = null
+    vi.restoreAllMocks()
+    vi.unstubAllGlobals()
+  })
+
+  it('reloads local data even when the notification socket is not connected', () => {
+    vi.stubGlobal('WebSocket', class {
+      static OPEN = 1
+      readyState = 0
+      onopen?: () => void
+      onmessage?: () => void
+      onerror?: () => void
+      onclose?: () => void
+    })
+    const reloadData = vi.spyOn(dataStore, 'reloadData').mockResolvedValue()
+    dataStore.dbNotificationWs = null
+
+    dataStore.broadcastDataChange('times', 'time-uid')
+
+    expect(reloadData).toHaveBeenCalledWith('times')
+  })
+
+  it('highlights the laptime announced by another client after reloading', async () => {
+    let socket: any
+    vi.stubGlobal('WebSocket', class {
+      static OPEN = 1
+      readyState = 1
+      onopen?: () => void
+      onmessage?: (event: { data: string }) => Promise<void>
+      onerror?: () => void
+      onclose?: () => void
+      send = vi.fn()
+      constructor () { socket = this }
+    })
+    dataStore.dbNotificationWs = null
+    dataStore.times = [createLaptime({ uid: 'time-1', laptime: '1:30.000' })]
+    dataStore.lastAddedLaptime = null
+    vi.spyOn(dataStore, 'reloadData').mockResolvedValue()
+
+    dataStore.setupDbNotifications()
+    await socket.onmessage({ data: JSON.stringify({ table: 'times', uid: 'time-1' }) })
+
+    expect(dataStore.lastAddedLaptime?.uid).toBe('time-1')
   })
 })
 
