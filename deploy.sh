@@ -32,12 +32,12 @@ echo ""
 
 # Build main app (includes WebSocket server)
 echo "📦 Building Docker image..."
-podman build --pull --rm -f 'Dockerfile' -t 'pc2-laptimes:latest' '.'
+podman build --pull --rm -f 'Dockerfile' -t 'localhost/pc2-laptimes:latest' '.'
 echo "✅ Build complete!"
 echo ""
 
 echo "💾 Saving image to tar..."
-podman save pc2-laptimes:latest -o pc2-laptimes.tar
+podman save localhost/pc2-laptimes:latest -o pc2-laptimes.tar
 echo "✅ Image saved!"
 echo ""
 
@@ -47,21 +47,19 @@ scp -r pc2-laptimes.tar $DESTINATION:/opt/containers/pc2-laptimes.tar
 echo "✅ Image copied!"
 echo ""
 
-# Stop service before loading new image
-echo "🛑 Stopping existing service..."
-ssh $DESTINATION 'systemctl --user stop pod-pc2-laptimes.service 2>/dev/null || echo "Service not running or does not exist yet (first deployment)"'
-echo ""
-
-# Load image
+# Load image. Running containers keep the old image until they are restarted,
+# so the site stays up during the transfer.
 echo "📥 Loading image on homelab..."
 ssh $DESTINATION 'podman load -i /opt/containers/pc2-laptimes.tar'
 echo "✅ Image loaded!"
 echo ""
 
-# Deploy
-echo "🚢 Deploying containers..."
-scp -r deployment/create-pod.sh $DESTINATION:/home/hosting/workspace/create-pc2-pod.sh
-ssh $DESTINATION 'bash /home/hosting/workspace/create-pc2-pod.sh'
+# Deploy. The pod and its containers are Quadlet units — see
+# homelab-ai/config/quadlet/pc2-laptimes.pod. Restarting only the app unit
+# recreates the UI container from the new image; Postgres/API stay up.
+echo "🚢 Restarting pc2-laptimes-app.service..."
+ssh $DESTINATION 'systemctl --user restart pc2-laptimes-app.service && systemctl --user is-active pc2-laptimes-app.service'
+echo "✅ Deployed!"
 echo ""
 
 # Cleanup old images only (keep volumes for database persistence)
@@ -73,7 +71,7 @@ echo ""
 # Cleanup local build artifacts on the podman VM (WSL podman-machine-default backend)
 echo "🧽 Cleaning local Podman VM artifacts..."
 rm -f pc2-laptimes.tar
-podman rmi -f pc2-laptimes:latest > /dev/null 2>&1 || true
+podman rmi -f localhost/pc2-laptimes:latest > /dev/null 2>&1 || true
 podman image prune -a -f > /dev/null 2>&1 || true
 podman builder prune -a -f > /dev/null 2>&1 || true
 echo "✅ Local Podman cleanup complete!"
