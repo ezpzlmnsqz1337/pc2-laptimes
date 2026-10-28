@@ -1,0 +1,13 @@
+[Unit]
+Description=pc2-laptimes pod (laptimes UI, PostgREST API, Postgres, Adminer, Swagger)
+
+[Pod]
+PodName=pc2-laptimes
+PublishPort=8090:8080
+PublishPort=8080:80
+PublishPort=3000:3000
+PublishPort=3001:8081
+PublishPort=3002:3002
+
+[Install]
+WantedBy=default.target

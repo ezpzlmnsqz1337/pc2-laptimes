@@ -1,0 +1,14 @@
+[Unit]
+Description=pc2-laptimes UI (nginx)
+
+[Container]
+ContainerName=pc2-laptimes-app
+Image=localhost/pc2-laptimes:latest
+PodmanArgs=--memory=256m
+Pod=pc2-laptimes.pod
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

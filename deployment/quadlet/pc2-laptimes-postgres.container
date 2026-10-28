@@ -1,0 +1,19 @@
+[Unit]
+Description=pc2-laptimes PostgreSQL
+
+[Container]
+ContainerName=pc2-laptimes-postgres
+Image=docker.io/library/postgres:17
+PodmanArgs=--memory=512m --memory-swap=512m
+Pod=pc2-laptimes.pod
+Volume=pc2-laptimes-pgdata:/var/lib/postgresql/data
+Secret=pg_pass,type=mount,target=/run/secrets/pg_pass
+Environment=POSTGRES_PASSWORD_FILE=/run/secrets/pg_pass
+Environment=POSTGRES_SHARED_BUFFERS=128MB
+Environment=POSTGRES_EFFECTIVE_CACHE_SIZE=256MB
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

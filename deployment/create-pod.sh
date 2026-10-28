@@ -3,8 +3,8 @@
 # pc2-laptimes runs as Quadlet units, not as hand-created Podman containers.
 #
 # The pod and container definitions live in the homelab-ai repo:
-#   homelab-ai/config/quadlet/pc2-laptimes.pod
-#   homelab-ai/config/quadlet/pc2-laptimes-{postgres,api,app,adminer,swagger}.container
+#   deployment/quadlet/pc2-laptimes.pod
+#   deployment/quadlet/pc2-laptimes-{postgres,api,app,adminer,swagger}.container
 #
 # Creating the pod with `podman pod create` / `podman generate systemd` here would
 # fight with Quadlet on the next boot, so this script only (re)starts the units

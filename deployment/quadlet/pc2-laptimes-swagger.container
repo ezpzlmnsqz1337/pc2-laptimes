@@ -1,0 +1,16 @@
+[Unit]
+Description=pc2-laptimes Swagger UI
+
+[Container]
+ContainerName=pc2-laptimes-swagger
+Image=docker.io/swaggerapi/swagger-ui:latest
+PodmanArgs=--memory=128m
+Pod=pc2-laptimes.pod
+Environment=PORT=8081
+EnvironmentFile=/home/hosting/.config/containers/systemd/env/pc2-swagger.env
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

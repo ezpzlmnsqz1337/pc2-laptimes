@@ -1,0 +1,14 @@
+[Unit]
+Description=pc2-laptimes Adminer
+
+[Container]
+ContainerName=pc2-laptimes-adminer
+Image=docker.io/library/adminer:5
+PodmanArgs=--memory=128m
+Pod=pc2-laptimes.pod
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target

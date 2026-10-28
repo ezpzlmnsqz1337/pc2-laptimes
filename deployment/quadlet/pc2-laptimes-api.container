@@ -1,0 +1,21 @@
+[Unit]
+Description=pc2-laptimes PostgREST API
+After=pc2-laptimes-postgres.service
+Requires=pc2-laptimes-postgres.service
+
+[Container]
+ContainerName=pc2-laptimes-api
+Image=docker.io/postgrest/postgrest:latest
+PodmanArgs=--memory=128m
+Pod=pc2-laptimes.pod
+Environment=PGRST_DB_URI=postgres://postgres:MyPass4Pos12_@localhost:5432/pc2-laptimes
+Environment=PGRST_DB_SCHEMA=public
+Environment=PGRST_DB_ANON_ROLE=postgres
+Environment=PGRST_DB_CHANNEL_ENABLED=false
+Environment=PGRST_OPENAPI_SERVER_PROXY_URI=http://192.168.0.102:3000
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
