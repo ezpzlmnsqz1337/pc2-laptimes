@@ -139,7 +139,7 @@ export interface DataStore {
 
   showScreen(screen: ScreenType): void
   setEditLaptime(laptimeId: string | null): void
-  setLastAddedLaptime(laptime: Laptime): void
+  setLastAddedLaptime(laptime: Laptime | null): void
   setWebsocketState(websocketState: WebsocketState): void
 
   fetchTracks(): void
@@ -201,7 +201,7 @@ export const dataStore: DataStore = {
   setEditLaptime (laptimeId: string | null) {
     this.editLaptime = laptimeId
   },
-  setLastAddedLaptime (laptime: Laptime) {
+  setLastAddedLaptime (laptime: Laptime | null) {
     this.lastAddedLaptime = laptime
   },
   setWebsocketState (websocketState: WebsocketState) {

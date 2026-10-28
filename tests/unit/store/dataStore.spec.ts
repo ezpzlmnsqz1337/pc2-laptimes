@@ -278,7 +278,7 @@ describe('broadcastDataChange', () => {
     })
     dataStore.dbNotificationWs = null
     dataStore.times = [createLaptime({ uid: 'time-1', laptime: '1:30.000' })]
-    dataStore.lastAddedLaptime = null
+    dataStore.setLastAddedLaptime(null)
     vi.spyOn(dataStore, 'reloadData').mockResolvedValue()
 
     dataStore.setupDbNotifications()
