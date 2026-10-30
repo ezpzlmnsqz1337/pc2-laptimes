@@ -165,10 +165,13 @@ See `src/assets/` for SQL files:
 - `grant_permissions.sql` - PostgREST permissions setup
 
 ### Database Access
-- **REST API**: PostgREST provides full CRUD operations on database tables
-- **API Endpoint**: `http://192.168.0.102:3000/` (homelab)
+- **REST API**: PostgREST provides CRUD operations on database tables
+- **API Endpoints**: `http://192.168.0.102:3000/` (LAN) and `https://pc2laptimes-api.braun-dev.eu` (public, NPM reverse proxy)
 - **Schema**: `public`
-- **Role**: `postgres` (no authentication required - home network only)
+- **Roles**: PostgREST never connects as `postgres`. It logs in as `laptimes_authenticator` (`LOGIN NOINHERIT`) and switches role per request:
+  - `laptimes_anon` - `SELECT` on `cars`, `drivers`, `tracks`, `times` only. Used when no JWT is sent. Public reads are intentional: lap times are non-sensitive leaderboard data.
+  - `laptimes_api` - `SELECT`, `INSERT`, `UPDATE`, `DELETE`. Used when a valid JWT with `{"role":"laptimes_api"}` is sent; all app writes carry it.
+- **Setup**: `src/assets/db/grant_permissions.sql` creates and grants the roles. See "PostgREST Auth Setup" under Deployment.
 
 ### Case Conversion
 - **Package**: Uses `ts-case-convert` (v2.1.0) for automatic case conversion
@@ -246,6 +249,7 @@ See `src/assets/` for SQL files:
 nvm install
 nvm use
 npm install
+cp .env.example .env.local   # paste VUE_APP_PGRST_JWT; reads work without it, writes do not
 npm run serve
 ```
 
@@ -321,10 +325,11 @@ npm run deploy:homelab
 - Exits on any error (`set -e`) - no continuing after failures
 - Provides helpful troubleshooting messages for common issues
 
-**Pod Creation** (`deployment/create-pod.sh`):
-- Creates Podman pod named `pc2-laptimes`
+**Pod Creation** (`deployment/quadlet/`):
+- Quadlet units create the Podman pod named `pc2-laptimes`
 - Sets up port mappings (8090:8080, 8080:80, 3000:3000, 3001:8081, 3002:3002)
-- Configures PostgreSQL with secrets for password management
+- Configures PostgreSQL with secret `pg_pass` for password management
+- Configures PostgREST with secrets `pg_api_uri` (least-privilege authenticator URI) and `pg_jwt_secret` (write-token signing key)
 - Generates systemd service for auto-start on boot
 - Enables and starts the pod
 
@@ -333,14 +338,69 @@ npm run deploy:homelab
 - **Base Image**: `nginx:alpine` for minimal size (~150-200MB total vs 1GB with Debian-based nginx)
 - **Entry point**: `docker-entrypoint.sh` starts nginx and WebSocket server
 - **Volume**: `pc2-laptimes-pgdata` for PostgreSQL persistence
-- **Secrets**: Podman secrets for database passwords
+- **Secrets**: Podman secrets `pg_pass` (superuser), `pg_api_uri` (PostgREST authenticator URI), `pg_jwt_secret` (write-token signing key)
+
+### PostgREST Auth Setup
+
+The API hostname is public, so writes are deny-by-default:
+
+| Surface | Database role | Credential |
+| --- | --- | --- |
+| Reads (`GET`) | `laptimes_anon` | none - public by design |
+| Writes (`POST`/`PATCH`/`DELETE`) | `laptimes_api` | `Authorization: Bearer <JWT>` |
+| Database login | `laptimes_authenticator` | password in Podman secret `pg_api_uri` |
+
+One-time provisioning (workstation with SSH access to the host):
+
+```bash
+./deployment/setup-api-auth.sh
+```
+
+The script creates the Podman secrets `pg_api_uri` and `pg_jwt_secret` (kept on re-run), applies `src/assets/db/grant_permissions.sql` as `postgres`, sets the authenticator password, and prints a write token for `.env.local`.
+
+`deployment/quadlet/pc2-laptimes-api.container` reads both secrets and sets `PGRST_DB_URI=@/run/secrets/pg_api_uri`, `PGRST_DB_ANON_ROLE=laptimes_anon`, and `PGRST_JWT_SECRET=@/run/secrets/pg_jwt_secret`.
+
+`deploy.sh` refuses to build unless the secrets and roles exist, mints the token from `pg_jwt_secret`, and passes it to the image build as `--build-arg VUE_APP_PGRST_JWT=...` (the Dockerfile exposes it to `npm run build`).
+
+Manual permission regression check after deploying:
+
+```bash
+API=http://192.168.0.102:3000
+
+# 1. anonymous read: expect 200
+curl -s -o /dev/null -w '%{http_code}\n' "$API/times"
+
+# 2. anonymous write: expect 401 or 403
+curl -s -o /dev/null -w '%{http_code}\n' -X POST \
+  -H 'Content-Type: application/json' -d '{}' "$API/times"
+
+# 3. authenticated write: expect anything except 401/403 (400/409 is fine for a dummy row)
+TOKEN=$(ssh hosting@hosting "podman secret inspect --showsecret pg_jwt_secret --format '{{.SecretData}}'" | node deployment/mint-token.mjs)
+curl -s -o /dev/null -w '%{http_code}\n' -X POST \
+  -H "Authorization: Bearer $TOKEN" \
+  -H 'Content-Type: application/json' -d '{}' "$API/times"
+
+# 4. database login role must not be a superuser (expect f|f), run on the host
+podman exec pc2-laptimes-postgres psql -U postgres -d pc2-laptimes -tAc \
+  "SELECT rolsuper, rolcanlogin FROM pg_roles WHERE rolname = 'laptimes_authenticator'"
+```
+
+Rotate the shared write token:
+
+```bash
+podman secret rm pg_jwt_secret
+./deployment/setup-api-auth.sh   # creates a new secret and prints a new token
+./deploy.sh                      # rebuilds the bundle with the new token
+```
+
+Residual risk: the token is compiled into the public SPA bundle, so it is a write gate, not per-user authentication. Anyone who extracts the bundle can write. Per-user auth/RLS remains a follow-up.
 
 ## Important Notes for AI Agents
 
 ### Active Development Context
 - **Current branch**: `main`
 - **Migration complete**: Data layer now uses PostgreSQL with PostgREST API
-- **No authentication**: Home network only, no user accounts needed
+- **No user accounts**: Reads are anonymous; PostgREST writes require the shared API JWT (`VUE_APP_PGRST_JWT`). The API no longer runs as `postgres`
 - **Two racing PCs**: App designed for simultaneous use on 2 computers with auto-submit feature
 
 ### Common Patterns to Follow
@@ -376,7 +436,9 @@ npm run deploy:homelab
 ### Anti-patterns to Avoid
 - ❌ Using `any` type in TypeScript
 - ❌ Adding Firestore code (migration to PostgreSQL is complete)
-- ❌ Implementing authentication/user accounts (not needed for home use)
+- ❌ Implementing user accounts/logins (not needed; the only credential is the shared PostgREST write token)
+- ❌ Committing `VUE_APP_PGRST_JWT`, database passwords, or other real secret values
+- ❌ Pointing PostgREST at the `postgres` superuser
 - ❌ Creating inline styles instead of SCSS modules
 - ❌ Direct DOM manipulation (use Vue refs and reactive data)
 - ❌ Bypassing the store for shared state
@@ -436,9 +498,10 @@ npm run dev                # Start WebSocket server locally
 - **Auto-Submit**: After race, telemetry data auto-fills laptime form (Driver has to be selected manually beforehand)
 - **Real-Time Sync**: When PC1 adds laptime, PC2's browser auto-refreshes because of notification from PC1 via WebSocket
 
-### No Authentication
-- **Home network only**: No login, no user accounts
-- **Security**: Assumes trusted home network environment
+### Authentication
+- **Reads**: anonymous via `laptimes_anon`; public leaderboard data by design
+- **Writes**: HS256 JWT for `laptimes_api`, compiled into the SPA as `VUE_APP_PGRST_JWT`
+- **Superuser**: `postgres` is never exposed through PostgREST; see "PostgREST Auth Setup"
 
 ### Ports Overview
 - **80**: Vue app (nginx)
@@ -451,5 +514,5 @@ npm run dev                # Start WebSocket server locally
 
 ---
 
-**Last Updated**: July 10, 2026  
+**Last Updated**: October 30, 2026  
 **Maintainer**: Feel free to update this file as the project evolves!

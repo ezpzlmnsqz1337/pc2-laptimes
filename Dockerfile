@@ -4,6 +4,11 @@ WORKDIR /app
 
 COPY . /app
 
+# Injected by deploy.sh from the pg_jwt_secret Podman secret. The token is
+# compiled into the public bundle, so it is a write gate, not a user secret.
+ARG VUE_APP_PGRST_JWT=""
+ENV VUE_APP_PGRST_JWT=$VUE_APP_PGRST_JWT
+
 RUN npm ci --ignore-engines && npm run build
 
 

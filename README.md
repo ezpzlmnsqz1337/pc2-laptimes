@@ -22,8 +22,12 @@ Then install dependencies and start development:
 
 ```bash
 npm install
+cp .env.example .env.local   # paste VUE_APP_PGRST_JWT; needed for writes only
 npm run serve
 ```
+
+Database reads are anonymous; writes need the shared PostgREST JWT. See
+`.env.example` and the "PostgREST Auth Setup" section in [AGENTS.md](AGENTS.md).
 
 ## Documentation
 

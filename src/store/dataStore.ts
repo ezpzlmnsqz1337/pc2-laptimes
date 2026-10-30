@@ -23,9 +23,39 @@ export type { Race } from '@/builders/RaceBuilder'
 
 const isDebugEnabled = process.env.NODE_ENV === 'development'
 const DB_RECONNECT_DELAY_MS = 5000
+const HTTP_UNAUTHORIZED = 401
+const HTTP_FORBIDDEN = 403
+const WRITE_AUTH_ERROR_MESSAGE = 'Saving failed: this app build has no valid database write credential.'
+
+type WriteMethod = 'POST' | 'PATCH' | 'DELETE'
 
 function debugLog (...args: unknown[]) {
   if (isDebugEnabled) console.log(...args)
+}
+
+function getPgrstToken (): string {
+  // Vue CLI only inlines VUE_APP_* variables at build time; this literal is
+  // replaced with the configured token, so it must not be read dynamically.
+  const token: unknown = process.env.VUE_APP_PGRST_JWT
+  return typeof token === 'string' ? token : ''
+}
+
+async function sendWrite (url: string, method: WriteMethod, body?: unknown): Promise<Response> {
+  const token = getPgrstToken()
+  const response = await fetch(url, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    },
+    ...(body === undefined ? {} : { body: JSON.stringify(body) })
+  })
+
+  if (response.status === HTTP_UNAUTHORIZED || response.status === HTTP_FORBIDDEN) {
+    eb.emit('toast:error', WRITE_AUTH_ERROR_MESSAGE)
+  }
+
+  return response
 }
 
 async function fetchCollection<T> (url: string, resourceLabel: string): Promise<T[] | null> {
@@ -274,26 +304,14 @@ export const dataStore: DataStore = {
   },
   async addCar (name: string) {
     const car = { uid: uuidv4(), name, imageUrl: '', gameId: '' }
-    const response = await fetch(`${CARS_ENDPOINT}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake(car))
-    })
+    const response = await sendWrite(CARS_ENDPOINT, 'POST', objectToSnake(car))
     if (response.ok) {
       this.broadcastDataChange('cars')
     }
   },
   async addTrack (name: string) {
     const track = { uid: uuidv4(), track: name, variants: [] as string[], gameId: '' }
-    const response = await fetch(`${TRACKS_ENDPOINT}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake({ ...track, variants: JSON.stringify(track.variants) }))
-    })
+    const response = await sendWrite(TRACKS_ENDPOINT, 'POST', objectToSnake({ ...track, variants: JSON.stringify(track.variants) }))
     if (response.ok) {
       this.broadcastDataChange('tracks')
     }
@@ -305,13 +323,11 @@ export const dataStore: DataStore = {
     const variants = track.variants ? [...track.variants] : []
     if (variants.includes(variant)) return
     const updatedTrack = { ...track, variants: [...variants, variant] }
-    const response = await fetch(`${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake({ ...updatedTrack, variants: JSON.stringify(updatedTrack.variants) }))
-    })
+    const response = await sendWrite(
+      `${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`,
+      'PATCH',
+      objectToSnake({ ...updatedTrack, variants: JSON.stringify(updatedTrack.variants) })
+    )
     if (response.ok) {
       track.variants = updatedTrack.variants
       this.broadcastDataChange('tracks')
@@ -319,13 +335,7 @@ export const dataStore: DataStore = {
   },
   async addDriver (name: string) {
     const driver = { uid: uuidv4(), name }
-    const response = await fetch(`${DRIVERS_ENDPOINT}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake(driver))
-    })
+    const response = await sendWrite(DRIVERS_ENDPOINT, 'POST', objectToSnake(driver))
     if (response.ok) {
       this.broadcastDataChange('drivers')
     }
@@ -337,13 +347,7 @@ export const dataStore: DataStore = {
       ...time,
       brakingLine: time.brakingLine === BrakingLine.ON
     }
-    const response = await fetch(`${TIMES_ENDPOINT}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake(payload))
-    })
+    const response = await sendWrite(TIMES_ENDPOINT, 'POST', objectToSnake(payload))
     if (response.ok) {
       this.broadcastDataChange('times', time.uid)
     }
@@ -366,13 +370,11 @@ export const dataStore: DataStore = {
     if (payload.date !== undefined) {
       payload.dateString = new Date(payload.date).toLocaleDateString('en-GB')
     }
-    const response = await fetch(`${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptime.uid)}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake(payload))
-    })
+    const response = await sendWrite(
+      `${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptime.uid)}`,
+      'PATCH',
+      objectToSnake(payload)
+    )
     if (!response.ok) {
       console.error(response.statusText)
       return
@@ -393,9 +395,7 @@ export const dataStore: DataStore = {
   },
   async deleteLaptime (laptimeId: string) {
     if (!laptimeId) return
-    const response = await fetch(`${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptimeId)}`, {
-      method: 'DELETE'
-    })
+    const response = await sendWrite(`${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptimeId)}`, 'DELETE')
     if (response.ok) {
       this.times = this.times.filter(x => x.uid !== laptimeId)
       this.races = RaceBuilder.buildRacesFromTimes(this.times)
@@ -405,13 +405,11 @@ export const dataStore: DataStore = {
   },
   async linkCarToGameId (carId: string, gameId: string) {
     if (!carId || !gameId) return
-    const response = await fetch(`${CARS_ENDPOINT}?uid=eq.${encodeURIComponent(carId)}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake({ gameId }))
-    })
+    const response = await sendWrite(
+      `${CARS_ENDPOINT}?uid=eq.${encodeURIComponent(carId)}`,
+      'PATCH',
+      objectToSnake({ gameId })
+    )
     if (response.ok) {
       const car = this.getCarById(carId)
       if (car) car.gameId = gameId
@@ -420,13 +418,11 @@ export const dataStore: DataStore = {
   },
   async linkTrackToGameId (trackId: string, gameId: string) {
     if (!trackId || !gameId) return
-    const response = await fetch(`${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake({ gameId }))
-    })
+    const response = await sendWrite(
+      `${TRACKS_ENDPOINT}?uid=eq.${encodeURIComponent(trackId)}`,
+      'PATCH',
+      objectToSnake({ gameId })
+    )
     if (response.ok) {
       const track = this.getTrackById(trackId)
       if (track) track.gameId = gameId
@@ -436,13 +432,7 @@ export const dataStore: DataStore = {
   async storeFailedAutoSubmitData (data: FailedAutoSubmitData) {
     if (!data) return
     const failedData = { uid: uuidv4(), ...data, dateString: new Date().toLocaleDateString('en-GB') }
-    await fetch(`${FAILED_AUTO_SUBMIT_ENDPOINT}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(objectToSnake(failedData))
-    })
+    await sendWrite(FAILED_AUTO_SUBMIT_ENDPOINT, 'POST', objectToSnake(failedData))
   },
   getTimesForDriver (driverId: string) {
     if (!driverId) return []

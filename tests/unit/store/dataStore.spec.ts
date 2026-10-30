@@ -45,6 +45,7 @@ describe('dataStore', () => {
 
   beforeEach(() => {
     vi.stubGlobal('fetch', fetchMock)
+    vi.stubEnv('VUE_APP_PGRST_JWT', '')
     dataStore.times = []
     dataStore.races = []
     dataStore.lastAddedLaptime = null
@@ -57,6 +58,7 @@ describe('dataStore', () => {
   afterEach(() => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
     fetchMock.mockReset()
     eb.removeAllListeners('toast:error')
   })
@@ -102,6 +104,41 @@ describe('dataStore', () => {
     await dataStore.addLaptime(createLaptime())
 
     expect(broadcastDataChange).not.toHaveBeenCalled()
+  })
+
+  it('sends the configured bearer token with writes', async () => {
+    vi.stubEnv('VUE_APP_PGRST_JWT', 'test-write-token')
+    fetchMock.mockResolvedValue({ ok: true, statusText: 'Created' })
+
+    await dataStore.addLaptime(createLaptime())
+
+    expect(fetchMock).toHaveBeenCalledWith(TIMES_ENDPOINT, expect.objectContaining({
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer test-write-token'
+      }
+    }))
+  })
+
+  it('reports a rejected write and does not broadcast when the token is rejected', async () => {
+    fetchMock.mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized' })
+    const errorListener = vi.fn()
+    const broadcastDataChange = vi.spyOn(dataStore, 'broadcastDataChange')
+    eb.on('toast:error', errorListener)
+
+    await dataStore.addLaptime(createLaptime())
+
+    expect(errorListener).toHaveBeenCalledTimes(1)
+    expect(broadcastDataChange).not.toHaveBeenCalled()
+  })
+
+  it('does not send the write token with anonymous reads', async () => {
+    vi.stubEnv('VUE_APP_PGRST_JWT', 'test-write-token')
+    fetchMock.mockResolvedValue({ ok: true, json: vi.fn().mockResolvedValue([]) })
+
+    await dataStore.fetchTimes()
+
+    expect(fetchMock).toHaveBeenCalledWith(TIMES_ENDPOINT, { cache: 'no-store' })
   })
 
   it('normalizes fetched times and groups matching participants into a race', async () => {
