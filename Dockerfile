@@ -1,4 +1,4 @@
-FROM node:20-slim AS build
+FROM docker.io/library/node:22-slim AS build
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY . /app
 RUN npm ci --ignore-engines && npm run build
 
 
-FROM nginx:alpine
+FROM docker.io/library/nginx:alpine
 
 # Install Node.js for the WebSocket server
 RUN apk add --no-cache nodejs npm
