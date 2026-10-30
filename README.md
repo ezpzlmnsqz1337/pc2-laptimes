@@ -24,3 +24,7 @@ Then install dependencies and start development:
 npm install
 npm run serve
 ```
+
+## Documentation
+
+Architecture, coding conventions, deployment, and project context are documented in [AGENTS.md](AGENTS.md).

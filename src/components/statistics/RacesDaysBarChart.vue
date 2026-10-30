@@ -16,9 +16,30 @@
 
 <script lang="ts">
 import { Laptime } from '@/builders/LaptimeBuilder'
+import { cssVariable } from '@/utils/cssVariable'
 import { BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js'
 import { Bar } from 'vue-chartjs'
 import { Options, Vue, prop } from 'vue-class-component'
+
+const CHART_LAYOUT_PADDING = 50
+const CHART_TICK_WIDTH = 30
+const CHART_FONT_SIZE = 18
+
+const CHART_COLOR_TOKENS = [
+  '--chart-color-1',
+  '--chart-color-2',
+  '--chart-color-3',
+  '--chart-color-4',
+  '--chart-color-5',
+  '--chart-color-6',
+  '--chart-color-7',
+  '--chart-color-8',
+  '--chart-color-9',
+  '--chart-color-10',
+  '--chart-color-11',
+  '--chart-color-12',
+  '--chart-color-13'
+]
 
 interface Drivers {
   [name: string]: number
@@ -82,18 +103,18 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
       family: "'Open Sans', Helvetica, Arial, sans-serif"
     },
     layout: {
-      color: 'black',
-      padding: 50
+      color: cssVariable('--text-dark1'),
+      padding: CHART_LAYOUT_PADDING
     },
     scales: {
       x: {
         grid: { display: false },
         stacked: true,
         ticks: {
-          color: '#ffffff',
-          tickWidth: 30,
+          color: cssVariable('--text-light1'),
+          tickWidth: CHART_TICK_WIDTH,
           font: {
-            size: 18
+            size: CHART_FONT_SIZE
           }
         }
       },
@@ -101,10 +122,10 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
         stacked: true,
         grid: { display: false },
         ticks: {
-          color: '#ffffff',
-          tickWidth: 30,
+          color: cssVariable('--text-light1'),
+          tickWidth: CHART_TICK_WIDTH,
           font: {
-            size: 18
+            size: CHART_FONT_SIZE
           }
         }
       }
@@ -112,9 +133,9 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
     plugins: {
       legend: {
         labels: {
-          color: '#ffffff',
+          color: cssVariable('--text-light1'),
           font: {
-            size: 18
+            size: CHART_FONT_SIZE
           },
           padding: 10
         }
@@ -128,7 +149,7 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
         },
         displayColors: false,
         bodyFont: {
-          size: 18
+          size: CHART_FONT_SIZE
         },
         padding: 10,
         yAlign: 'bottom'
@@ -136,8 +157,9 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
     }
   }
 
-  chartColors = ['#d9ad96', '#8928c9', '#a7fa55', '#d67840', '#2388eb', '#274db4', '#7cf7ca', '#7027b0',
-    '#e32d34', '#000000', '#57aee6', '#ffffff', '#e0ad92']
+  get chartColors (): string[] {
+    return CHART_COLOR_TOKENS.map(token => cssVariable(token))
+  }
 
   mounted () {
     this.getData()

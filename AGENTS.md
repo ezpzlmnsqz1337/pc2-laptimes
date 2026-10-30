@@ -5,7 +5,7 @@
 **Project Cars 2 Lap Times Tracker** - A Vue 3 + TypeScript web application for tracking, browsing, and analyzing lap times from Project Cars 2 racing simulator. The app includes real-time data monitoring via UDP telemetry and WebSocket-based synchronization between clients.
 
 **Status**: Work in Progress (Forever WiP)  
-**Branch Context**: `feat/remove-firestore` - Migrating away from Firestore to a different data storage solution
+**Branch Context**: `main`
 
 ## Tech Stack
 
@@ -235,9 +235,9 @@ See `src/assets/` for SQL files:
 4. **Event bus**: Be cautious with eventBus changes - many components may listen
 
 ### Testing
-- **Unit tests**: Jest + Vue Test Utils (see `tests/unit/`)
+- **Unit tests**: Vitest + Vue Test Utils (see `tests/unit/`)
 - **Run tests**: `npm run test:unit`
-- **Config**: `jest.config.js`
+- **Config**: `vitest.config.ts`
 
 ## Deployment
 
@@ -338,7 +338,7 @@ npm run deploy:homelab
 ## Important Notes for AI Agents
 
 ### Active Development Context
-- **Current branch**: `feat/remove-firestore` - Migration from Firestore to PostgreSQL + PostgREST
+- **Current branch**: `main`
 - **Migration complete**: Data layer now uses PostgreSQL with PostgREST API
 - **No authentication**: Home network only, no user accounts needed
 - **Two racing PCs**: App designed for simultaneous use on 2 computers with auto-submit feature

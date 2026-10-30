@@ -7,15 +7,15 @@
         class="__row"
       >
         <template
-          v-for="variant in track"
-          :key="variant"
+          v-for="(variantCars, variantName) in track"
+          :key="variantName"
         >
           <Carousel
             :items-to-show="1"
           >
             <Slide
-              v-for="laptimes in variant"
-              :key="laptimes"
+              v-for="(laptimes, carId) in variantCars"
+              :key="carId"
               class="__item"
             >
               <h3>
@@ -150,7 +150,7 @@ class Leaderboards extends Vue.with(LeaderboardsProps) {
       if (driver) filter.driverId = driver.uid
     }
     if (this.queryParams.has('position')) {
-      filter.position = parseInt(this.queryParams.get('position')!)
+      filter.position = parseInt(this.queryParams.get('position')!, 10)
     }
     if (this.queryParams.has('distinct')) {
       filter.distinct = this.queryParams.get('distinct') === Distinct.YES ? Distinct.YES : Distinct.NO

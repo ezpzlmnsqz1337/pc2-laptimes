@@ -61,6 +61,12 @@ describe('compareLaptimes', () => {
     const result = laptimeBuilder.compareLaptimes('1:30.000', '1:30.000')
     expect(result).toBe(0)
   })
+
+  it('sorts invalid laptimes after valid ones', () => {
+    expect(laptimeBuilder.compareLaptimes('invalid', '1:30.000')).toBeGreaterThan(0)
+    expect(laptimeBuilder.compareLaptimes('1:30.000', 'invalid')).toBeLessThan(0)
+    expect(laptimeBuilder.compareLaptimes('invalid', 'invalid')).toBe(0)
+  })
 })
 
 describe('getLaptimeDiff', () => {
@@ -87,6 +93,11 @@ describe('getLaptimeDiff', () => {
   it('does not produce a negative lap minute when the second time is faster', () => {
     const diff = laptimeBuilder.getLaptimeDiff('1:00.000', '0:59.999')
     expect(diff).toBe('- 0:00.001')
+  })
+
+  it('returns an empty diff when a laptime is invalid', () => {
+    expect(laptimeBuilder.getLaptimeDiff('invalid', '1:30.000')).toBe('')
+    expect(laptimeBuilder.getLaptimeDiff('1:30.000', 'invalid')).toBe('')
   })
 })
 

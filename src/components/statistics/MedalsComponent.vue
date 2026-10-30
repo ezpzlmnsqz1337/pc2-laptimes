@@ -27,7 +27,7 @@
               class="__loading"
             >
               <PulseLoader
-                color="#188cff"
+                color="var(--hover)"
                 size="15px"
               />
             </td>

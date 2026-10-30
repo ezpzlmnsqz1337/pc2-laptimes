@@ -129,7 +129,7 @@
 </template>
 
 <script lang="ts">
-import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
+import { RealtimeDataListener, RealtimePacket } from '@/builders/RealtimeDataBuilder'
 import { PacketType } from '@/constants/PacketType'
 import { Vue } from 'vue-class-component'
 
@@ -150,31 +150,31 @@ class RealtimeData extends Vue {
   }
 
   get brake () {
-    return this.$realtimeDataStore.brake
+    return this.$realtimeDataStore.brake ?? 0
   }
 
   get throttle () {
-    return this.$realtimeDataStore.throttle
+    return this.$realtimeDataStore.throttle ?? 0
   }
 
   get clutch () {
-    return this.$realtimeDataStore.clutch
+    return this.$realtimeDataStore.clutch ?? 0
   }
 
   get speed () {
-    return this.$realtimeDataStore.speed
+    return this.$realtimeDataStore.speed ?? 0
   }
 
   get rpm () {
-    return this.$realtimeDataStore.rpm
+    return this.$realtimeDataStore.rpm ?? 0
   }
 
   get maxRpm () {
-    return this.$realtimeDataStore.maxRpm
+    return this.$realtimeDataStore.maxRpm ?? 0
   }
 
   get gearNumGears () {
-    return this.$realtimeDataStore.gearNumGears
+    return this.$realtimeDataStore.gearNumGears ?? 0
   }
 
   get carName () {
@@ -219,15 +219,15 @@ class RealtimeData extends Vue {
     this.realtimeData = !this.realtimeData
   }
 
-  onRealtimeDataReceived (data: any) {
-    if (data.packetType === PacketType.TELEMETRY) {
+  onRealtimeDataReceived (packet: RealtimePacket) {
+    if (packet.packetType === PacketType.TELEMETRY) {
       this.setDials()
       if (this.lightsEnabled) {
-        const { throttle, rpm, maxRpm, brake } = data.data
-        this.setLightsColor(throttle, rpm, maxRpm, brake)
+        const { throttle, rpm, maxRpm, brake } = packet.data
+        this.setLightsColor(Number(throttle), Number(rpm), Number(maxRpm), Number(brake))
       }
     }
-    this.$realtimeDataStore.setValues(data.data)
+    this.$realtimeDataStore.setValues(packet.data)
   }
 
   setDials () {

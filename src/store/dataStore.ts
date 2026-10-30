@@ -21,7 +21,26 @@ import { objectToCamel, objectToSnake } from 'ts-case-convert'
 export { RACE_GROUP_WINDOW_MS } from '@/builders/RaceBuilder'
 export type { Race } from '@/builders/RaceBuilder'
 
-// const debug = process.env.NODE_ENV !== 'production'
+const isDebugEnabled = process.env.NODE_ENV === 'development'
+const DB_RECONNECT_DELAY_MS = 5000
+
+function debugLog (...args: unknown[]) {
+  if (isDebugEnabled) console.log(...args)
+}
+
+async function fetchCollection<T> (url: string, resourceLabel: string): Promise<T[] | null> {
+  try {
+    const response = await fetch(url, { cache: 'no-store' })
+    if (!response.ok) {
+      throw new Error(`Request failed with status ${response.status} ${response.statusText}`)
+    }
+    return await response.json() as T[]
+  } catch (error) {
+    console.error(`Failed to fetch ${resourceLabel}:`, error)
+    eb.emit('toast:error', `Unable to load ${resourceLabel}. Check the database connection.`)
+    return null
+  }
+}
 
 export interface LaptimeUpdate {
   uid: string
@@ -38,6 +57,48 @@ export interface LaptimeUpdate {
   game?: Game
   date?: number
   notes?: string
+}
+
+interface LaptimeDbPayload extends Omit<Partial<Laptime>, 'brakingLine'> {
+  brakingLine?: BrakingLine | boolean
+  dateString?: string
+}
+
+interface RawCar {
+  uid: string
+  name: string
+  game_id?: string
+  image_url?: string
+}
+
+interface RawTrack {
+  uid: string
+  track: string
+  variants: string[]
+  game_id?: string
+}
+
+interface RawDriver {
+  uid: string
+  name: string
+}
+
+interface RawLaptime {
+  uid: string
+  car_id: string
+  track_id: string
+  track_variant: string
+  driver_id: string
+  transmission: TransmissionType
+  weather: WeatherType
+  braking_line: boolean
+  controls: ControlType
+  start_type: StartType
+  laptime: string
+  game: Game
+  date: string
+  notes: string
+  date_string?: string
 }
 
 export interface FailedAutoSubmitData {
@@ -78,9 +139,9 @@ export interface RaceFilter {
 }
 
 let reloadInFlight = false
-let queuedReloadTable: string | null = null
+const pendingReloadTables = new Set<string>()
 let hasConnectedNotifications = false
-let pendingNotification: { table: string, uid?: string } | null = null
+let pendingNotifications: { table: string, uid?: string }[] = []
 
 function toNotificationPayload (table: string, uid?: string) {
   return {
@@ -220,7 +281,6 @@ export const dataStore: DataStore = {
       },
       body: JSON.stringify(objectToSnake(car))
     })
-    console.log(response.statusText)
     if (response.ok) {
       this.broadcastDataChange('cars')
     }
@@ -234,7 +294,6 @@ export const dataStore: DataStore = {
       },
       body: JSON.stringify(objectToSnake({ ...track, variants: JSON.stringify(track.variants) }))
     })
-    console.log(response.statusText)
     if (response.ok) {
       this.broadcastDataChange('tracks')
     }
@@ -257,7 +316,6 @@ export const dataStore: DataStore = {
       track.variants = updatedTrack.variants
       this.broadcastDataChange('tracks')
     }
-    console.log(response.statusText)
   },
   async addDriver (name: string) {
     const driver = { uid: uuidv4(), name }
@@ -268,7 +326,6 @@ export const dataStore: DataStore = {
       },
       body: JSON.stringify(objectToSnake(driver))
     })
-    console.log(response.statusText)
     if (response.ok) {
       this.broadcastDataChange('drivers')
     }
@@ -287,7 +344,6 @@ export const dataStore: DataStore = {
       },
       body: JSON.stringify(objectToSnake(payload))
     })
-    console.log(response.statusText)
     if (response.ok) {
       this.broadcastDataChange('times', time.uid)
     }
@@ -295,13 +351,20 @@ export const dataStore: DataStore = {
   async updateLaptime (laptime: LaptimeUpdate) {
     if (!laptime || !laptime.uid) return
 
-    const payload: Record<string, any> = { ...this.getTimeById(laptime.uid), ...laptime }
+    const existing = this.getTimeById(laptime.uid)
+    const index = this.times.findIndex(x => x.uid === laptime.uid)
+    if (!existing || index === -1) {
+      console.error(`Unable to update unknown laptime: ${laptime.uid}`)
+      return
+    }
+
+    const payload: LaptimeDbPayload = { ...existing, ...laptime }
     delete payload.uid
     if (payload.brakingLine !== undefined) {
       payload.brakingLine = payload.brakingLine === BrakingLine.ON
     }
     if (payload.date !== undefined) {
-      payload.dateString = new Date(parseInt(payload.date)).toLocaleDateString('en-GB')
+      payload.dateString = new Date(payload.date).toLocaleDateString('en-GB')
     }
     const response = await fetch(`${TIMES_ENDPOINT}?uid=eq.${encodeURIComponent(laptime.uid)}`, {
       method: 'PATCH',
@@ -311,31 +374,21 @@ export const dataStore: DataStore = {
       body: JSON.stringify(objectToSnake(payload))
     })
     if (!response.ok) {
-      console.log(response.statusText)
-      return
-    }
-
-    const index = this.times.findIndex(x => x.uid === laptime.uid)
-    if (index === -1) {
-      console.log(response.statusText)
+      console.error(response.statusText)
       return
     }
 
     const sanitizedUpdate = Object.fromEntries(
       Object.entries(laptime).filter(([key, value]) => key !== 'uid' && value !== undefined)
-    ) as Record<string, any>
+    ) as Partial<Laptime>
 
     if (payload.dateString !== undefined) {
       sanitizedUpdate.dateString = payload.dateString
-    }
-    if (payload.brakingLine !== undefined) {
-      sanitizedUpdate.brakingLine = (laptime.brakingLine as BrakingLine) ?? this.times[index].brakingLine
     }
 
     this.times[index] = { ...this.times[index], ...sanitizedUpdate }
     this.races = RaceBuilder.buildRacesFromTimes(this.times)
     this.refreshRaceTotals()
-    console.log(response.statusText)
     this.broadcastDataChange('times')
   },
   async deleteLaptime (laptimeId: string) {
@@ -349,7 +402,6 @@ export const dataStore: DataStore = {
       this.refreshRaceTotals()
       this.broadcastDataChange('times')
     }
-    console.log(response.statusText)
   },
   async linkCarToGameId (carId: string, gameId: string) {
     if (!carId || !gameId) return
@@ -365,7 +417,6 @@ export const dataStore: DataStore = {
       if (car) car.gameId = gameId
       this.broadcastDataChange('cars')
     }
-    console.log(response.statusText)
   },
   async linkTrackToGameId (trackId: string, gameId: string) {
     if (!trackId || !gameId) return
@@ -381,19 +432,17 @@ export const dataStore: DataStore = {
       if (track) track.gameId = gameId
       this.broadcastDataChange('tracks')
     }
-    console.log(response.statusText)
   },
   async storeFailedAutoSubmitData (data: FailedAutoSubmitData) {
     if (!data) return
     const failedData = { uid: uuidv4(), ...data, dateString: new Date().toLocaleDateString('en-GB') }
-    const response = await fetch(`${FAILED_AUTO_SUBMIT_ENDPOINT}`, {
+    await fetch(`${FAILED_AUTO_SUBMIT_ENDPOINT}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(objectToSnake(failedData))
     })
-    console.log(response.statusText)
   },
   getTimesForDriver (driverId: string) {
     if (!driverId) return []
@@ -409,10 +458,10 @@ export const dataStore: DataStore = {
     const activeFilters = Object.entries(rest).filter(([, value]) => value)
 
     const times = this.times
-      .filter((time: any) => {
+      .filter((time) => {
         if (normalizedDate && time.dateString !== normalizedDate) return false
 
-        return activeFilters.every(([key, value]) => time[key] === value)
+        return activeFilters.every(([key, value]) => time[key as keyof Laptime] === value)
       })
       .sort((a, b) => ltb.compareLaptimes(a.laptime, b.laptime))
 
@@ -490,10 +539,11 @@ export const dataStore: DataStore = {
     })
   },
   async fetchTracks () {
-    const response = await fetch(TRACKS_ENDPOINT, { cache: 'no-store' })
-    const tracks = await response.json()
-    this.tracks = tracks.map((x: Track) => {
-      const camelCased = objectToCamel(x) as Track
+    const tracks = await fetchCollection<RawTrack>(TRACKS_ENDPOINT, 'tracks')
+    if (!tracks) return
+
+    this.tracks = tracks.map((x) => {
+      const camelCased = objectToCamel(x)
       // PostgREST returns JSONB as already-parsed objects, not strings
       return {
         ...camelCased,
@@ -503,23 +553,30 @@ export const dataStore: DataStore = {
     this.refreshRaceTotals()
   },
   async fetchCars () {
-    const response = await fetch(CARS_ENDPOINT, { cache: 'no-store' })
-    const cars = await response.json()
-    this.cars = cars.map((x: Car) => objectToCamel(x) as Car)
+    const cars = await fetchCollection<RawCar>(CARS_ENDPOINT, 'cars')
+    if (!cars) return
+
+    this.cars = cars.map((x) => objectToCamel(x))
     this.refreshRaceTotals()
   },
   async fetchDrivers () {
-    const response = await fetch(DRIVERS_ENDPOINT, { cache: 'no-store' })
-    const drivers = await response.json()
-    this.drivers = drivers.map((x: Driver) => objectToCamel(x) as Driver)
+    const drivers = await fetchCollection<RawDriver>(DRIVERS_ENDPOINT, 'drivers')
+    if (!drivers) return
+
+    this.drivers = drivers.map((x) => objectToCamel(x))
     this.refreshRaceTotals()
   },
   async fetchTimes () {
-    const response = await fetch(TIMES_ENDPOINT, { cache: 'no-store' })
-    const times = await response.json()
-    this.times = times.map((x: any) => {
-      const camelCased = objectToCamel(x) as any
-      return { ...camelCased, date: parseInt(camelCased.date), brakingLine: camelCased.brakingLine ? 'on' : 'off' }
+    const times = await fetchCollection<RawLaptime>(TIMES_ENDPOINT, 'laptimes')
+    if (!times) return
+
+    this.times = times.map((x) => {
+      const camelCased = objectToCamel(x)
+      return {
+        ...camelCased,
+        date: parseInt(camelCased.date, 10),
+        brakingLine: camelCased.brakingLine ? BrakingLine.ON : BrakingLine.OFF
+      }
     })
     this.races = RaceBuilder.buildRacesFromTimes(this.times)
     this.refreshRaceTotals()
@@ -540,11 +597,11 @@ export const dataStore: DataStore = {
       this.dbNotificationWs = new WebSocket(WS_NOTIFICATION_URL)
 
       this.dbNotificationWs.onopen = () => {
-        console.log('Connected to database notification server')
-        if (pendingNotification) {
-          this.dbNotificationWs?.send(JSON.stringify(toNotificationPayload(pendingNotification.table, pendingNotification.uid)))
-          pendingNotification = null
-        }
+        debugLog('Connected to database notification server')
+        pendingNotifications.forEach((notification) => {
+          this.dbNotificationWs?.send(JSON.stringify(toNotificationPayload(notification.table, notification.uid)))
+        })
+        pendingNotifications = []
         if (hasConnectedNotifications) {
           this.reloadData('times')
         }
@@ -556,7 +613,7 @@ export const dataStore: DataStore = {
           const message = JSON.parse(event.data)
 
           if (message.type === 'connected') {
-            console.log(message.message)
+            debugLog(message.message)
             return
           }
 
@@ -578,13 +635,12 @@ export const dataStore: DataStore = {
       }
 
       this.dbNotificationWs.onclose = () => {
-        console.log('Disconnected from database notification server')
+        debugLog('Disconnected from database notification server')
         this.dbNotificationWs = null
-        // Auto-reconnect after 5 seconds
         setTimeout(() => {
-          console.log('Attempting to reconnect to notification server...')
+          debugLog('Attempting to reconnect to notification server...')
           this.setupDbNotifications()
-        }, 5000)
+        }, DB_RECONNECT_DELAY_MS)
       }
     } catch (error) {
       console.error('Failed to connect to notification server:', error)
@@ -600,11 +656,11 @@ export const dataStore: DataStore = {
     const isOpen = this.dbNotificationWs?.readyState === WebSocket.OPEN
 
     if (isOpen) {
-      this.dbNotificationWs!.send(JSON.stringify(toNotificationPayload(table, uid)))
+      this.dbNotificationWs?.send(JSON.stringify(toNotificationPayload(table, uid)))
     } else {
-      // Keep the notification until the relay reconnects so the other client
-      // still receives the change instead of silently drifting.
-      pendingNotification = { table, uid }
+      // Keep notifications until the relay reconnects so the other client
+      // still receives every change instead of silently drifting.
+      pendingNotifications.push({ table, uid })
       this.setupDbNotifications()
     }
 
@@ -612,33 +668,33 @@ export const dataStore: DataStore = {
   },
   async reloadData (table: string) {
     if (reloadInFlight) {
-      queuedReloadTable = table
+      pendingReloadTables.add(table)
       return
     }
 
     reloadInFlight = true
-    console.log(`Reloading data for table: ${table}`)
+    debugLog(`Reloading data for table: ${table}`)
 
     try {
       switch (table) {
         case 'cars':
           await this.fetchCars()
-          console.log('Cars reloaded')
+          debugLog('Cars reloaded')
           break
         case 'tracks':
           await this.fetchTracks()
-          console.log('Tracks reloaded')
+          debugLog('Tracks reloaded')
           break
         case 'drivers':
           await this.fetchDrivers()
-          console.log('Drivers reloaded')
+          debugLog('Drivers reloaded')
           break
         case 'times':
           await this.fetchTimes()
-          console.log('Laptimes reloaded')
+          debugLog('Laptimes reloaded')
           break
         default:
-          console.log(`Unknown table: ${table}`)
+          console.warn(`Unknown table: ${table}`)
       }
     } catch (error) {
       console.error(`Failed to reload data for ${table}:`, error)
@@ -648,8 +704,10 @@ export const dataStore: DataStore = {
 
     eb.emit('laptimes:change')
 
-    const queuedTable = queuedReloadTable
-    queuedReloadTable = null
-    if (queuedTable) await this.reloadData(queuedTable)
+    const queuedTables = Array.from(pendingReloadTables)
+    pendingReloadTables.clear()
+    for (const queuedTable of queuedTables) {
+      await this.reloadData(queuedTable)
+    }
   }
 }

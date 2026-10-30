@@ -51,7 +51,7 @@
       class="__connecting"
     >
       <PulseLoader
-        color="#188cff"
+        color="var(--hover)"
         size="8px"
       />
     </div>

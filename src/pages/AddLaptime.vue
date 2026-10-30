@@ -263,7 +263,7 @@
 <script lang="ts">
 import { Track } from '@/constants/Track'
 import { Laptime } from '@/builders/LaptimeBuilder'
-import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
+import { RealtimeDataListener, RealtimePacket } from '@/builders/RealtimeDataBuilder'
 import InputRow from '@/components/add-laptime/InputRow.vue'
 import LaptimeInput from '@/components/add-laptime/LaptimeInput.vue'
 import NewCarModal from '@/components/add-laptime/NewCarModal.vue'
@@ -280,10 +280,13 @@ import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { WebsocketState } from '@/constants/WebsocketState'
+import { DEFAULT_PLAYER_NAME, PLAYER_NAME_BY_HOST } from '@/constants/PlayerNames'
 import eb from '@/eventBus'
 import { FailedAutoSubmitData, LaptimeFilter } from '@/store/dataStore'
 import { trackMapping } from '@/utils/trackMapping'
 import { Options, Vue } from 'vue-class-component'
+
+const FILTER_APPLY_DELAY_MS = 500
 
 @Options({
   components: {
@@ -385,6 +388,7 @@ class AddLaptime extends Vue {
   }
 
   get canSetCar () {
+    if (!this.carName) return false
     return Boolean(this.$dataStore.getCarByGameId(this.carName))
   }
 
@@ -394,6 +398,7 @@ class AddLaptime extends Vue {
   }
 
   get canSetTrack () {
+    if (!this.trackLocation) return false
     return Boolean(this.$dataStore.getTrackByGameId(this.trackLocation))
   }
 
@@ -407,7 +412,7 @@ class AddLaptime extends Vue {
   }
 
   get fastestLapTime () {
-    const participantName = this.$rdb.getHostname() === 'wallpc' ? 'ezpzlmnsqz1337' : 'tvojemama'
+    const participantName = PLAYER_NAME_BY_HOST[this.$rdb.getHostname()] ?? DEFAULT_PLAYER_NAME
     const participant = this.participants.find(p => p.name === participantName)
     if (!participant) return
 
@@ -415,11 +420,13 @@ class AddLaptime extends Vue {
     return this.$ltb.dateToLaptime(d)
   }
 
-  onRealTimeDataReceived (data: any) {
-    data = data.data
+  onRealTimeDataReceived (packet: RealtimePacket) {
+    const data = packet.data
     if ('raceState' in data) {
-      if (this.autoSubmit) this.handleAutoSubmit(data.raceState)
-      this.lastRaceState = data.raceState
+      const raceState = data.raceState
+      if (typeof raceState !== 'number') return
+      if (this.autoSubmit) this.handleAutoSubmit(raceState as RaceState)
+      this.lastRaceState = raceState as RaceState
     }
   }
 
@@ -431,11 +438,13 @@ class AddLaptime extends Vue {
     this.$dataStore.toggleAutoSubmit()
   }
 
-  linkCarToGameId (carId: string, gameId: string) {
+  linkCarToGameId (carId: string, gameId: string | null) {
+    if (!gameId) return
     this.$dataStore.linkCarToGameId(carId, gameId)
   }
 
-  linkTrackToGameId (trackId: string, gameId: string) {
+  linkTrackToGameId (trackId: string, gameId: string | null) {
+    if (!gameId) return
     this.$dataStore.linkTrackToGameId(trackId, gameId)
   }
 
@@ -470,10 +479,11 @@ class AddLaptime extends Vue {
     eb.emit('filter:clear')
     setTimeout(() => {
       eb.emit('filter:set', { carId, trackId, trackVariant } as LaptimeFilter)
-    }, 500)
+    }, FILTER_APPLY_DELAY_MS)
   }
 
-  setCarName (carName: string) {
+  setCarName (carName: string | null) {
+    if (!carName) return
     const car = this.$dataStore.getCarByGameId(carName)
     if (!car) {
       this.$toast.error('Unable to set car. Car does not exist.', {
@@ -484,7 +494,8 @@ class AddLaptime extends Vue {
     this.carId = car.uid
   }
 
-  setTrackLocation (trackLocation: string) {
+  setTrackLocation (trackLocation: string | null) {
+    if (!trackLocation) return
     const track = this.$dataStore.getTrackByGameId(trackLocation)
     if (!track) {
       this.$toast.error('Unable to set track. Track does not exist.', {
@@ -500,8 +511,14 @@ class AddLaptime extends Vue {
     return this.$dataStore.getTrackVariants(trackId)
   }
 
-  setTrackVariation (trackLocation: string, trackVariation: string) {
-    const variant = (trackMapping as any)[trackLocation]?.[trackVariation || '-']
+  setTrackVariation (trackLocation: string | null, trackVariation: string | null) {
+    if (!trackLocation) return
+    const mapping = trackMapping[trackLocation]
+    if (!mapping || Array.isArray(mapping)) {
+      this.$toast.warning('Unable to set track variant. Track variant does not exist.')
+      return
+    }
+    const variant = mapping[trackVariation || '-']
     if (!variant) {
       this.$toast.warning('Unable to set track variant. Track variant does not exist.')
       return
@@ -519,7 +536,7 @@ class AddLaptime extends Vue {
       this.trackVariant = null
       return
     }
-    this.trackVariant = variants.pop() || null
+    this.trackVariant = variants[variants.length - 1] ?? null
   }
 
   reset (): void {

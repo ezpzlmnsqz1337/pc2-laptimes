@@ -35,8 +35,11 @@ import Statistics from '@/pages/Statistics.vue'
 import { Options, Vue } from 'vue-class-component'
 import { ScreenType } from '@/constants/ScreenType'
 import { StatisticsScreenType } from '@/constants/StatisticsScreenType'
-import { RealtimeDataListener } from '@/builders/RealtimeDataBuilder'
+import { RealtimeDataListener, RealtimePacket } from '@/builders/RealtimeDataBuilder'
 import { RaceState } from '@/constants/RaceState'
+import eb from '@/eventBus'
+
+const TOAST_DURATION_MS = 5000
 
 @Options({
   components: {
@@ -55,6 +58,7 @@ class App extends Vue {
 
   created () {
     this.dataListener = this.$rdb.addListener(this.onRealTimeDataReceived)
+    eb.on('toast:error', this.showErrorToast)
   }
 
   mounted () {
@@ -72,18 +76,25 @@ class App extends Vue {
     return this.$dataStore.editLaptime
   }
 
-  onRealTimeDataReceived (data: any) {
-    data = data.data
+  onRealTimeDataReceived (packet: RealtimePacket) {
+    const data = packet.data
     if ('raceState' in data) {
-      if (this.lastRaceState === RaceState.BEFORE_RACE_MENU && data.raceState === RaceState.RACE_IS_ON) {
+      const raceState = data.raceState
+      if (typeof raceState !== 'number') return
+      if (this.lastRaceState === RaceState.BEFORE_RACE_MENU && raceState === RaceState.RACE_IS_ON) {
         this.$dataStore.showScreen(ScreenType.REALTIME_DATA)
       }
-      this.lastRaceState = data.raceState
+      this.lastRaceState = raceState as RaceState
     }
+  }
+
+  showErrorToast (message: string) {
+    this.$toast.error(message, { duration: TOAST_DURATION_MS })
   }
 
   beforeUnmount () {
     this.$rdb.removeListener(this.dataListener)
+    eb.off('toast:error', this.showErrorToast)
     this.$dataStore.disconnectDbNotifications()
   }
 
@@ -181,6 +192,22 @@ export default App
   --medal-gold: gold;
   --medal-silver: silver;
   --medal-bronze: #cd7f32;
+  --status-success-soft: rgba(5, 151, 17, 0.18);
+  --status-error-soft: rgba(255, 0, 0, 0.16);
+  --surface-highlight-soft: rgba(255, 255, 255, 0.08);
+  --chart-color-1: #d9ad96;
+  --chart-color-2: #8928c9;
+  --chart-color-3: #a7fa55;
+  --chart-color-4: #d67840;
+  --chart-color-5: #2388eb;
+  --chart-color-6: #274db4;
+  --chart-color-7: #7cf7ca;
+  --chart-color-8: #7027b0;
+  --chart-color-9: #e32d34;
+  --chart-color-10: #000000;
+  --chart-color-11: #57aee6;
+  --chart-color-12: #ffffff;
+  --chart-color-13: #e0ad92;
   --state-selected-bg: #242424;
   --surface-muted: #f8f8f8;
   --surface-overlay-strong: rgba(72, 72, 72, 0.7);

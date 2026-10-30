@@ -7,6 +7,7 @@ import { StartType } from '@/constants/StartType'
 import { TransmissionType } from '@/constants/TransmissionType'
 import { WeatherType } from '@/constants/WeatherType'
 import { dataStore, TIMES_ENDPOINT } from '@/store/dataStore'
+import eb from '@/eventBus'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 vi.mock('@/constants/Rank', () => ({
@@ -57,6 +58,7 @@ describe('dataStore', () => {
     vi.restoreAllMocks()
     vi.unstubAllGlobals()
     fetchMock.mockReset()
+    eb.removeAllListeners('toast:error')
   })
 
   it('persists a normalized laptime and notifies other clients after a successful write', async () => {
@@ -104,6 +106,7 @@ describe('dataStore', () => {
 
   it('normalizes fetched times and groups matching participants into a race', async () => {
     fetchMock.mockResolvedValue({
+      ok: true,
       json: vi.fn().mockResolvedValue([
         {
           uid: 'time-1',
@@ -139,6 +142,18 @@ describe('dataStore', () => {
       times: [{ uid: 'time-1' }, { uid: 'time-2' }],
       winnerDriverId: 'driver-2'
     })
+  })
+
+  it('keeps existing data and emits an error toast when the fetch fails', async () => {
+    dataStore.times = [createLaptime()]
+    const errorListener = vi.fn()
+    eb.on('toast:error', errorListener)
+    fetchMock.mockResolvedValue({ ok: false, status: 500, statusText: 'Internal Server Error' })
+
+    await dataStore.fetchTimes()
+
+    expect(dataStore.times).toHaveLength(1)
+    expect(errorListener).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -350,5 +365,20 @@ describe('reloadData', () => {
     await dataStore.reloadData('drivers')
 
     expect(fetchDrivers).toHaveBeenCalledTimes(1)
+  })
+
+  it('queues every table requested while a reload is in flight', async () => {
+    let resolveTimes: (() => void) | undefined
+    fetchTimes.mockImplementation(() => new Promise<void>((resolve) => {
+      resolveTimes = resolve
+    }))
+
+    const timesReload = dataStore.reloadData('times')
+    await dataStore.reloadData('cars')
+    resolveTimes?.()
+    await timesReload
+
+    expect(fetchTimes).toHaveBeenCalledTimes(1)
+    expect(fetchCars).toHaveBeenCalledTimes(1)
   })
 })

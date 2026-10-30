@@ -1,4 +1,5 @@
-import RaceSettingsBadge, { BadgeValue } from '@/components/laptime-table/race-settings/RaceSettingsBadge.vue'
+import RaceSettingsBadge from '@/components/laptime-table/race-settings/RaceSettingsBadge.vue'
+import type { BadgeValue } from '@/constants/BadgeType'
 import { BadgeType } from '@/constants/BadgeType'
 import { BrakingLine } from '@/constants/BrakingLine'
 import { ControlType } from '@/constants/ControlType'

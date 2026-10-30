@@ -399,15 +399,15 @@ table {
 }
 
 .__h2hWin {
-  background-color: rgba(5, 151, 17, 0.18);
+  background-color: var(--status-success-soft);
 }
 
 .__h2hLoss {
-  background-color: rgba(255, 0, 0, 0.16);
+  background-color: var(--status-error-soft);
 }
 
 .__h2hEven {
-  background-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--surface-highlight-soft);
 }
 
 .__carDetailItem {

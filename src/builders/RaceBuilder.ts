@@ -57,7 +57,6 @@ export default class RaceBuilder {
         a.date - b.date
     })
 
-    // ponytail: laptimeBuilder already imported at top
     const races: Race[] = []
     let session: Laptime[] = []
 

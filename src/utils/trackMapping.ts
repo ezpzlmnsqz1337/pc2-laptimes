@@ -1,4 +1,4 @@
-export const trackMapping = {
+export const trackMapping: Record<string, Record<string, string> | string[]> = {
   Algarve: {},
   'Azure Circuit': {
     'Grand Prix': 'Grand Prix Circuit'

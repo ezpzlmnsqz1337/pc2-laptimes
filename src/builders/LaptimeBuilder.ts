@@ -23,11 +23,19 @@ export interface Laptime {
   game: Game
   date: number
   notes: string
+  dateString?: string
 }
 
 export class LaptimeBuilder {
   compareLaptimes (laptime1: string, laptime2: string) {
-    return this.laptimeToDate(laptime1)!.getTime() - this.laptimeToDate(laptime2)!.getTime()
+    const time1 = this.laptimeToDate(laptime1)
+    const time2 = this.laptimeToDate(laptime2)
+
+    if (!time1 && !time2) return 0
+    if (!time1) return 1
+    if (!time2) return -1
+
+    return time1.getTime() - time2.getTime()
   }
 
   dateToLaptime (date: Date) {
@@ -40,14 +48,15 @@ export class LaptimeBuilder {
 
     const l1 = laptime.match(pattern)
     if (!l1) return
-    return new Date(parseInt(l1[1]) * 60 * 1000 + parseInt(l1[2]) * 1000 + parseInt(l1[3]))
+    return new Date(parseInt(l1[1], 10) * 60 * 1000 + parseInt(l1[2], 10) * 1000 + parseInt(l1[3], 10))
   }
 
   getLaptimeDiff (laptime1: string, laptime2: string) {
     const time1 = this.laptimeToDate(laptime1)
     const time2 = this.laptimeToDate(laptime2)
+    if (!time1 || !time2) return ''
 
-    const diffMs = time2!.getTime() - time1!.getTime()
+    const diffMs = time2.getTime() - time1.getTime()
     const sign = diffMs < 0 ? '-' : '+'
 
     return `${sign} ${this.dateToLaptime(new Date(Math.abs(diffMs)))}`
@@ -59,7 +68,7 @@ export class LaptimeBuilder {
     if ((minutes.length <= 0 || seconds.length !== SECONDS_LENGTH || milliseconds.length !== MILLISECONDS_LENGTH)) return false
     if (!`${minutes}:${seconds}.${milliseconds}`.match(pattern)) return false
 
-    const [m, s, ms] = [minutes, seconds, milliseconds].map(x => parseInt(x))
+    const [m, s, ms] = [minutes, seconds, milliseconds].map(x => parseInt(x, 10))
 
     // check greater than zero
     if ((m < 0 || s < 0 || ms < 0)) return false
@@ -71,9 +80,9 @@ export class LaptimeBuilder {
 
   laptimeFromComponents (minutes:string, seconds:string, milliseconds:string) {
     return this.dateToLaptime(new Date(
-      parseInt(minutes) * 60 * 1000 +
-      parseInt(seconds) * 1000 +
-      parseInt(milliseconds)
+      parseInt(minutes, 10) * 60 * 1000 +
+      parseInt(seconds, 10) * 1000 +
+      parseInt(milliseconds, 10)
     ))
   }
 }

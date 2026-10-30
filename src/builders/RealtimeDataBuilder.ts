@@ -1,8 +1,21 @@
+import { PacketType } from '@/constants/PacketType'
 import { WebsocketState } from '@/constants/WebsocketState'
 
+const isDebugEnabled = process.env.NODE_ENV === 'development'
 const MAX_RETRY_ATTEMPTS = 3
+const RETRY_INTERVAL_MS = 5000
+const DEFAULT_TELEMETRY_PORT = 8765
 
-export type RealtimeDataListener = (message: MessageEvent<any>) => any;
+function debugLog (...args: unknown[]) {
+  if (isDebugEnabled) console.log(...args)
+}
+
+export interface RealtimePacket {
+  packetType?: PacketType
+  data: Record<string, unknown>
+}
+
+export type RealtimeDataListener = (packet: RealtimePacket) => void
 
 export default class RealtimeDataBuilder {
   // eslint-disable-next-line no-use-before-define
@@ -10,8 +23,8 @@ export default class RealtimeDataBuilder {
 
   protected ws: WebSocket | null = null
   protected hostname = window.location.hostname
-  protected port = 8765
-  listeners: Function[] = []
+  protected port = DEFAULT_TELEMETRY_PORT
+  listeners: RealtimeDataListener[] = []
   protected retryHandler?: number
   protected retries = 0
 
@@ -25,15 +38,19 @@ export default class RealtimeDataBuilder {
   connect (hostname: string, port: number) {
     this.hostname = hostname
     this.port = port
-    this.ws = new WebSocket(`ws://${hostname}:${port}`)
-    this.ws.onmessage = (message) => {
+
+    this.ws?.close()
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+    const ws = new WebSocket(`${protocol}://${hostname}:${port}`)
+    this.ws = ws
+
+    ws.onmessage = (message) => {
       try {
-        const data = JSON.parse(message.data)
+        const data = JSON.parse(message.data) as RealtimePacket
         if (data.packetType === undefined) return
-        // console.log('Packet type: ', data)
-        this.listeners.forEach((x) => x(data))
+        this.listeners.forEach((listener) => listener(data))
       } catch (e: unknown) {
-        console.log('Error: ', (e as SyntaxError).message, message)
+        debugLog('Error parsing realtime telemetry packet:', e, message.data)
       }
     }
 
@@ -41,25 +58,29 @@ export default class RealtimeDataBuilder {
   }
 
   disconnect () {
-    clearInterval(this.retryHandler)
-    this.ws!.close()
+    if (this.retryHandler) clearInterval(this.retryHandler)
+    this.retryHandler = undefined
+    this.retries = 0
+    this.ws?.close()
+    this.ws = null
   }
 
   setupRetryHandler () {
     this.retryHandler = setInterval(() => {
       if (this.retries >= MAX_RETRY_ATTEMPTS) {
         clearInterval(this.retryHandler)
+        this.retryHandler = undefined
         return
       }
-      if (this.ws!.readyState !== WebsocketState.ESTABLISHED) {
+      if (this.ws?.readyState !== WebsocketState.ESTABLISHED) {
         this.retry()
-        console.log(
+        debugLog(
           `Retry WS connection attempt ${this.retries}/${MAX_RETRY_ATTEMPTS}`
         )
       } else {
         this.retries = 0
       }
-    }, 5000)
+    }, RETRY_INTERVAL_MS)
   }
 
   addListener (listener: RealtimeDataListener) {
@@ -67,8 +88,10 @@ export default class RealtimeDataBuilder {
     return listener
   }
 
-  removeListener (listener: Function) {
-    this.listeners.splice(this.listeners.indexOf(listener), 1)
+  removeListener (listener: RealtimeDataListener) {
+    const index = this.listeners.indexOf(listener)
+    if (index === -1) return
+    this.listeners.splice(index, 1)
   }
 
   retry () {

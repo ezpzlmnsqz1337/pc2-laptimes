@@ -41,7 +41,6 @@ export class StatisticsBuilder {
     const driverPoints = this.calculatePoints(dm)
     if (driverPoints <= 0) return Rank.EXPIRED
 
-    // ponytail: ratio to top driver; geometric thresholds for natural spread; >=10 races floor at SILVER1
     const maxPoints = medals.length > 0 ? this.calculatePoints(medals[0]) : 1
     const ratio = driverPoints / maxPoints
 
@@ -52,7 +51,6 @@ export class StatisticsBuilder {
     return Rank.EXPIRED
   }
 
-  // ponytail: race-wins-based rank for the races section; wins combine race count + win rate naturally
   getRaceRank (races: number, wins: number, maxWins: number): Rank {
     if (races <= 0) return Rank.UNRANKED
     if (races < 10) return Rank.UNRANKED

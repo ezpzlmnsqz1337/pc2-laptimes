@@ -210,7 +210,7 @@ export default class RaceStatisticsBuilder {
             losses: score.losses,
             yearlyRecords: Object.entries(score.yearlyRecords)
               .map(([year, yearlyScore]) => ({
-                year: parseInt(year),
+                year: parseInt(year, 10),
                 wins: yearlyScore.wins,
                 losses: yearlyScore.losses
               }))
