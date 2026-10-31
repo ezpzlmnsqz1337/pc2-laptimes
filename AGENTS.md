@@ -29,7 +29,7 @@
   - Node.js relay server for client-to-client notifications (`ws-server/`)
   - Python app WebSocket for game telemetry data
 - **Deployment**: Podman containers + nginx
-- **Container Platform**: Homelab Intel NUC with Podman pods
+- **Container Platform**: Homelab hosting VM (VM 105, `192.168.0.102`) with Podman pods
 
 ### Key Features
 1. **Add Laptime**: Manual lap time entry with car, driver, track, and race settings
@@ -289,7 +289,7 @@ From dev WSL, `podman ps` should now work.
 npm run build
 ```
 
-### Homelab Deployment (Intel NUC)
+### Homelab Deployment (hosting VM)
 
 **Full Stack Deployment**:
 ```bash
@@ -314,7 +314,7 @@ npm run deploy:homelab
 1. Check Podman availability and working status
 2. Build Podman image locally
 3. Save image to tar file
-4. Copy to homelab server (Intel NUC) via SSH
+4. Copy to hosting VM (`192.168.0.102`) via SSH
 5. Stop existing service if running
 6. Load image on homelab
 7. Run pod creation script
@@ -479,7 +479,7 @@ npm run dev                # Start WebSocket server locally
 - **Python UDP Relay App**: External app (not in this repo) that receives PC2 UDP data and forwards to browser via WebSocket
 - **PostgreSQL 17**: Database server running in separate container
 - **PostgREST**: Auto-generates REST API from PostgreSQL schema
-- **Homelab Intel NUC**: Physical server running Podman pods
+- **Homelab hosting VM**: Proxmox VM 105 at `192.168.0.102` running Podman pods
 - **nginx**: Web server in production container
 - **Node.js**: Required in production for WebSocket relay server
 - **Adminer**: Database administration UI (port 8081)
