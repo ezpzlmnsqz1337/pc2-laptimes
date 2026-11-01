@@ -6,7 +6,7 @@ module.exports = {
     themeColor: '#080d16',
     msTileColor: '#080d16',
     appleMobileWebAppCapable: 'yes',
-    appleMobileWebAppStatusBarStyle: 'blue',
+    appleMobileWebAppStatusBarStyle: 'black-translucent',
     iconPaths: {
       faviconSVG: 'icons/favicon.svg',
       favicon32: null,
@@ -19,6 +19,7 @@ module.exports = {
       name: 'PC2 Laptimes',
       short_name: 'PC2 Laptimes',
       start_url: '/',
+      scope: '/',
       display: 'standalone',
       background_color: '#080d16',
       theme_color: '#080d16',

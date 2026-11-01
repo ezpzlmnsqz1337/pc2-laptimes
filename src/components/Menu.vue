@@ -230,6 +230,7 @@ export default Menu
   flex-direction: row;
   flex-wrap: wrap;
   padding: var(--space-2xl) var(--space-8xl);
+  padding-top: calc(var(--space-2xl) + env(safe-area-inset-top, 0px));
 
   .__menu {
     display: flex;
@@ -329,6 +330,7 @@ export default Menu
     flex-direction: column;
     align-items: stretch;
     padding: var(--space-2xl);
+    padding-top: calc(var(--space-2xl) + env(safe-area-inset-top, 0px));
 
     .__menu {
       display: grid;
