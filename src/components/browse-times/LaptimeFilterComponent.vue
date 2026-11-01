@@ -3,17 +3,21 @@
     v-show="showFilter"
     class="__filterWrapper"
   >
-    <div class="__hideFilter">
-      <Button
-        :type="ButtonType.DANGER"
-        @click="$emit('filter:close')"
-      >
-        <div
-          class="fa fa-window-close"
-        /><span>Close</span>
-      </Button>
+    <div class="__filterHeader">
+      <h2 class="__filterHeading">
+        Filter times
+      </h2>
+      <div class="__hideFilter">
+        <Button
+          :type="ButtonType.SECONDARY"
+          @click="$emit('filter:close')"
+        >
+          <div
+            class="fa fa-window-close"
+          /><span>Close</span>
+        </Button>
+      </div>
     </div>
-    <h2>Filter times</h2>
     <InputRow>
       <SelectInput
         :model-value="filter.carId"
@@ -82,34 +86,35 @@
           @click="setFilter({date: null})"
         >
           <div
-            class="fa fa-ban"
-            style="margin-right: 0"
+            class="fa fa-ban __noMarginIcon"
           />
         </Button>
       </div>
     </InputRow>
 
-    <Button
-      :type="ButtonType.SECONDARY"
-      @click="showMoreFilters = !showMoreFilters"
-    >
-      <div
-        :class="`fa fa-chevron-${showMoreFilters ? 'up' : 'down'}`"
-      />More filters
-    </Button>
-    <Button
-      :type="ButtonType.SECONDARY"
-      @click="setRandomFilter()"
-    >
-      <div class="fa fa-random" /><span>Random</span>
-    </Button>
-    <Button
-      :type="ButtonType.DANGER"
-      :disabled="!isFilterSet()"
-      @click="clearFilter()"
-    >
-      <div class="fa fa-ban" /><span>Clear filter</span>
-    </Button>
+    <div class="__filterActions">
+      <Button
+        :type="ButtonType.SECONDARY"
+        @click="showMoreFilters = !showMoreFilters"
+      >
+        <div
+          :class="`fa fa-chevron-${showMoreFilters ? 'up' : 'down'}`"
+        />More filters
+      </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        @click="setRandomFilter()"
+      >
+        <div class="fa fa-random" /><span>Random</span>
+      </Button>
+      <Button
+        :type="ButtonType.SECONDARY"
+        :disabled="!isFilterSet()"
+        @click="clearFilter()"
+      >
+        <div class="fa fa-ban" /><span>Clear filter</span>
+      </Button>
+    </div>
 
     <div class="__distinctFilter">
       <InputRow
@@ -312,14 +317,33 @@ export default LaptimeFilterComponent
 
 <style lang="scss" scoped>
 .__filterWrapper {
+  position: relative;
   padding: var(--space-8xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
 
-  .__hideFilter {
-    position: relative;
-    left: 0;
-    top: 0;
-    height: 0;
+  .__filterHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8xl);
+    margin: var(--space-2xl) 0 var(--space-8xl);
+  }
+
+  .__filterHeading {
+    margin: 0;
     text-align: left;
+  }
+
+  .__filterActions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2xl);
+  }
+
+  .__noMarginIcon {
+    margin-right: 0;
   }
 
   .__moreFilters,
@@ -327,7 +351,7 @@ export default LaptimeFilterComponent
     margin-top: var(--space-5xl);
 
     &.__hidden {
-      visibility: hidden;
+      display: none;
     }
   }
 
@@ -351,12 +375,12 @@ export default LaptimeFilterComponent
     font-size: var(--font-size-base);
     display: block;
     width: 100%;
-    border: 1px solid var(--border-light1);
+    border: 1px solid var(--line-control);
   }
 
   :deep(.v3dp__popout){
-    --elem-disabled-color: var(--text-disabled);
-    color: var(--text-light1);
+    --elem-disabled-color: var(--muted);
+    color: var(--fg);
     font-size: var(--font-size-base);
     bottom: 1rem;
   }

@@ -36,101 +36,93 @@ export default Button
 
 <style lang="scss" scoped>
 button {
-  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-  --btn-text-dark: var(--text-dark1);
-  --btn-text-light: var(--text-light1);
-  --btn-default: var(--bg-light1);
-  --btn-default-hover: var(--btn-default-hover-bg);
-  --btn-primary: var(--dark-blue1);
-  --btn-primary-hover: var(--btn-primary-hover-bg);
-  --btn-secondary: var(--btn-secondary-bg);
-  --btn-secondary-hover: var(--btn-secondary-hover-bg);
-  --btn-success: var(--btn-success-bg);
-  --btn-success-hover: var(--btn-success-hover-bg);
-  --btn-danger: var(--btn-danger-bg);
-  --btn-danger-hover: var(--btn-danger-hover-bg);
-  --btn-warning: var(--btn-warning-bg);
-  --btn-warning-hover: var(--btn-warning-hover-bg);
-  --btn-disabled: var(--btn-disabled-bg);
-  --btn-disabled-text: var(--btn-disabled-text-color);
-}
-
-button {
-  border: none;
-  background-color: var(--btn-default);
-  color: var(--btn-text-dark);
-  transition: background-color 0.1s;
-  margin: var(--space-2xs);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xl);
+  min-height: var(--target-min);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-raised);
+  color: var(--fg);
+  font-size: var(--font-size-compact);
+  font-weight: 600;
   padding: var(--space-2xl) var(--space-5xl);
+  cursor: pointer;
+  transition: background-color var(--motion-fast) ease, border-color var(--motion-fast) ease;
 
   &:deep(.fa) {
     margin-right: var(--space-lg);
   }
 
-  &:disabled, &:disabled:hover {
-    cursor: not-allowed;
-    background-color: var(--btn-disabled) !important;
-    color: var(--btn-disabled-text) !important;
-  }
-
   &:hover {
-    background-color: var(--btn-default-hover);
-    color: var(--btn-text-dark);
-    cursor: pointer;
+    background-color: var(--line-strong);
   }
 
   &.__primary {
-    background-color: var(--btn-primary);
-    color: var(--btn-text-light);
+    background-color: var(--accent);
+    color: var(--canvas);
   }
 
   &.__primary:hover {
-    background-color: var(--btn-primary-hover);
-    color: var(--btn-text-light);
+    background-color: var(--accent-strong);
+    color: var(--canvas);
   }
 
   &.__secondary {
-    background-color: var(--btn-secondary);
-    color: var(--btn-text-light);
+    background-color: transparent;
+    border-color: var(--line-control);
+    color: var(--fg);
   }
 
   &.__secondary:hover {
-    background-color: var(--btn-secondary-hover);
-    color: var(--btn-text-light);
+    background-color: var(--surface-raised);
+    border-color: var(--accent);
   }
 
   &.__success {
-    background-color: var(--btn-success);
-    color: var(--btn-text-light);
+    background-color: var(--success);
+    color: var(--canvas);
   }
 
-  &.__success:hover{
-    background-color: var(--btn-success-hover);
-    color: var(--btn-text-light);
+  &.__success:hover {
+    background-color: var(--success-strong);
+    color: var(--canvas);
   }
 
   &.__danger {
-    background-color: var(--btn-danger);
-    color: var(--btn-text-light);
+    background-color: var(--danger);
+    color: var(--canvas);
   }
 
   &.__danger:hover {
-    background-color: var(--btn-danger-hover);
-    color: var(--btn-text-light);
+    background-color: var(--danger-strong);
+    color: var(--canvas);
   }
 
   &.__warning {
-    background-color: var(--btn-warning);
-    color: var(--btn-text-dark);
+    background-color: var(--warning);
+    color: var(--canvas);
   }
 
   &.__warning:hover {
-    background-color: var(--btn-warning-hover);
-    color: var(--btn-text-light);
+    background-color: var(--warning-strong);
+    color: var(--canvas);
   }
 
   &.__block {
-    display: block;
+    display: flex;
+    width: 100%;
+  }
+
+  /* Disabled must win over every variant fill. */
+  &:disabled,
+  &:disabled:hover {
+    cursor: not-allowed;
+    background-color: var(--line);
+    border-color: var(--line);
+    color: var(--muted);
   }
 }
 </style>

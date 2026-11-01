@@ -133,8 +133,9 @@ export default App
 </script>
 
 <style lang="scss">
+@import './assets/css/tokens';
 @import './assets/css/v-select.css';
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   --font-size-root: 1em;
@@ -164,83 +165,81 @@ export default App
   --space-neg-8xl: -1rem;
   --space-btn-mobile-y: 8px;
   --space-btn-mobile-x: 12px;
-  --hover: #188cff;
-  --active: #274db4;
-  --text-light1: #ffffff;
-  --text-light2: gray;
-  --text-disabled: #939393;
-  --text-dark1: #242424;
-  --bg-dark1: #8b8b8b;
-  --bg-dark2: #5d5d5d;
-  --bg-dark3: #424242;
-  --bg-dark4: #3a3a3a;
-  --bg-dark5: #242424;
-  --bg-light1: #ffffff;
-  --bg-light2: #a0a0a0;
-  --bg-light3: #707070;
-  --border-light1: #ffffff;
-  --border-dark1: #424242;
-  --dark-blue1: #274db4;
-  --anchor: #2183df;
-  --brake: #ff0000;
-  --throttle: #00ff00;
-  --clutch: #e4e43d;
-  --status-error: #ff0000;
-  --status-warning: #ffff00;
-  --status-success: #059711;
-  --status-orange: orange;
-  --medal-gold: gold;
-  --medal-silver: silver;
-  --medal-bronze: #cd7f32;
-  --status-success-soft: rgba(5, 151, 17, 0.18);
-  --status-error-soft: rgba(255, 0, 0, 0.16);
-  --surface-highlight-soft: rgba(255, 255, 255, 0.08);
-  --chart-color-1: #d9ad96;
-  --chart-color-2: #8928c9;
-  --chart-color-3: #a7fa55;
-  --chart-color-4: #d67840;
-  --chart-color-5: #2388eb;
-  --chart-color-6: #274db4;
-  --chart-color-7: #7cf7ca;
-  --chart-color-8: #7027b0;
-  --chart-color-9: #e32d34;
-  --chart-color-10: #000000;
-  --chart-color-11: #57aee6;
-  --chart-color-12: #ffffff;
-  --chart-color-13: #e0ad92;
-  --state-selected-bg: #242424;
-  --surface-muted: #f8f8f8;
-  --surface-overlay-strong: rgba(72, 72, 72, 0.7);
-  --surface-overlay-soft: rgba(72, 72, 72, 0.35);
-  --overlay-backdrop: rgba(0, 0, 0, 0.5);
-  --shadow-overlay: rgba(0, 0, 0, 0.33);
-  --shadow-dark: #333333;
-  --telemetry-surface-bg: rgba(46, 46, 46, 0.809);
-  --telemetry-surface-border: rgba(0, 0, 0, 0.464);
-  --telemetry-player1-border: rgb(15, 0, 255);
-  --telemetry-player2-border: rgb(0, 131, 17);
-  --telemetry-rpm-fill: #1a27db;
-  --text-shadow-strong: #080808;
-  --accent-blink: #3a9ee0;
-  --interactive-hover-strong: #005db9;
-  --interactive-disabled-bg: #8c8c8c;
-  --interactive-selected-disabled: #265a8f;
-  --btn-default-hover-bg: #e7e7e7;
-  --btn-primary-hover-bg: #3f71a3;
-  --btn-secondary-bg: #787879;
-  --btn-secondary-hover-bg: #5f5f5f;
-  --btn-success-bg: #2ab135;
-  --btn-success-hover-bg: #0e8b19;
-  --btn-danger-bg: #e02c2c;
-  --btn-danger-hover-bg: #c71818;
-  --btn-warning-bg: #fffb26;
-  --btn-warning-hover-bg: #94881a;
-  --btn-disabled-bg: #a0a0a0;
-  --btn-disabled-text-color: #cacaca;
-  --vdp-hover-bg-color: #188cff;
-  --vdp-selected-bg-color: #274db4;
-  --vdp-bg-color: var(--bg-dark2);
-  --vdp-text-color: var(--text-dark1);
+
+  /* Legacy names mapped onto the canonical tokens. New code should use the
+     canonical names; these stay so existing components inherit the theme. */
+  --hover: var(--accent);
+  --active: var(--accent-strong);
+  --text-light1: var(--fg);
+  --text-light2: var(--muted);
+  --text-disabled: var(--muted);
+  --text-dark1: var(--canvas);
+  --bg-dark1: var(--surface-raised);
+  --bg-dark2: var(--surface-raised);
+  --bg-dark3: var(--surface);
+  --bg-dark4: var(--surface);
+  --bg-dark5: var(--canvas);
+  --bg-light1: var(--surface-raised);
+  --bg-light2: var(--line);
+  --bg-light3: var(--line-strong);
+  --border-light1: var(--line-strong);
+  --border-dark1: var(--line);
+  --dark-blue1: var(--accent-strong);
+  --anchor: var(--accent);
+  --brake: var(--danger);
+  --throttle: var(--success);
+  --clutch: var(--warning);
+  --status-error: var(--danger);
+  --status-warning: var(--warning);
+  --status-success: var(--success);
+  --status-orange: var(--warning);
+  --status-success-soft: var(--success-soft);
+  --status-error-soft: var(--danger-soft);
+  --surface-highlight-soft: var(--accent-soft);
+  --chart-color-1: #7aa2f7;
+  --chart-color-2: #bb9af7;
+  --chart-color-3: #9ece6a;
+  --chart-color-4: #ff9e64;
+  --chart-color-5: #4d8dff;
+  --chart-color-6: #2f6fe0;
+  --chart-color-7: #7dcfff;
+  --chart-color-8: #b48ead;
+  --chart-color-9: #f87171;
+  --chart-color-10: #1e2c44;
+  --chart-color-11: #6cb6ff;
+  --chart-color-12: #e6edf7;
+  --chart-color-13: #e0af68;
+  --state-selected-bg: var(--surface-raised);
+  --surface-muted: var(--surface-raised);
+  --surface-overlay-strong: rgba(14, 22, 38, 0.86);
+  --surface-overlay-soft: rgba(14, 22, 38, 0.6);
+  --shadow-dark: rgba(0, 0, 0, 0.45);
+  --telemetry-surface-bg: rgba(14, 22, 38, 0.86);
+  --telemetry-surface-border: var(--line-strong);
+  --telemetry-player1-border: var(--accent);
+  --telemetry-player2-border: var(--success);
+  --telemetry-rpm-fill: var(--accent-strong);
+  --text-shadow-strong: var(--canvas);
+  --accent-blink: var(--accent);
+  --interactive-hover-strong: var(--accent-strong);
+  --interactive-disabled-bg: var(--line);
+  --interactive-selected-disabled: var(--line-strong);
+  --btn-default-hover-bg: var(--line-strong);
+  --btn-primary-hover-bg: var(--accent-strong);
+  --btn-secondary-bg: var(--surface-raised);
+  --btn-secondary-hover-bg: var(--line-strong);
+  --btn-success-bg: var(--success);
+  --btn-success-hover-bg: var(--success-strong);
+  --btn-danger-bg: var(--danger);
+  --btn-danger-hover-bg: var(--danger-strong);
+  --btn-warning-bg: var(--warning);
+  --btn-warning-hover-bg: var(--warning-strong);
+  --btn-disabled-bg: var(--line);
+  --btn-disabled-text-color: var(--muted);
+  --vdp-hover-bg-color: var(--accent);
+  --vdp-selected-bg-color: var(--accent-strong);
+  --vdp-bg-color: var(--surface-raised);
+  --vdp-text-color: var(--fg);
 }
 
 * {
@@ -249,12 +248,19 @@ export default App
 
 html {
   font-size: var(--font-size-root);
+  background: var(--canvas);
 }
 
 body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  min-height: 100vh;
+  background: var(--canvas);
+  color: var(--fg);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: var(--font-size-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h2 {
@@ -262,12 +268,18 @@ h2 {
 }
 
 #app {
-  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: var(--text-light1);
-  font-size: var(--font-size-sm);
+  color: var(--fg);
+  font-size: var(--font-size-base);
   margin-top: 0;
+}
+
+/* Estate baseline: visible focus, never removed without a replacement. */
+:focus-visible {
+  outline: var(--focus-width) solid var(--accent);
+  outline-offset: var(--focus-offset);
 }
 
 input[type=text],
@@ -275,7 +287,10 @@ input[type=password],
 input[type=email],
 input[type=number] {
   padding: var(--space-2xl);
-  border-radius: 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-control);
+  background: var(--surface-raised);
+  color: var(--fg);
 }
 
 /* Chrome, Safari, Edge, Opera */
@@ -292,41 +307,55 @@ input[type=number] {
 
 select {
   padding: var(--space-2xl);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line-control);
+  background: var(--surface-raised);
+  color: var(--fg);
 }
 
 a {
-  color: var(--anchor);
+  color: var(--accent);
 }
 
 .__red {
-  color: var(--status-error);
+  color: var(--danger);
 }
 
 .__yellow {
-  color: var(--status-warning);
+  color: var(--warning);
 }
 
 .__green {
-  color: var(--status-success);
+  color: var(--success);
 }
 
 .__orange {
-  color: var(--status-orange);
+  color: var(--warning);
 }
 
 .__appWrapper {
-  height: 100vh;
-  overflow-y: scroll;
-  /* Hide scrollbar for IE, Edge and Firefox */
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+  min-height: 100vh;
+  overflow-y: auto;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
+/* Thin, visible scrollbars: content must stay reachable. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
 ::-webkit-scrollbar {
-  display: none;
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
 }
 
 .fa.fa-steering_wheel {
@@ -361,23 +390,34 @@ a {
 }
 
 .bounce-enter-active {
-  animation: bounce-in .5s;
+  animation: bounce-in var(--motion-slow);
 }
 
 .bounce-leave-active {
-  animation: bounce-in .3s reverse;
+  animation: bounce-in var(--motion-base) reverse;
 }
 
 @keyframes bounce-in {
   0% {
-    transform: scale(0);
+    transform: scale(.96);
   }
 
-  50% {
-    transform: scale(1.1);
+  60% {
+    transform: scale(1.01);
   }
 
   100% {
     transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }</style>

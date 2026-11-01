@@ -1,88 +1,30 @@
 <template>
-  <div
-    ref="background1"
-    class="__background1"
-  />
-  <div
-    ref="background2"
-    class="__background2 __hidden"
-  />
-  <div
-    ref="background3"
-    class="__background3 __hidden"
-  />
+  <div class="__background" />
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component'
+import { Vue } from 'vue-class-component'
 
-@Options({
-  emits: ['close']
-})
-class Background extends Vue {
-  protected currentBgIndex = 0
-
-  $refs!: any
-
-  mounted () {
-    setInterval(() => {
-      this.cycleBackground()
-    }, 15000)
-  }
-
-  cycleBackground () {
-    const bgCount = 3
-    this.$refs[`background${this.currentBgIndex + 1}`].style.opacity = 0
-    this.currentBgIndex = ++this.currentBgIndex % bgCount
-    this.$refs[`background${this.currentBgIndex + 1}`].style.opacity = 1
-  }
-}
-
+/**
+ * Static, dimmed backdrop. The app identity is a night circuit — one still
+ * image plus the accent glow, no ambient animation (principles: motion explains).
+ */
+class Background extends Vue {}
 export default Background
 </script>
 
 <style scoped lang="scss">
-.__background1, .__background2, .__background3 {
-  background-blend-mode: multiply;
-  background-color: var(--bg-dark3);
-  background-size: cover;
-  width: 100%;
-  height: 120%;
-  position: absolute;
-  top: 0;
-  z-index: -999;
-  opacity: 1;
-  transition: opacity 1.5s ease-in;
-}
-
-.__background1 {
-  background-image: url('~@/assets/images/project-cars-2-bg-1.jpg');
-}
-
-.__background2 {
-  background-image: url('~@/assets/images/project-cars-2-bg-2.jpg');
-}
-
-.__background3 {
-  background-image: url('~@/assets/images/project-cars-2-bg-3.jpg');
-}
-
-.__hidden {
-  opacity: 0;
-}
-
-@media only screen and (max-width: 700px) {
-  .__background1, .__background2, .__background3 {
-    background-position: center center;
-    background-size: cover;
-  }
-
-  .__laptimes {
-    padding: var(--space-8xl);
-  }
-
-  .__menu button {
-    font-size: var(--font-size-xs);
-  }
+.__background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(110% 60% at 50% -10%, var(--accent-soft), transparent 60%),
+    linear-gradient(to bottom, rgba(8, 13, 22, 0.82), var(--canvas) 70%),
+    url('~@/assets/images/project-cars-2-bg-1.jpg');
+  background-size: cover, cover, cover;
+  background-position: center top;
+  background-repeat: no-repeat;
 }
 </style>

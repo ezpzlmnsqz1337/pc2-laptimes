@@ -2,6 +2,7 @@
   <TransitionGroup
     name="list"
     tag="table"
+    class="__laptimeBoard"
   >
     <tr
       key="header"
@@ -29,18 +30,31 @@
     <tr
       v-show="!times.length"
       key="loading-row"
+      class="__row"
     >
       <td
         colspan="999"
         class="__loading"
       >
+        <div
+          v-if="loadError"
+          class="__loadError"
+        >
+          <span class="__noLaptimesFound">{{ loadError }}</span>
+          <Button
+            :type="ButtonType.SECONDARY"
+            @click="retryLoad()"
+          >
+            Retry
+          </Button>
+        </div>
         <PulseLoader
-          v-if="loading"
-          color="#188cff"
+          v-else-if="loading"
+          color="var(--accent)"
           size="15px"
         />
         <span
-          v-if="!loading"
+          v-else
           class="__noLaptimesFound"
         >No laptimes found matching your filter.</span>
       </td>
@@ -51,18 +65,24 @@
       class="__row"
       :class="getRowClass(time)"
       :title="getRowTitleText(time)"
+      :aria-label="getRowAriaLabel(time)"
+      tabindex="0"
       @click="handleRowClick($event, time)"
+      @keydown.enter.prevent="handleRowClick($event, time)"
+      @keydown.space.prevent="handleRowClick($event, time)"
     >
       <td
         v-if="displayColumn('rank')"
         class="__id"
+        data-label="Rank"
       >
-        {{ index + 1 }}.
+        <span :class="index < 3 ? ['medal-pill', `medal-pill--${index + 1}`] : null">{{ index + 1 }}.</span>
       </td>
 
       <td
         v-if="displayColumn('driver')"
         class="__driver"
+        data-label="Driver"
       >
         <DriverComponent
           :time="time"
@@ -74,6 +94,7 @@
       <td
         v-if="displayColumn('laptime')"
         class="__laptime"
+        data-label="Laptime"
       >
         <LaptimeComponent
           :show-diff="index > 0"
@@ -85,6 +106,7 @@
       <td
         v-if="displayColumn('car')"
         class="__car"
+        data-label="Car"
       >
         <CarComponent
           :time="time"
@@ -96,6 +118,7 @@
       <td
         v-if="displayColumn('track')"
         class="__track"
+        data-label="Track"
       >
         <TrackComponent
           :time="time"
@@ -107,6 +130,7 @@
       <td
         v-if="displayColumn('settings')"
         class="__settings"
+        data-label="Settings"
       >
         <RaceSettings
           :editable="true"
@@ -171,6 +195,14 @@ class LaptimeTable extends Vue.with(LaptimeTableProps) {
     return { __lastAddedLaptime: this.lastAddedLaptime && this.lastAddedLaptime.uid === laptime.uid, __hasNotes: laptime.notes }
   }
 
+  getRowAriaLabel (laptime: Laptime) {
+    return `Laptime ${laptime.laptime}`
+  }
+
+  get loadError () {
+    return this.$dataStore.loadError
+  }
+
   getRowTitleText (laptime: Laptime) {
     const date = new Date(laptime.date).toLocaleString()
     let result = `Date: ${date}`
@@ -178,7 +210,7 @@ class LaptimeTable extends Vue.with(LaptimeTableProps) {
     return result
   }
 
-  handleRowClick (e: MouseEvent, laptime: Laptime) {
+  handleRowClick (e: MouseEvent | KeyboardEvent, laptime: Laptime) {
     this.$dataStore.setEditLaptime(laptime.uid)
   }
 
@@ -206,12 +238,25 @@ class LaptimeTable extends Vue.with(LaptimeTableProps) {
       })
     })
   }
+
+  retryLoad () {
+    this.loading = true
+    this.$dataStore.reloadData('times')
+  }
 }
 export default LaptimeTable
 </script>
 
 <style lang="scss" scoped>
 @import '../../assets/css/table.scss';
+
+.__loadError {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8xl);
+}
+
 .__lastAddedLaptime {
   --blink-color: var(--accent-blink);
   animation: blink 1s 10;

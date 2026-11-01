@@ -139,10 +139,12 @@ export default RaceSettingsBadge
 
 <style scoped lang="scss">
 .__textContainer {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--space-sm) var(--space-sm) var(--space-2xl) var(--space-sm) var(--shadow-dark);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
   padding: var(--space-lg) var(--space-5xl);
   margin-bottom: var(--space-lg);
   font-size: var(--font-size-sm);
@@ -150,65 +152,65 @@ export default RaceSettingsBadge
 }
 
 .__weatherSunny {
-  background-color: var(--status-warning);
-  color: var(--text-dark1);
+  background-color: var(--warning);
+  color: var(--canvas);
 }
 
 .__weatherRainy {
-  background-color: var(--dark-blue1);
-  color: var(--text-light1);
+  background-color: var(--accent-strong);
+  color: var(--canvas);
 }
 
 .__weatherSnow {
-  background-color: var(--surface-muted);
-  color: var(--text-dark1);
+  background-color: var(--surface-raised);
+  color: var(--fg);
 }
 
 .__brakingLineOff {
-  background-color: var(--status-error);
-  color: var(--text-light1);
+  background-color: var(--danger);
+  color: var(--canvas);
 }
 
 .__brakingLineOn {
-  background-color: var(--status-success);
-  color: var(--text-light1);
+  background-color: var(--success);
+  color: var(--canvas);
 }
 
 .__transmissionAutomatic {
-  background-color: var(--status-success);
-  color: var(--text-light1);
+  background-color: var(--success);
+  color: var(--canvas);
 }
 
 .__transmissionSequential {
-  background-color: var(--dark-blue1);
-  color: var(--text-light1);
+  background-color: var(--accent-strong);
+  color: var(--canvas);
 }
 
 .__transmissionHPattern {
-  background-color: var(--status-orange);
-  color: var(--text-light1);
+  background-color: var(--warning);
+  color: var(--canvas);
 }
 
 .__controlsKeyboard {
-  background-color: var(--status-success);
-  color: var(--text-light1);
+  background-color: var(--success);
+  color: var(--canvas);
 }
 
 .__controlsGamepad {
-  background-color: var(--active);
-  color: var(--text-light1);
+  background-color: var(--accent);
+  color: var(--canvas);
 }
 
 .__controlsSteeringWheel {
-  background-color: var(--bg-dark3);
-  color: var(--text-light1);
+  background-color: var(--surface-raised);
+  color: var(--fg);
 }
 
 @media only screen and (max-width: 1024px) {
   .__textContainer {
     padding: var(--space-sm) var(--space-lg);
     margin-bottom: var(--space-lg);
-    font-size: var(--font-size-2xs);
+    font-size: var(--font-size-sm);
   }
 }
 
@@ -217,13 +219,23 @@ export default RaceSettingsBadge
     justify-content: center;
     padding: var(--space-sm) var(--space-lg);
     margin-bottom: var(--space-lg);
-    font-size: var(--font-size-2xs);
+    font-size: var(--font-size-sm);
     min-width: 1.3rem;
     width: 1.3rem;
   }
 
+  /* Keep the value available to screen readers when the badge collapses to its icon. */
   .__textContainer span {
-    display: none;
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
   }
 }
 </style>

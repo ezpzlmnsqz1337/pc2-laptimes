@@ -246,6 +246,7 @@ export default Leaderboards
 
   .__trackCarMatrix .__item {
       padding-bottom: var(--space-8xl);
+      overflow-x: auto;
   }
 
   .__carImage > img{

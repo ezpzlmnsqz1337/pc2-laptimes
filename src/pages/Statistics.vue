@@ -68,7 +68,7 @@
       class="__loading __center"
     >
       <PulseLoader
-        color="#188cff"
+        color="var(--accent)"
         size="15px"
       />
     </div>
@@ -267,7 +267,9 @@ export default Statistics
 .__menu {
   text-align: center;
   .__selected {
-    background-color: var(--state-selected-bg) !important;
+    background-color: var(--accent-soft) !important;
+    border-color: var(--accent) !important;
+    color: var(--fg) !important;
   }
 }
 
@@ -312,6 +314,12 @@ export default Statistics
 @media only screen and (max-width: 700px) {
   .__statistics {
     padding: var(--space-8xl);
+  }
+
+  .__menu {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2xl);
   }
 
   .__controls {

@@ -4,64 +4,66 @@
       class="__item"
     >
       <h2>Medals</h2>
-      <table class="__medalsTable">
-        <tbody>
-          <tr>
-            <th>Driver</th><th>Events</th>
-            <th
-              v-for="place in 7"
-              :key="`place-heading-${place}`"
-            >
-              <span v-if="place === 1">{{ place }}st</span>
-              <span v-if="place === 2">{{ place }}nd</span>
-              <span v-if="place === 3">{{ place }}rd</span>
-              <span v-if="place > 3">{{ place }}th</span>
-            </th>
-            <th>Points</th><th>Rank</th>
-          </tr>
-          <tr
-            v-show="!medals.length"
-          >
-            <td
-              colspan="7"
-              class="__loading"
-            >
-              <PulseLoader
-                color="var(--hover)"
-                size="15px"
-              />
-            </td>
-          </tr>
-          <tr
-            v-for="m in medals"
-            :key="m.driverId"
-            class="__driver"
-          >
-            <td class="__name">
-              {{ getDriverName(m.driverId) }}
-            </td>
-            <td class="__totalRaces">
-              {{ getDriverTotalRaces(m.driverId) }}
-            </td>
-            <td
-              v-for="place in 7"
-              :key="`place-${place}`"
-              class="__place"
-            >
-              <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: place})">{{ m.places[place-1] }}</span>
-            </td>
-            <td class="__points">
-              <span>{{ $sb.calculatePoints(m) }}</span>
-            </td>
-            <td class="__rank">
-              <img
-                :src="getRank(m.driverId)"
-                alt="rank"
+      <div class="__tableScroll">
+        <table class="__medalsTable">
+          <tbody>
+            <tr>
+              <th>Driver</th><th>Events</th>
+              <th
+                v-for="place in 7"
+                :key="`place-heading-${place}`"
               >
-            </td>
-          </tr>
-        </tbody>
-      </table>
+                <span v-if="place === 1">{{ place }}st</span>
+                <span v-if="place === 2">{{ place }}nd</span>
+                <span v-if="place === 3">{{ place }}rd</span>
+                <span v-if="place > 3">{{ place }}th</span>
+              </th>
+              <th>Points</th><th>Rank</th>
+            </tr>
+            <tr
+              v-show="!medals.length"
+            >
+              <td
+                colspan="7"
+                class="__loading"
+              >
+                <PulseLoader
+                  color="var(--accent)"
+                  size="15px"
+                />
+              </td>
+            </tr>
+            <tr
+              v-for="m in medals"
+              :key="m.driverId"
+              class="__driver"
+            >
+              <td class="__name">
+                {{ getDriverName(m.driverId) }}
+              </td>
+              <td class="__totalRaces">
+                {{ getDriverTotalRaces(m.driverId) }}
+              </td>
+              <td
+                v-for="place in 7"
+                :key="`place-${place}`"
+                class="__place"
+              >
+                <span @click="setFilter({ distinct: Distinct.YES, driverId: m.driverId, position: place})">{{ m.places[place-1] }}</span>
+              </td>
+              <td class="__points">
+                <span>{{ $sb.calculatePoints(m) }}</span>
+              </td>
+              <td class="__rank">
+                <img
+                  :src="getRank(m.driverId)"
+                  alt="rank"
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </template>
@@ -126,7 +128,11 @@ export default MedalsComponent
 
 .__place:hover > span {
   cursor: pointer;
-  color: var(--hover);
+  color: var(--accent);
+}
+
+.__tableScroll {
+  max-width: 100%;
 }
 
 .__totalRacesTable, .__medalsTable {
@@ -167,6 +173,10 @@ export default MedalsComponent
 @media only screen and (max-width: 700px) {
   .__medals .__item {
     width: 100%;
+  }
+
+  .__tableScroll {
+    overflow-x: auto;
   }
 
   .__medalsTable .__rank img{

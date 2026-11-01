@@ -14,22 +14,46 @@
             class="fa fa-pen"
           /><span>Edit</span>
         </Button>
-        <Button
+        <div
           v-if="editEnabled"
           class="__delete"
-          :type="ButtonType.DANGER"
-          @click="deleteLaptime(laptimeId)"
         >
-          <div
-            class="fa fa-trash"
-          /><span>Delete</span>
-        </Button>
+          <Button
+            v-if="!confirmDelete"
+            :type="ButtonType.DANGER"
+            @click="requestDelete()"
+          >
+            <div
+              class="fa fa-trash"
+            /><span>Delete</span>
+          </Button>
+          <template v-else>
+            <span
+              class="__deletePrompt"
+              role="alert"
+            >Delete?</span>
+            <Button
+              :type="ButtonType.DANGER"
+              @click="deleteLaptime(laptimeId)"
+            >
+              <div
+                class="fa fa-trash"
+              /><span>Confirm delete</span>
+            </Button>
+            <Button
+              :type="ButtonType.SECONDARY"
+              @click="cancelDelete()"
+            >
+              Cancel
+            </Button>
+          </template>
+        </div>
         <h2>Laptime detail</h2>
       </div>
     </template>
     <template #body>
       <Modal
-        v-show="showLogin"
+        v-if="showLogin"
         class="__authorizeModal"
         @close="$emit('close')"
       >
@@ -158,7 +182,6 @@
             <textarea
               :value="laptime.notes"
               :disabled="!editEnabled"
-              style="resize: none"
               @change="updateLaptime({notes: ($event.target as HTMLTextAreaElement).value}, laptime)"
             />
           </InputRow>
@@ -207,6 +230,7 @@ class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
   showLogin = false
   password = ''
   passwordHash = ''
+  confirmDelete = false
 
   get laptime () {
     return this.$dataStore.getTimeById(this.laptimeId)!
@@ -318,6 +342,14 @@ class LaptimeDetailModal extends Vue.with(LaptimeDetailModalProps) {
     this.$dataStore.updateLaptime({ uid: time.uid, ...e })
   }
 
+  requestDelete () {
+    this.confirmDelete = true
+  }
+
+  cancelDelete () {
+    this.confirmDelete = false
+  }
+
   deleteLaptime (laptimeId: string) {
     this.$emit('close')
     setTimeout(() => this.$dataStore.deleteLaptime(laptimeId))
@@ -333,6 +365,31 @@ export default LaptimeDetailModal
  :deep(.__modalContainer) {
     width: fit-content;
   }
+}
+
+.__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5xl);
+
+  h2 {
+    flex-basis: 100%;
+  }
+}
+
+.__delete {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5xl);
+}
+
+.__deletePrompt {
+  color: var(--danger);
+  font-weight: 600;
 }
 
 .__wrapper {
@@ -359,12 +416,13 @@ export default LaptimeDetailModal
 
   textarea {
     width: 100%;
-    background-color: var(--bg-light1);
+    background-color: var(--surface-raised);
     padding: var(--space-2xl);
-    border: 0.1rem solid var(--border-dark1);
+    border: 0.1rem solid var(--line);
+    resize: none;
 
     &:disabled {
-      background-color: var(--surface-muted);
+      background-color: var(--surface-raised);
     }
   }
 

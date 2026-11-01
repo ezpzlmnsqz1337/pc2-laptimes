@@ -93,13 +93,16 @@ deployment/          # Kubernetes/Podman deployment scripts
 
 ### CSS/SCSS Standards (Enforced)
 - **No hardcoded design tokens in component styles**: avoid hardcoded colors, spacing, and typography sizes in `.vue` style blocks.
+- **Semantic tokens first**: use the canonical names from `src/assets/css/_tokens.scss` (`--canvas`, `--surface`, `--surface-raised`, `--line`, `--line-strong`, `--fg`, `--muted`, `--accent`, `--accent-strong`, `--success`, `--warning`, `--danger`, `--medal-*`, `--radius-*`, `--motion-*`). Legacy names (`--bg-dark*`, `--text-light*`, `--hover`, `--dark-blue1`, ...) are aliases in `src/App.vue` that point at the semantic tokens — keep them working, but do not use them in new code.
+- **Canonical contract**: `tokens.json` in `/work/homelab-ai/docs/design/` is the source of truth. Change the value in both `_tokens.scss` and `tokens.json`, then run `node /work/homelab-ai/scripts/check_design_tokens.mjs`.
 - **Use CSS variables**: use shared tokens from `:root` in `src/App.vue` for:
-  - colors (`--text-*`, `--bg-*`, `--status-*`, etc.)
+  - colors (canonical names above)
   - spacing (`--space-*`)
   - typography (`--font-size-*`)
 - **Prefer consolidated spacing tokens**: use existing spacing tokens first and avoid adding new one-off spacing values unless there is a strong reuse case.
 - **Prefer relative units**: use `rem`, `%`, `vw/vh` where applicable (avoid fixed `px` for typography/spacing unless justified).
 - **Keep styles component-scoped and reusable**: avoid inline styles and avoid over-coupled selectors.
+- **Direct-DOM exception**: modal focus trapping in `src/components/ui/Modal.vue` queries and focuses dialog elements directly — the only sanctioned direct-DOM case.
 - **Avoid unnecessary `!important`** unless overriding third-party library styles and there is no cleaner option.
 - **When editing existing code**: if nearby violations are found, proactively suggest or apply low-risk improvements.
 

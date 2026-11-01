@@ -1,0 +1,52 @@
+// Canonical design tokens: /work/homelab-ai/docs/design/tokens.json (apps.pc2-laptimes)
+// Semantic names are shared across the estate; values are this app's identity.
+
+:root {
+  color-scheme: dark;
+
+  --canvas: #080d16;
+  --surface: #0e1626;
+  --surface-raised: #16223a;
+  --line: #1e2c44;
+  --line-strong: #2c3f60;
+  --line-control: #4b6693;
+
+  --fg: #e6edf7;
+  --muted: #94a6bf;
+
+  --accent: #4d8dff;
+  --accent-strong: #3b78e8;
+  --accent-soft: rgba(77, 141, 255, 0.14);
+
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --success-strong: #22b183;
+  --warning-strong: #dcae1f;
+  --danger-strong: #e05f5f;
+  --success-soft: rgba(52, 211, 153, 0.16);
+  --warning-soft: rgba(251, 191, 36, 0.16);
+  --danger-soft: rgba(248, 113, 113, 0.16);
+
+  --medal-gold: #f2c14e;
+  --medal-silver: #c9d2e0;
+  --medal-bronze: #c98a5a;
+  --medal-gold-soft: rgba(242, 193, 78, 0.12);
+  --medal-silver-soft: rgba(201, 210, 224, 0.1);
+  --medal-bronze-soft: rgba(201, 138, 90, 0.12);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --motion-fast: 150ms;
+  --motion-base: 250ms;
+  --motion-slow: 400ms;
+
+  --target-min: 44px;
+  --focus-width: 2px;
+  --focus-offset: 2px;
+
+  --shadow-overlay: rgba(0, 0, 0, 0.45);
+  --overlay-backdrop: rgba(3, 7, 15, 0.72);
+}

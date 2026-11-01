@@ -40,16 +40,15 @@ export default TableControls
 <style scoped lang="scss">
 .__tableControls {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5xl);
+  min-height: var(--target-min);
+  margin-bottom: var(--space-2xl);
 
   .__share {
-    position: absolute;
-    right: 0;
-    top: 0;
-  }
-  .__showFilter {
-    position: absolute;
-    left: 0;
-    top: 0;
+    margin-left: auto;
   }
 }
 

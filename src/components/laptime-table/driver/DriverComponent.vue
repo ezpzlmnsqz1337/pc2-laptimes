@@ -62,7 +62,7 @@ img {
 @media only screen and (max-width: 700px) {
   img {
     margin: var(--space-2xs);
-    width: 3rem;
+    width: 2rem;
   }
 }
 

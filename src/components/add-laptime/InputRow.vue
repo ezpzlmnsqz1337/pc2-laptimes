@@ -2,6 +2,8 @@
   <div
     class="__inputRow"
     :class="{__borderBottom: borderBottom}"
+    :role="heading ? 'group' : undefined"
+    :aria-label="heading || undefined"
   >
     <div
       v-if="heading"
@@ -97,7 +99,7 @@ export default InputRow
 
 .__borderBottom {
   padding-bottom: var(--space-8xl);
-  border-bottom: 0.1rem solid var(--border-light1);
+  border-bottom: 1px solid var(--line);
 }
 
 @media only screen and (max-width: 700px) {

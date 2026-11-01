@@ -6,7 +6,11 @@
     >
       <div class="__modalWrapper">
         <div
+          ref="dialog"
           class="__modalContainer"
+          role="dialog"
+          aria-modal="true"
+          tabindex="-1"
           @click.stop
         >
           <div class="__modalHeader">
@@ -31,10 +35,76 @@
 <script lang="ts">
 import { Options, Vue } from 'vue-class-component'
 
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+let modalCount = 0
+const openModals: Vue[] = []
+
 @Options({
   emits: ['close']
 })
-class Modal extends Vue {}
+class Modal extends Vue {
+  $refs!: { dialog: HTMLElement }
+  private lastFocused: HTMLElement | null = null
+  private titleId = `modal-title-${++modalCount}`
+
+  mounted () {
+    this.lastFocused = document.activeElement as HTMLElement
+    openModals.push(this)
+    window.addEventListener('keydown', this.onKeydown)
+    this.labelDialog()
+    this.focusFirst()
+  }
+
+  beforeUnmount () {
+    window.removeEventListener('keydown', this.onKeydown)
+    const index = openModals.indexOf(this)
+    if (index !== -1) openModals.splice(index, 1)
+    this.lastFocused?.focus?.()
+  }
+
+  labelDialog () {
+    const root = this.$refs.dialog
+    if (!root) return
+    const heading = root.querySelector<HTMLElement>('h2, h3')
+    if (!heading) return
+    if (!heading.id) heading.id = this.titleId
+    root.setAttribute('aria-labelledby', heading.id)
+  }
+
+  focusFirst () {
+    const root = this.$refs.dialog
+    if (!root) return
+    const target = root.querySelector<HTMLElement>(FOCUSABLE)
+    ;(target ?? root).focus()
+  }
+
+  onKeydown (e: KeyboardEvent) {
+    if (e.key === 'Escape') {
+      // Nested modals share the window target: only the topmost one reacts.
+      if (openModals[openModals.length - 1] !== this) return
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      this.$emit('close')
+      return
+    }
+    if (e.key !== 'Tab') return
+    const root = this.$refs.dialog
+    if (!root) return
+    const items = Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE))
+      .filter(el => el.offsetParent !== null)
+    if (items.length === 0) return
+    const first = items[0]
+    const last = items[items.length - 1]
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault()
+      last.focus()
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault()
+      first.focus()
+    }
+  }
+}
 export default Modal
 </script>
 
@@ -42,32 +112,33 @@ export default Modal
 .__modalMask {
   position: fixed;
   z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background-color: var(--overlay-backdrop);
-  display: table;
-  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8xl);
+  transition: opacity var(--motion-base) ease;
 }
 
 .__modalWrapper {
-  display: table-cell;
-  vertical-align: middle;
+  display: contents;
 }
 
 .__modalContainer {
-  min-width: 22rem;
-  max-width: 90vw;
+  min-width: min(22rem, 100%);
+  max-width: min(90vw, 60rem);
   max-height: 90vh;
-  margin: 0 auto;
-  padding: var(--space-8xl);
-  background-color: var(--bg-dark4);
-  box-shadow: 0 2px 8px var(--shadow-overlay);
-  transition: all 0.3s ease;
-  font-family: Helvetica, Arial, sans-serif;
-  overflow-y: scroll;
+  padding: var(--space-9xl);
+  background-color: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px var(--shadow-overlay);
+  transition: transform var(--motion-base) ease, opacity var(--motion-base) ease;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-y: auto;
   text-align: center;
+  color: var(--fg);
 }
 
 .__modalHeader {
@@ -75,7 +146,7 @@ export default Modal
 
   h3 {
     margin-top: 0;
-    color: var(--text-light1);
+    color: var(--fg);
   }
 }
 
@@ -87,26 +158,18 @@ export default Modal
   float: right;
 }
 
-/*
- * The following styles are auto-applied to elements with
- * transition="modal" when their visibility is toggled
- * by Vue.js.
- *
- * You can easily play with the modal transition by editing
- * these styles.
- */
-
-.modal-enter {
-  opacity: 0;
-}
-
+.modal-enter-active,
 .modal-leave-active {
+  transition: opacity var(--motion-base) ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
   opacity: 0;
 }
 
-.modal-enter .__modalContainer,
-.modal-leave-active .__modalContainer {
-  -webkit-transform: scale(1.1);
-  transform: scale(1.1);
+.modal-enter-from .__modalContainer,
+.modal-leave-to .__modalContainer {
+  transform: scale(.98);
 }
 </style>

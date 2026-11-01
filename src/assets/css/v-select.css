@@ -1,9 +1,46 @@
+.v-select {
+  color: var(--fg);
+}
+
 .v-select > .vs__dropdown-toggle {
-  background-color: var(--bg-light1);
-  padding: 0.5rem;
-  border-radius: 0;
+  background-color: var(--surface-raised);
+  border: 1px solid var(--line-control);
+  color: var(--fg);
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+}
+
+.v-select.vs--open > .vs__dropdown-toggle,
+.v-select > .vs__dropdown-toggle:focus-within {
+  border-color: var(--accent);
+}
+
+.vs__dropdown-menu {
+  background-color: var(--surface-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  color: var(--fg);
+}
+
+.vs__dropdown-option--highlight {
+  background-color: var(--accent);
+  color: var(--canvas);
+}
+
+.vs__selected {
+  color: var(--fg);
+}
+
+.vs__search,
+.vs__search::placeholder {
+  color: var(--muted);
+  background: transparent;
 }
 
 .vs__actions .vs__clear {
-  fill: red;
+  fill: var(--muted);
+}
+
+.vs__actions .vs__open-indicator {
+  fill: var(--muted);
 }

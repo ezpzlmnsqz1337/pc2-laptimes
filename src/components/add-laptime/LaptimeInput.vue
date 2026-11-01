@@ -6,7 +6,6 @@
     <input
       ref="minutesRef"
       v-model="minutes"
-      tabindex="1"
       type="text"
       maxlength="2"
       class="__minutes"
@@ -21,7 +20,6 @@
     <input
       ref="secondsRef"
       v-model="seconds"
-      tabindex="2"
       maxlength="2"
       type="text"
       class="__seconds"
@@ -36,7 +34,6 @@
     <input
       ref="millisecondsRef"
       v-model="milliseconds"
-      tabindex="3"
       maxlength="3"
       type="text"
       class="__milliseconds"
@@ -155,8 +152,8 @@ export default LaptimeInput
   }
 
   .__colon, .__dot {
-    background-color: var(--bg-light1);
-    color: var(--text-dark1);
+    background-color: var(--surface-raised);
+    color: var(--muted);
     font-size: var(--font-size-xl);
     padding-top: var(--space-sm);
     border: none;
@@ -165,12 +162,8 @@ export default LaptimeInput
   input {
     font-size: var(--font-size-xl);
 
-    &:focus {
-      outline: 0;
-    }
-
     &:disabled {
-      background-color: var(--bg-light1);
+      background-color: var(--surface);
     }
   }
 

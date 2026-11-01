@@ -32,11 +32,13 @@
         </Button>
       </div>
 
-      <RaceTotalsTable
-        :include-solo="includeSolo"
-        :filter-year="filterYear"
-        @show-driver-races="showDriverRaces"
-      />
+      <div class="__tableScroll">
+        <RaceTotalsTable
+          :include-solo="includeSolo"
+          :filter-year="filterYear"
+          @show-driver-races="showDriverRaces"
+        />
+      </div>
     </div>
 
     <div
@@ -302,7 +304,7 @@ export default Races
     margin-bottom: var(--space-8xl);
 
     .__selected {
-      background-color: var(--state-selected-bg) !important;
+      background-color: var(--surface-raised) !important;
     }
   }
 
@@ -331,13 +333,17 @@ export default Races
   }
 
   .__selected {
-    background-color: var(--state-selected-bg);
+    background-color: var(--surface-raised);
   }
 
   .__empty {
-    background-color: var(--bg-dark1);
+    background-color: var(--surface-raised);
     padding: var(--space-8xl);
     margin-top: var(--space-8xl);
+  }
+
+  .__tableScroll {
+    max-width: 100%;
   }
 
   .__racesList {
@@ -357,6 +363,13 @@ export default Races
       align-items: stretch;
     }
 
+    .__tableScroll {
+      overflow-x: auto;
+    }
+
+    .__racesList {
+      overflow-x: auto;
+    }
   }
 }
 </style>

@@ -26,6 +26,7 @@ const DB_RECONNECT_DELAY_MS = 5000
 const HTTP_UNAUTHORIZED = 401
 const HTTP_FORBIDDEN = 403
 const WRITE_AUTH_ERROR_MESSAGE = 'Saving failed: this app build has no valid database write credential.'
+const LOAD_TIMES_ERROR_MESSAGE = 'Could not load laptimes.'
 
 type WriteMethod = 'POST' | 'PATCH' | 'DELETE'
 
@@ -198,6 +199,7 @@ export interface DataStore {
   tracks: Track[]
   drivers: Driver[]
   lastAddedLaptime: Laptime | null
+  loadError: string | null
   getCarById(id: string): Car | undefined
   getCarByGameId(id: string): Car | undefined
   getTrackByGameId(id: string): Track | undefined
@@ -261,6 +263,7 @@ export const dataStore: DataStore = {
   tracks: [],
   drivers: [],
   lastAddedLaptime: null,
+  loadError: null,
   getCarById (id: string) {
     return this.cars.find(x => x.uid === id)
   },
@@ -557,8 +560,12 @@ export const dataStore: DataStore = {
     this.refreshRaceTotals()
   },
   async fetchTimes () {
+    this.loadError = null
     const times = await fetchCollection<RawLaptime>(TIMES_ENDPOINT, 'laptimes')
-    if (!times) return
+    if (!times) {
+      this.loadError = LOAD_TIMES_ERROR_MESSAGE
+      return
+    }
 
     this.times = times.map((x) => {
       const camelCased = objectToCamel(x)

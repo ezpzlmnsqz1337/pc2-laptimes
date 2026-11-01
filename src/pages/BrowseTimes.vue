@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="__browseTimes"
-    @keypress="onKeyPressEvent($event)"
-  >
+  <div class="__browseTimes">
     <LaptimeFilterComponent
       ref="filterRef"
       :show-filter="showFilter"
@@ -15,7 +12,10 @@
         @filter:toggle="toggleFilter()"
         @share:click="share()"
       />
-      <h2>Laptime board</h2>
+      <div class="__tableHeading">
+        <h2>Laptime board</h2>
+        <span class="__count">{{ times.length }} recorded laps</span>
+      </div>
       <LaptimeTable
         ref="tableRef"
         :last-added-laptime="lastAddedLaptime"
@@ -33,6 +33,9 @@ import eb from '@/eventBus'
 import { LaptimeFilter } from '@/store/dataStore'
 import { Options, Vue } from 'vue-class-component'
 
+const URL_FILTER_POLL_INTERVAL_MS = 500
+const URL_FILTER_POLL_MAX_TRIES = 20
+
 @Options({
   components: {
     LaptimeFilterComponent,
@@ -42,6 +45,8 @@ import { Options, Vue } from 'vue-class-component'
 })
 class BrowseTimes extends Vue {
   showFilter = true
+
+  private urlFilterPollTimer: number | null = null
 
   $refs!: {
     tableRef: InstanceType<typeof LaptimeTable>,
@@ -77,11 +82,36 @@ class BrowseTimes extends Vue {
     }
     this.$refs.tableRef.filterRef = this.$refs.filterRef
     this.$refs.tableRef.loading = true
-    setTimeout(() => this.handleUrl(), 500)
+    this.pollFilterData()
+  }
+
+  beforeUnmount () {
+    this.stopUrlFilterPoll()
+  }
+
+  pollFilterData () {
+    let tries = 0
+    this.urlFilterPollTimer = window.setInterval(() => {
+      tries++
+      if (this.queryParams.has('filter') || this.times.length) {
+        this.stopUrlFilterPoll()
+        this.handleUrl()
+      } else if (tries >= URL_FILTER_POLL_MAX_TRIES) {
+        this.stopUrlFilterPoll()
+        this.$refs.tableRef.loadData()
+      }
+    }, URL_FILTER_POLL_INTERVAL_MS)
+  }
+
+  stopUrlFilterPoll () {
+    if (this.urlFilterPollTimer === null) return
+    window.clearInterval(this.urlFilterPollTimer)
+    this.urlFilterPollTimer = null
   }
 
   onKeyPressEvent (e: KeyboardEvent) {
     if (this.activeScreen !== ScreenType.BROWSE_TIMES) return
+    if (e.target instanceof HTMLElement && e.target.closest('input, select, textarea, [contenteditable="true"]')) return
     if (e.key === 'f') {
       this.toggleFilter()
     } else if (e.key === 'c') {
@@ -123,30 +153,57 @@ export default BrowseTimes
 .__laptimeTable {
   width: 100%;
   padding: var(--space-8xl);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.__tableHeading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-8xl);
+  flex-wrap: wrap;
+  margin: var(--space-10xl) 0 var(--space-8xl);
+  text-align: left;
+}
+
+.__count {
+  color: var(--muted);
+  font-size: var(--font-size-compact);
+  font-variant-numeric: tabular-nums;
 }
 
 .__browseTimes {
   padding: var(--space-11xl) var(--space-8xl) var(--space-8xl);
   margin: 0 auto;
-  text-align: center;
+  text-align: left;
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
+  align-items: flex-start;
+  gap: var(--space-10xl);
 }
 
 @media only screen and (max-width: 1024px) {
   .__browseTimes {
     flex-direction: column;
+    gap: var(--space-8xl);
   }
 
   .__laptimeTable {
-    padding: 0;
+    padding: var(--space-5xl);
   }
 }
 
 @media only screen and (max-width: 700px) {
   .__browseTimes {
-    padding: var(--space-8xl);
+    padding: var(--space-8xl) var(--space-5xl);
   }
 }
 </style>

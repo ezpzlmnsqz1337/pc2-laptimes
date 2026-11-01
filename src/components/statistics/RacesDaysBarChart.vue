@@ -22,8 +22,13 @@ import { Bar } from 'vue-chartjs'
 import { Options, Vue, prop } from 'vue-class-component'
 
 const CHART_LAYOUT_PADDING = 50
+const CHART_LAYOUT_PADDING_MOBILE = 8
 const CHART_TICK_WIDTH = 30
 const CHART_FONT_SIZE = 18
+const CHART_FONT_SIZE_MOBILE = 11
+const CHART_MAX_Y_TICKS = 8
+const CHART_LEGEND_BOX_WIDTH_MOBILE = 12
+const MOBILE_MEDIA_QUERY = '(max-width: 700px)'
 
 const CHART_COLOR_TOKENS = [
   '--chart-color-1',
@@ -96,63 +101,73 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
     myChart: InstanceType<typeof Bar>,
   }
 
-  chartOptions = {
-    responsive: true,
-    indexAxis: 'y',
-    font: {
-      family: "'Open Sans', Helvetica, Arial, sans-serif"
-    },
-    layout: {
-      color: cssVariable('--text-dark1'),
-      padding: CHART_LAYOUT_PADDING
-    },
-    scales: {
-      x: {
-        grid: { display: false },
-        stacked: true,
-        ticks: {
-          color: cssVariable('--text-light1'),
-          tickWidth: CHART_TICK_WIDTH,
-          font: {
-            size: CHART_FONT_SIZE
+  chartOptions = this.buildChartOptions(false)
+  private isMobileViewport = false
+  private viewportHandler = () => this.syncViewport()
+
+  buildChartOptions (isMobile: boolean) {
+    const fontSize = isMobile ? CHART_FONT_SIZE_MOBILE : CHART_FONT_SIZE
+    const textColor = cssVariable('--fg')
+    return {
+      responsive: true,
+      indexAxis: 'y',
+      font: {
+        family: "'Inter', ui-sans-serif, system-ui, sans-serif"
+      },
+      layout: {
+        padding: isMobile ? CHART_LAYOUT_PADDING_MOBILE : CHART_LAYOUT_PADDING
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          stacked: true,
+          ticks: {
+            color: textColor,
+            tickWidth: CHART_TICK_WIDTH,
+            font: {
+              size: fontSize
+            }
+          }
+        },
+        y: {
+          stacked: true,
+          grid: { display: false },
+          ticks: {
+            color: textColor,
+            tickWidth: CHART_TICK_WIDTH,
+            font: {
+              size: fontSize
+            },
+            ...(isMobile ? { autoSkip: true, maxTicksLimit: CHART_MAX_Y_TICKS } : {})
           }
         }
       },
-      y: {
-        stacked: true,
-        grid: { display: false },
-        ticks: {
-          color: cssVariable('--text-light1'),
-          tickWidth: CHART_TICK_WIDTH,
-          font: {
-            size: CHART_FONT_SIZE
+      plugins: {
+        legend: {
+          position: isMobile ? 'bottom' : 'top',
+          labels: {
+            color: textColor,
+            font: {
+              size: fontSize
+            },
+            padding: 10,
+            ...(isMobile ? { boxWidth: CHART_LEGEND_BOX_WIDTH_MOBILE } : {})
           }
-        }
-      }
-    },
-    plugins: {
-      legend: {
-        labels: {
-          color: cssVariable('--text-light1'),
-          font: {
-            size: CHART_FONT_SIZE
+        },
+        tooltip: {
+          position: 'average',
+          titleSpacing: 0,
+          titleMarginBottom: 0,
+          titleFont: {
+            size: 0
           },
-          padding: 10
+          displayColors: false,
+          bodyFont: {
+            size: fontSize
+          },
+          padding: 10,
+          yAlign: 'bottom'
         }
-      },
-      tooltip: {
-        position: 'average',
-        titleSpacing: 0,
-        titleMarginBottom: 0,
-        titleFont: {
-          size: 0
-        },
-        displayColors: false,
-        bodyFont: {
-          size: CHART_FONT_SIZE
-        },
-        padding: 10,
-        yAlign: 'bottom'
       }
     }
   }
@@ -162,7 +177,20 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
   }
 
   mounted () {
+    this.syncViewport()
+    window.addEventListener('resize', this.viewportHandler)
     this.getData()
+  }
+
+  beforeUnmount () {
+    window.removeEventListener('resize', this.viewportHandler)
+  }
+
+  syncViewport () {
+    const isMobile = typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_MEDIA_QUERY).matches
+    if (isMobile === this.isMobileViewport) return
+    this.isMobileViewport = isMobile
+    this.chartOptions = this.buildChartOptions(isMobile)
   }
 
   countNumberOfRaces (laptimes: Laptime[]): RacesByDate {

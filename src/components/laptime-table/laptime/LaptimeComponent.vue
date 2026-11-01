@@ -40,11 +40,13 @@ export default LaptimeComponent
   flex-direction: row;
   gap: 1rem;
   padding: 0 var(--space-8xl);
+  font-variant-numeric: tabular-nums;
 }
 
 .__losing {
   white-space: nowrap;
-  color: #c20000;
+  color: var(--muted);
+  font-size: var(--font-size-xs);
 }
 
 @media only screen and (max-width: 1300px) {

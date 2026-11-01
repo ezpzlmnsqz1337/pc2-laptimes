@@ -252,14 +252,14 @@ table {
     }
 
     tr:nth-child(odd):hover {
-      color: var(--text-light1);
-      background-color: var(--bg-dark1);
+      color: var(--fg);
+      background-color: var(--surface-raised);
       cursor: default;
     }
 
     tr:nth-child(even):hover {
-      color: var(--text-dark1);
-      background-color: var(--bg-light1);
+      color: var(--fg);
+      background-color: var(--surface-raised);
       cursor: default;
     }
   }
@@ -270,7 +270,7 @@ table {
       text-decoration: none;
 
       &:hover {
-        color: var(--hover);
+        color: var(--accent);
       }
     }
   }
@@ -366,7 +366,7 @@ table {
   }
 
   thead th {
-    border-bottom: 1px solid var(--table-border, var(--bg-light2));
+    border-bottom: 1px solid var(--line);
   }
 
   tbody tr:hover {
@@ -374,13 +374,13 @@ table {
   }
 
   tbody tr:nth-child(odd) {
-    color: var(--text-light1);
-    background-color: var(--bg-dark1);
+    color: var(--fg);
+    background-color: var(--surface-raised);
   }
 
   tbody tr:nth-child(even) {
-    color: var(--text-dark1);
-    background-color: var(--bg-light1);
+    color: var(--fg);
+    background-color: var(--surface-raised);
   }
 }
 
@@ -394,20 +394,20 @@ table {
   min-width: 5.5rem;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-  border-radius: var(--space-md);
+  border-radius: var(--radius-sm);
   color: inherit;
 }
 
 .__h2hWin {
-  background-color: var(--status-success-soft);
+  background-color: var(--success-soft);
 }
 
 .__h2hLoss {
-  background-color: var(--status-error-soft);
+  background-color: var(--danger-soft);
 }
 
 .__h2hEven {
-  background-color: var(--surface-highlight-soft);
+  background-color: var(--accent-soft);
 }
 
 .__carDetailItem {
