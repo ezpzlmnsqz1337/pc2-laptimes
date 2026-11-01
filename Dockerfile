@@ -20,6 +20,9 @@ RUN apk add --no-cache nodejs npm
 # Copy the built web app
 COPY --from=build /app/dist /usr/share/nginx/html
 
+# Custom nginx config: no-store for index.html/service-worker.js, immutable hashed assets
+COPY deployment/nginx-default.conf /etc/nginx/conf.d/default.conf
+
 # Copy and setup WebSocket server
 WORKDIR /app/ws-server
 COPY ws-server/package*.json ./

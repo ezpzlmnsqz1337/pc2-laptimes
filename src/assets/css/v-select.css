@@ -22,6 +22,11 @@
   color: var(--fg);
 }
 
+.vs__dropdown-option {
+  color: var(--fg);
+  background: transparent;
+}
+
 .vs__dropdown-option--highlight {
   background-color: var(--accent);
   color: var(--canvas);
@@ -43,4 +48,35 @@
 
 .vs__actions .vs__open-indicator {
   fill: var(--muted);
+}
+
+/* vue-select renders native button/input elements; reset the browser defaults
+   so they stay on the dark surface instead of a white box. */
+.v-select button {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  color: var(--muted);
+}
+
+.v-select .vs__actions {
+  background: transparent;
+}
+
+.v-select input {
+  background: transparent;
+}
+
+.v-select.vs--disabled .vs__dropdown-toggle {
+  background: var(--surface);
+}
+
+.v-select.vs--disabled .vs__selected,
+.v-select.vs--disabled .vs__search {
+  color: var(--muted);
+  background: transparent;
+}
+
+.v-select.vs--disabled .vs__open-indicator {
+  background: transparent;
 }

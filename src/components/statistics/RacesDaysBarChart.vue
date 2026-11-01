@@ -29,6 +29,7 @@ const CHART_FONT_SIZE_MOBILE = 11
 const CHART_MAX_Y_TICKS = 8
 const CHART_LEGEND_BOX_WIDTH_MOBILE = 12
 const MOBILE_MEDIA_QUERY = '(max-width: 700px)'
+const MONTH_LABEL_FORMAT: Intl.DateTimeFormatOptions = { month: 'numeric', year: 'numeric' }
 
 const CHART_COLOR_TOKENS = [
   '--chart-color-1',
@@ -50,13 +51,19 @@ interface Drivers {
   [name: string]: number
 }
 
-interface RacesAndDrivers {
+interface RacePeriod {
+  key: string
+  label: string
+}
+
+interface RacesInPeriod {
+  label: string
   totalRaces: number
   drivers: Drivers
 }
 
-interface RacesByDate {
-  [date: string]: RacesAndDrivers
+interface RacesByPeriod {
+  [key: string]: RacesInPeriod
 }
 
 export interface ChartClickEvent {
@@ -177,7 +184,7 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
   }
 
   mounted () {
-    this.syncViewport()
+    this.applyViewport(this.matchesMobileViewport())
     window.addEventListener('resize', this.viewportHandler)
     this.getData()
   }
@@ -186,37 +193,62 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
     window.removeEventListener('resize', this.viewportHandler)
   }
 
-  syncViewport () {
-    const isMobile = typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_MEDIA_QUERY).matches
-    if (isMobile === this.isMobileViewport) return
+  matchesMobileViewport () {
+    return typeof window.matchMedia === 'function' && window.matchMedia(MOBILE_MEDIA_QUERY).matches
+  }
+
+  applyViewport (isMobile: boolean) {
     this.isMobileViewport = isMobile
     this.chartOptions = this.buildChartOptions(isMobile)
   }
 
-  countNumberOfRaces (laptimes: Laptime[]): RacesByDate {
-    const result = {} as RacesByDate
+  syncViewport () {
+    const isMobile = this.matchesMobileViewport()
+    if (isMobile === this.isMobileViewport) return
+    this.applyViewport(isMobile)
+    this.getData()
+  }
+
+  countNumberOfRaces (laptimes: Laptime[]): RacesByPeriod {
+    const result = {} as RacesByPeriod
     laptimes.forEach(x => {
       const driverName = this.$dataStore.getDriverById(x.driverId)!.name
-      const date = new Date(x.date).toLocaleDateString()
-      if (!result[date]) {
-        result[date] = { totalRaces: 0, drivers: {} }
+      const period = this.getRacePeriod(new Date(x.date))
+      if (!result[period.key]) {
+        result[period.key] = { label: period.label, totalRaces: 0, drivers: {} }
       }
-      result[date].totalRaces += 1
-      if (!result[date].drivers[driverName]) {
-        result[date].drivers[driverName] = 0
+      const racesInPeriod = result[period.key]
+      racesInPeriod.totalRaces += 1
+      if (!racesInPeriod.drivers[driverName]) {
+        racesInPeriod.drivers[driverName] = 0
       }
-      result[date].drivers[driverName] += 1
+      racesInPeriod.drivers[driverName] += 1
     })
     return result
   }
 
-  generateChartData (noOfRaces: RacesByDate, activeDrivers: string[]) {
-    Object.keys(noOfRaces).forEach(date => {
-      this.chartData.labels.push(date)
+  getRacePeriod (date: Date): RacePeriod {
+    if (!this.isMobileViewport) {
+      const label = date.toLocaleDateString()
+      return { key: label, label }
+    }
+
+    const year = date.getFullYear()
+    const month = date.getMonth() + 1
+    return {
+      key: `${year}-${String(month).padStart(2, '0')}`,
+      label: new Date(year, month - 1).toLocaleDateString(undefined, MONTH_LABEL_FORMAT)
+    }
+  }
+
+  generateChartData (noOfRaces: RacesByPeriod, activeDrivers: string[]) {
+    this.getPeriodKeys(noOfRaces).forEach(key => {
+      const racesInPeriod = noOfRaces[key]
+      this.chartData.labels.push(racesInPeriod.label)
 
       activeDrivers.forEach(name => {
         const ds = this.getDatasetByLabel(name)
-        ds.data.push(noOfRaces[date].drivers[name] || 0)
+        ds.data.push(racesInPeriod.drivers[name] || 0)
         ds.stack = 'drivers'
       })
     })
@@ -224,6 +256,11 @@ class RacesDaysBarChart extends Vue.with(RacesDaysBarChartProps) {
     this.chartData.datasets.forEach((x, index) => {
       x.backgroundColor = this.chartColors[index % this.chartColors.length]
     })
+  }
+
+  getPeriodKeys (noOfRaces: RacesByPeriod): string[] {
+    const keys = Object.keys(noOfRaces)
+    return this.isMobileViewport ? keys.sort() : keys
   }
 
   async getData () {

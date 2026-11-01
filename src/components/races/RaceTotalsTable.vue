@@ -421,12 +421,26 @@ table {
 }
 
 @media only screen and (max-width: 700px) {
+  table {
+    td {
+      padding: var(--space-2xs) var(--space-sm);
+      font-size: var(--font-size-compact);
+    }
+  }
+
+  td:nth-child(3),
+  td:nth-child(4),
+  td:nth-child(5) {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
   .__rank img {
-    width: 3rem;
+    width: 2rem;
   }
 
   .__carCell img {
-    width: 4rem;
+    width: 2.5rem;
   }
 
   .__detailsGrid {

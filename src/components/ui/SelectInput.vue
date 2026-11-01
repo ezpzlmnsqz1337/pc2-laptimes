@@ -51,12 +51,11 @@ export default SelectInput
 
 .__selected {
   :deep(.vs__dropdown-toggle) {
-    border: 0.1rem solid var(--dark-blue1);
-    box-shadow: 0px 0px 5px 2px var(--dark-blue1);
+    border: 1px solid var(--accent);
   }
 
   :deep(span.vs__selected) {
-    color: var(--dark-blue1);
+    color: var(--fg);
     font-weight: bold;
   }
 }
