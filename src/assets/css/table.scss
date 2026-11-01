@@ -216,6 +216,8 @@ table td.__loading {
     background: var(--surface-raised);
     border: 1px solid var(--line);
     border-radius: var(--radius-md);
+    min-width: 0;
+    overflow: hidden;
 
     td {
       display: flex;
@@ -224,8 +226,16 @@ table td.__loading {
       justify-content: space-between;
       gap: var(--space-2xl);
       min-width: 0;
+      overflow-wrap: anywhere;
       padding: var(--space-sm) 0;
       border: 0;
+
+      // Flex items default to min-width: auto, which keeps them at max-content
+      // width and pushes long names/badges past the card.
+      > * {
+        min-width: 0;
+        max-width: 100%;
+      }
 
       &::before {
         content: attr(data-label);
@@ -235,6 +245,7 @@ table td.__loading {
         font-weight: 600;
         letter-spacing: 0.08em;
         text-transform: uppercase;
+        flex-shrink: 0;
       }
 
       &.__loading {
@@ -244,6 +255,15 @@ table td.__loading {
         &::before {
           content: none;
         }
+      }
+
+      // RaceSettings renders one badge per setting as direct children of the
+      // cell, so the cell itself is the badge row.
+      &.__settings {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: var(--space-2xs);
+        max-width: 100%;
       }
     }
   }
@@ -266,6 +286,11 @@ table td.__loading {
     top: var(--space-2xl);
     padding: var(--space-sm) var(--space-sm) var(--space-sm) 0;
     width: 100%;
+  }
+
+  .medal-pill {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .__settings {
@@ -291,5 +316,11 @@ table td.__loading {
   .__driver img {
     margin: var(--space-2xs);
     width: 2rem;
+  }
+
+  // :deep() because the car and driver images belong to child components.
+  tr.__row td :deep(img) {
+    max-width: 100%;
+    height: auto;
   }
 }
