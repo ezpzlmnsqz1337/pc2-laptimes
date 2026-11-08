@@ -6,6 +6,11 @@ ContainerName=pc2-laptimes-swagger
 Image=docker.io/swaggerapi/swagger-ui:latest
 PodmanArgs=--memory=128m
 Pod=pc2-laptimes.pod
+HealthCmd=curl -fsS http://127.0.0.1:8081/
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
+HealthOnFailure=restart
 Environment=PORT=8081
 EnvironmentFile=/home/hosting/.config/containers/systemd/env/pc2-swagger.env
 

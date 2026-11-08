@@ -11,6 +11,11 @@ Secret=pg_pass,type=mount,target=/run/secrets/pg_pass
 Environment=POSTGRES_PASSWORD_FILE=/run/secrets/pg_pass
 Environment=POSTGRES_SHARED_BUFFERS=128MB
 Environment=POSTGRES_EFFECTIVE_CACHE_SIZE=256MB
+HealthCmd=pg_isready -U postgres -d postgres
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
+HealthOnFailure=restart
 
 [Service]
 Restart=always

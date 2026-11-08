@@ -6,6 +6,11 @@ ContainerName=pc2-laptimes-adminer
 Image=docker.io/library/adminer:5
 PodmanArgs=--memory=128m
 Pod=pc2-laptimes.pod
+HealthCmd=curl -fsS http://127.0.0.1:8080/
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
+HealthOnFailure=restart
 
 [Service]
 Restart=always

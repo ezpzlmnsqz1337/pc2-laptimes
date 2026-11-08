@@ -6,6 +6,11 @@ ContainerName=pc2-laptimes-app
 Image=localhost/pc2-laptimes:latest
 PodmanArgs=--memory=256m
 Pod=pc2-laptimes.pod
+HealthCmd=curl -fsS http://127.0.0.1:80/
+HealthInterval=30s
+HealthRetries=3
+HealthStartPeriod=30s
+HealthOnFailure=restart
 
 [Service]
 Restart=always
